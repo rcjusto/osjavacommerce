@@ -1,0 +1,100 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($userGroup.idGroup)
+        #label('admin.customer.group.modify') ID: $!userGroup.idGroup
+    #else
+        #label('admin.customer.group.new')
+    #end
+</h1>
+<form action="$!action.url('customergroupsave','admin')" method="post" class="validable">
+    #shidden('name=idUserGroup' "value=$!userGroup.idGroup")
+    <div class="formulario">
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.group.name')</th>
+                <td>
+                    #stextfield('name=userGroup.groupName' 'cssClass=field string-medium required')
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            <button type="button" href="$!action.url('customergrouplist','admin')"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+#if ($userGroup.idGroup)
+<form action="$!action.url('customergroupedit','admin')" method="post" class="validable">
+    #shidden('name=idUserGroup' "value=$!userGroup.idGroup")
+    <h2 class="block-title">#label('admin.customers.in.group')</h2>
+
+    <div class="listado">
+        #set($nav=$groupusers)
+        #parse('/WEB-INF/views/admin/navigator.vm')
+
+        #if($util.isNotEmpty($groupusers.listado))
+        <table class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                <th>#label('admin.id')</th>
+                <th>#label('admin.user.id')</th>
+                <th>#label('admin.name')</th>
+                <th>#label('admin.email')</th>
+                <th>#label('admin.visits')</th>
+            </tr>
+            #foreach($u in $groupusers.listado)
+                <tr>
+                    <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!u.user.idUser"/></td>
+                    <td>$!u.user.idUser</td>
+                    <td>$!u.user.userId</td>
+                    <td>$!u.user.fullName</td>
+                    <td>$!u.user.email</td>
+                    <td>$!u.user.visits</td>
+                </tr>
+            #end
+        </table>
+        #else
+            <div class="info">
+                <p>#label('admin.customers.group.empty')</p>
+            </div>
+        #end
+        <div class="button-bar">
+        #if($util.isNotEmpty($groupusers.listado))
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #end
+            <button type="button" id="btnAddCustomers"><span class="add">#label('admin.add.customers')</span></button>
+        </div>
+    </div>
+</form>
+#end
+<form id="formAddUser" action="$!action.url('customergroupadd','admin')" method="post">
+    #shidden('name=idUserGroup' "value=$!userGroup.idGroup")
+</form>
+<script type="text/javascript">
+    $(function(){
+        $('#btnAddCustomers').click(function(){
+            $('#dialogContent').loading("$!action.getText('admin.loading.users')", "$!action.getText('admin.please.wait')");
+            $('#dialogContent').load("$action.url('customerlist','admin')", {output:'selector',multiple:'true', rnd:Math.random()}, function() {
+                $('#dialogo').find('button.buttonOk:first').click(function() {
+                    if ($('#formAddUser').find("input[name='addUser']").size()>0) {
+                        $('#formAddUser').submit();
+                    }
+                    $('#dialogo').dialog('close');
+                });
+            });
+            $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+            return false;
+        });
+        $('input.check-user').live('change', function(){
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                $('<input>').attr('type','hidden').attr('id','u'+id).attr('name','addUser').val(id).appendTo('#formAddUser');
+            } else {
+                $('#u'+id).remove();
+            }
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

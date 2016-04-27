@@ -1,0 +1,107 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text() == 'hide filters') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+            jQuery.cookie('filters.visible', 'false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text('hide filters');
+            jQuery.cookie('filters.visible', 'true');
+        }
+    }
+    $(function() {
+        if (jQuery.cookie('filters.visible') == 'false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+        }
+    });
+</script>
+<h1 style="float:left;">#label('admin.product.registration.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">hide filters</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    <form action="$!action.url('product_registrations')" method="post" class="validable">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.purchase.place')</th>
+                    <td>#stextfield('name=filterPlace' 'cssClass=field string-short')</td>
+                    <th>#label('admin.model.number')</th>
+                    <td>#stextfield('name=filterModel' 'cssClass=field string-short')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.from')</th>
+                    <td><input type="text" name="filterDateFrom" value="$!util.formatDate($filterDateFrom)" class="field date"/></td>
+                    <th>#label('admin.to')</th>
+                    <td><input type="text" name="filterDateTo" value="$!util.formatDate($filterDateTo)" class="field date"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.user')</th>
+                    <td>#stextfield('name=filterUser' 'cssClass=field string-medium')</td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{registrations.name}_pagerows').val($(this).val());" class="field">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$registrations.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th>
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+
+
+        #if($util.isNotEmpty($registrations.listado))
+            #set($nav=$registrations)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th>#label('admin.id')</th>
+                    <th>#label('admin.user')</th>
+                    <th>#label('admin.date')</th>
+                    <th>#label('admin.purchase.place')</th>
+                    <th>#label('admin.invoice.number')</th>
+                    <th>#label('admin.model.number')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($c in $registrations.listado)
+                    #surl('id=urlView' "action=product_registration" 'namespace=/admin' "idRegistration=$!c.id")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!c.id"/></td>
+                        <td>$!c.id</td>
+                        <td>$!c.user.fullName</td>
+                        <td>$!util.formatDate($c.purchaseDate)</td>
+                        <td>$!c.purchasePlace</td>
+                        <td>$!c.invoiceNumber</td>
+                        <td>$!c.modelNumber</td>
+                        <td class="link-bar">
+                            <a href="$urlView"><span class="view">#label('admin.details')</span></a>
+                        </td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <p>#label('admin.product.registration.not.found')</p>
+            </div>
+        #end
+
+        <div class="button-bar">
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        </div>
+    </form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

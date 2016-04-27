@@ -1,0 +1,7 @@
+    </div>
+    </div>
+    <div id="footer">#parse('/WEB-INF/views/admin/footer.vm')</div>
+</div>
+    <div id="dialogo"><div id="dialogContent"></div></div>
+</body>
+</html>

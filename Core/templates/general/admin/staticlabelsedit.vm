@@ -1,0 +1,49 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($localizedText.id)
+        #label('admin.label.modify')
+    #else
+        #label('admin.label.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=staticlabelsave")
+<form action="$urlForm" method="post">
+#shidden('name=staticId' "value=$!localizedText.code")
+#shidden('name=localizedText.type' 'value=LABEL')
+#shidden('name=localizedText.id')
+<div class="formulario">
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.code')</th>
+            <td>
+                #if ($localizedText.id)
+                    <input type="text" readonly="readonly" value="$!localizedText.code" class="field readonly string-medium"/>
+                #else
+                    #stextfield('name=localizedText.code' 'cssClass=field string-medium')
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.category')</th>
+            <td>
+                #stextfield('name=localizedText.category' 'cssClass=field required string-medium')
+            </td>
+        </tr>
+        #foreach($l in $languages)
+            <tr>
+                <th class="required">#label('admin.value') $l:</th>
+                <td>
+                    <textarea name="localizedText_value" class="field required string-large">$!esc.html($localizedText.getValueLang($l))</textarea>
+                </td>
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=staticlabels" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

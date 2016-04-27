@@ -1,0 +1,55 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($statusCode && $util.isNotEmpty($statusCode))
+        #label('admin.rma.status.modify')
+    #else
+        #label('admin.rma.status.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savermastatus")
+<form action="$urlForm" method="post" class="validable">
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>#label('admin.code')</th>
+                <td>
+                    #if($statusCode && $util.isNotEmpty($statusCode))
+                        <input type="hidden" name="statusCode" value="$!statusCode"/>
+                        <input type="text" readonly="readonly" value="$!statusCode" class="readonly field string-medium"/>
+                    #else
+                        <input type="text" name="statusCode" value="$!statusCode" class="required field string-medium"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.name')</th>
+                <td>
+                    <input name="vis_statusName" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="statusName" value="$!names.getValueLang($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.text')</th>
+                <td>
+                    <textarea name="vis_statusText" rows="10" class="multilang field string-large"></textarea>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="statusText" value="$!texts.getValueLang($l)"/>
+                    #end
+                    <a href="#" class="textarea-ckeditor"></a>
+                </td>
+            </tr>
+        </table>
+
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listrmastatus" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

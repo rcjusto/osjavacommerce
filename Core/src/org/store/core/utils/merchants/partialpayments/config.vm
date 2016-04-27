@@ -1,0 +1,37 @@
+<tr>
+    <td colspan="2">
+        <h2>Configurar opciones de pago</h2>
+        <table class="sheet formulario">
+            <tr>
+                <th>#label('initial.percent')</th>
+                <th>#label('partial.percent')</th>
+                <th>#label('partial.frequency')</th>
+                <th>#label('partial.payments.number')</th>
+                <th>#label('payment.interest')</th>
+                <th>#label('payment.option.name')</th>
+                <th>#label('payment.total.days')</th>
+            </tr>
+            #foreach($pc in $payments)
+                <tr>
+                    <td><input type="text" name="initialPercent" value="$!util.formatNumber($pc.initialPercent, '0.00')" class="field decimal"/></td>
+                    <td><input type="text" name="partialPercent" value="$!util.formatNumber($pc.partialPercent, '0.00')" class="field decimal"/></td>
+                    <td><input type="text" name="frequencyDays" value="$!pc.frequencyDays" class="field integer"/></td>
+                    <td><input type="text" name="partialPayments" value="$!pc.partialPayments" class="field integer"/></td>
+                    <td><input type="text" name="interestPercent" class="field decimal" value="$!util.formatNumber($pc.interestPercent,'0.00')"/></td>
+                    <td><input type="text" name="paymentOptionName" value="$!pc.name" class="field string-150"/></td>
+                    <td><input type="text" readonly="readonly" class="field readonly integer" value="$!pc.totalDays"/></td>
+                </tr>
+            #end
+            #foreach($opt in [1..5])
+            <tr>
+                <td><input type="text" name="initialPercent" value="" class="field decimal"/></td>
+                <td><input type="text" name="partialPercent" value="" class="field decimal"/></td>
+                <td><input type="text" name="frequencyDays" value="" class="field integer"/></td>
+                <td><input type="text" name="partialPayments" value="" class="field integer"/></td>
+                <td><input type="text" name="interestPercent" value="" class="field decimal"/></td>
+                <td><input type="text" name="paymentOptionName" value="" class="field string-150"/></td>
+            </tr>
+            #end
+        </table>
+    </td>
+</tr>

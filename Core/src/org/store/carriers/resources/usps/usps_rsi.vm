@@ -1,0 +1,1 @@
+<IntlRateRequest USERID="$!bean.user">#foreach( $pack in $bean.packages )<Package ID="$velocityCount"><Pounds>$!pack.pounds</Pounds><Ounces>$pack.onces</Ounces><MailType>$!bean.mailType</MailType><Country>$!bean.country</Country></Package>#end</IntlRateRequest>

@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/struts/css/clear.css"/>
+    <link rel="stylesheet" type="text/css" href="$!action.skinFile('css/admin.css')"/>
+    <script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            #if($upload_products && $upload_products>0)
+                parent.$(parent.document).trigger("uploadImg");
+            #end
+        });
+    </script>
+</head>
+<body style="margin: 0;padding: 0">
+#actionErrors()
+<form action="$!action.url('imagesupload','admin')" method="post" enctype="multipart/form-data">
+    #foreach($i in [1..5])
+        <div style="margin-bottom: 6px;">
+            <input type="file" name="newImages" value="" class="field" size="15">
+        </div>
+    #end
+    <div>
+        <button type="submit"><span>#label('admin.upload.all')</span></button>
+    </div>
+</form>
+</body>
+</html>

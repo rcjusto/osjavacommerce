@@ -1,0 +1,11 @@
+body {font: 10pt Arial, Helvetica, serif;background-color:#ffffff;padding:0;}
+h1,h2,h3,p {margin:0;}
+table {border-collapse: separate;border-spacing:0;empty-cells:show;}
+td, th {text-align: left;}
+table.with-border {border-right:1px solid #666666;border-bottom:1px solid #666666;color:#333333;font-size:11pt;}
+table.with-border td, table.with-border th {border-left:1px solid #666666;border-top:1px solid #666666;padding:3px 6px;text-align:left;}
+table.with-border th {background-color:#eeeeee;font-weight:bold;font-size:10pt;}
+table.with-border tr.subtotal th,table.with-border tr.subtotal td {background-color:#fbfbfb;}
+table.with-border tr.total th,table.with-border tr.total td {background-color:#fbfbfb;font-weight:bold;border-top:3px solid #666666;font-size:12pt;}
+table.with-border .price {text-align:right}
+table.with-border .quantity {text-align:center}

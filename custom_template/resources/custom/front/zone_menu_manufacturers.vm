@@ -1,0 +1,48 @@
+#if ($category)
+
+    #set($_numRows = $math.toInteger($action.getStoreProperty('listing.visible.manufacturers','2')))
+    #set($manufacturers = $extras.get('MANUFACTURER'))
+    #if($util.isNotEmpty($manufacturers))
+    <div class="tree-menu manufacturers block template-block">
+        <h2>#label('shop.bymanufacturers')</h2>
+        <ul class="filterManufacturers">
+            #foreach($man in $manufacturers)
+                <li class="level0 clearfix" #if($velocityCount>=$_numRows) style="display: none;" #end>
+                    <a href="#" data="$!man.idManufacturer" class="filter-manufacturer level0">
+                        $man.manufacturerName
+                        <span class="num-products">($!man.getProperty('NUM_PROD'))</span>
+                    </a>
+                </li>
+            #end
+            #if($manufacturers.size()>$_numRows)
+                <li class="clearfix">
+                    <a href="#" class="moreLink level0">#label('more.manufacturers')</a>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+
+#else
+
+    #set($_numRows = $_parameters.get('rows'))
+    #if(!$_numRows) #set($_numRows = 10) #end
+    #if($_numRows==0) #set($_numRows = $util.null) #end
+
+    #set($_hotManufacturers = $dao.getHotManufacturers($_numRows))
+    #if($_hotManufacturers && !$_hotManufacturers.isEmpty())
+    <div class="tree-menu manufacturers block template-block">
+        <h2>#label('shop.bymanufacturers')</h2>
+        <ul>
+            #foreach($hotMan in $_hotManufacturers)
+                #set( $manufacturer = $list.get($hotMan,1))
+                <li class="level0">
+                    <a href="$!action.urlManufacturer($manufacturer)" class="level0">$!manufacturer.manufacturerName</a>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+    #set($_hotManufacturers = $util.null)
+
+#end

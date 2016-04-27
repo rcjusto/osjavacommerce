@@ -1,0 +1,27 @@
+<div id="exportedLoading" class="loading">
+    <h2>#label('admin.exporting.products')</h2>
+    <p>#label('admin.please.wait')</p>
+</div>
+<div id="exportedInfo" class="info" style="display:none;">
+    <h2>#label('admin.products.exported.successfully')</h2>
+    <p><a href="$!{exportFile}">#label('admin.download.here')</a></p>
+</div>
+<script type="text/javascript">
+    var fileName = "$!{exportFile}";
+    function generatedFileExist() {
+        if (fileName!=null && fileName!='' && fileName!=undefined) {
+            jQuery.getJSON("$!action.url('generatedfileexist')",{fileName:fileName}, function(d){
+                if (d.fileExist) {
+                    $('#exportedLoading').hide();
+                    $('#exportedInfo').show();
+                } else {
+                    setTimeout(generatedFileExist(),1000);
+                }
+            });
+        }
+    }
+    $(function(){
+        $('#exportedLoading').show();
+        generatedFileExist();
+    });
+</script>

@@ -1,0 +1,42 @@
+#if($util.isNotEmpty($users.listado))
+    #set($nav=$users)
+    #parse('/WEB-INF/views/admin/navigator.vm')
+#end
+#if($multiple=='false')
+    #set($selControl = 'radio')
+#else
+    #set($selControl = 'checkbox')
+#end
+
+    #if($util.isNotEmpty($users.listado))
+    <div style="">
+    <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="width:1%;">&nbsp;</th>
+            <th class="sort" sortby="firstname,lastname">#label('admin.name')</th>
+            <th class="sort" sortby="email">#label('admin.email')</th>
+            <th class="sort" sortby="registerDate" >#label('admin.registered')</th>
+            <th class="sort" style="text-align:right">#label('admin.orders')</th>
+            <th class="sort" style="text-align:right">#label('admin.visits')</th>
+        </tr>
+        #foreach($u in $users.listado)
+            #set( $userOrders = $dao.getUserOrders($u) )
+            <tr>
+                <td><input type="$selControl" value="$!u.idUser" class="check-user" id="selectedUser$!u.idUser" name="selectedUser" /></td>
+                <td title="$!u.fullName"><label for="selectedUser$!u.idUser">$!u.fullName</label></td>
+                <td><label for="selectedUser$!u.idUser">$!u.email</label></td>
+                <td>$!util.formatDate($u.registerDate,$defaultLanguage)</td>
+                <td style="text-align:right">$!userOrders.size()</td>
+                <td style="text-align:right">$!u.visits</td>
+            </tr>
+        #end
+    </table>
+    </div>    
+    #else
+        <div class="info">
+            <p>#label('admin.customers.not.found')</p>
+        </div>
+    #end
+<script type="text/javascript">
+    $(function(){initTable();});
+</script>

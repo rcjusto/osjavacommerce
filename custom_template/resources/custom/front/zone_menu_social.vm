@@ -1,0 +1,12 @@
+<div class="menu-social block clearfix template-block">
+    <h2>#label('follow.us')</h2>
+    <ul class="clearfix">
+        #foreach($social in ['Twitter','Facebook','Flickr','Delicious','FriendFeed','Linked In','YouTube','Digg','Last.FM','Feedburner'])
+            #set($social = $social.replaceAll('[.]','_'))
+            #set($social = $social.replaceAll(' ','_'))
+            #if($util.isNotEmpty($action.getStoreProperty("social.url.${social}",'')))
+                <li class="social ${social} hoverable"><a title="$!social" class="social $social" target="_blank" href="$action.getStoreProperty("social.url.${social}",'')"></a></li>
+            #end
+        #end
+    </ul>
+</div>

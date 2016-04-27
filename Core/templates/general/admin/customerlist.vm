@@ -1,0 +1,146 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text()=='hide filters') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+            jQuery.cookie('filters.visible','false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text('hide filters');
+            jQuery.cookie('filters.visible','true');
+        }
+    }
+    $(function(){
+        if (jQuery.cookie('filters.visible')=='false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+        }
+        $('#tab_listado').sortedTable('userSortField','userSortDirection',function(){$('#form_filter').submit();});
+    });
+</script>
+
+
+
+<h1 style="float:left;">#label('admin.user.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">#label('admin.hide.filters')</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    #surl('id=urlformfilter' "action=customerlist")
+    <form id="form_filter" action="$urlformfilter" method="post" class="validable">
+    #shidden('name=userFilter.sortedField' 'id=userSortField')
+    #shidden('name=userFilter.sortedDirection' 'id=userSortDirection')
+    <div id="filterContainer" class="filters formulario">
+        #formErrors()
+        <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+            <tr>
+                <th>#label('admin.buy.products.from')</th>
+                <td>
+                    #set($catTree = $dao.getCategoryTree(false))
+                    <select name="userFilter.filterCategories" class="field myselect string-medium">
+                        <option value="" level="0">#label('admin.not.filter')</option>
+                        #categoryOption($catTree 0 $!productFilter.filterCategories)
+                    </select>
+                </td>
+                <th>#label('admin.level')</th>
+                <td>
+                    <select name="userFilter.filterLevel" class="field string-medium">
+                        <option value="">#label('admin.not.filter')</option>
+                        #foreach($l in $userLevelList) <option #if($userFilter.filterLevel==$l.id) selected="selected" #end  value="$l.id">$!{l.getName($defaultLanguage)}</option> #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.name.email')</th>
+                <td>#stextfield('name=userFilter.filterName' 'cssClass=field string-medium')</td>
+                <th>Has Orders:</th>
+                <td style="line-height:22px;">
+                    <span style="float:left;margin-right:10px;">#label('admin.between')</span>
+                    #stextfield('name=userFilter.filterMinOrder' "value=$!{util.formatNumber(${userFilter.filterMinOrder}, 'money')}" 'cssClass=field decimal')
+                    <span style="float:left;margin:0 10px;"> #label('admin.and') </span>
+                    #stextfield('name=userFilter.filterMaxOrder' "value=$!{util.formatNumber(${userFilter.filterMaxOrder}, 'money')}" 'cssClass=field decimal')
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.items.per.page')</th>
+                <td>
+                    <select onchange="$('#$!{users.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                    #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                        #if($opt==$users.pageRows)
+                        <option value="$opt" selected="selected">$opt</option>
+                        #else
+                        <option value="$opt">$opt</option>
+                        #end
+                    #end
+                    </select>
+                </td>
+                <th colspan="2">
+                    <button type="submit"><span class="search">#label('admin.update')</span></button>
+                </th>
+            </tr>
+        </table>
+    </div>
+    #set($nav=$users)
+    #parse('/WEB-INF/views/admin/navigator.vm')
+
+    #if($util.isNotEmpty($users.listado))
+    <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th class="sort" sortby="idUser">#label('admin.id')</th>
+            <th class="sort" sortby="userId">#label('admin.user.id')</th>
+            <th class="sort" sortby="firstname,lastname">#label('admin.name')</th>
+            <th class="sort" sortby="email">#label('admin.email')</th>
+            <th class="sort" sortby="registerDate">#label('admin.registered')</th>
+            <th style="text-align:right;">#label('admin.orders')</th>
+            <th style="text-align:right;" class="sort" sortby="visits">#label('admin.visits')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($u in $users.listado)
+            #set( $userOrders = $dao.getUserOrders($u) )
+            #surl('id=urlEdit' "action=customeredit" "idUser=$!u.idUser")
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!u.idUser"/></td>
+                <td>$!u.idUser</td>
+                <td>$!u.userId</td>
+                <td>$!u.fullName</td>
+                <td>$!u.email</td>
+                <td>$!util.formatDate( $u.registerDate,$defaultLanguage)</td>
+                <td style="text-align:right;">$!userOrders.size()</td>
+                <td style="text-align:right">$!u.visits</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.customers')</h2>
+            <p>#label('admin.customers.not.found')</p>
+        </div>
+    #end
+
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        <button type="button" href="$!action.url('customeredit','admin')"><span class="add">#label('admin.user.new')</span></button>
+        #if($can_export)
+            <button type="button" onclick="$('#formExport').submit();"><span class="exportcsv">#label('admin.export.customers')</span></button>
+            <button type="button" href="$!action.url('import_customers','admin')"><span class="exportcsv">#label('admin.import.customers')</span></button>
+        #end
+    </div>
+</form>
+
+    #if($can_export)
+    <form id="formExport" action="$!action.url('export_customers','admin')" method="post">
+    #shidden('name=userFilter.sortedField' )
+    #shidden('name=userFilter.sortedDirection')
+    #shidden('name=userFilter.filterCategories')
+    #shidden('name=userFilter.filterLevel')
+    #shidden('name=userFilter.filterName')
+    #shidden('name=userFilter.filterMinOrder')
+    #shidden('name=userFilter.filterMaxOrder')
+    </form>
+    #end
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,90 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=urlUpdateRate' "action=currencyrateupdate")
+<script type="text/javascript">
+    function updateRate(el, id) {
+        var url = "$urlUpdateRate";
+        $('.thisCurr').html(el);
+        $('#ratesResultOK').hide();
+        $('#ratesResultError').hide();
+        $('#ratesLoading').show();
+        jQuery.getJSON(url, {idCurrency:id}, function(data) {
+            $('#ratesLoading').hide();
+            if (data.errors != null && data.errors.length > 0) {
+                var htmlError = '';
+                jQuery.each(data.errors, function() {htmlError += this + '<br/>';});
+                $('#thisError').html(htmlError);
+                $('#ratesResultError').show();
+            } else {
+                $('#ratesResultOK').show();
+                $('#' + data.currency).find('td.ratio').html(data.ratio);
+                $('#' + data.currency).find('td.reverse-ratio').html(data.reverseRatio);
+                $('#' + data.currency).find('td.date').html(data.lastUpdate);
+            }
+        });
+        return false;
+    }
+</script>
+<h1>#label('admin.currency.list')</h1>
+<div class="listado">
+    <div id="ratesLoading" class="loading">
+        <h2>#label('admin.updating.rates.for') "<span class="thisCurr"></span>"</h2>
+
+        <p>#label('admin.please.wait')</p>
+    </div>
+    <div id="ratesResultOK" class="info" style="display:none;">
+        <h2>#label('admin.rate.updated.successfully')</h2>
+        <p><a href="#" onclick="$('#ratesResultOK').hide();">#label('admin.click.here.to.close.this.box')</a></p>
+    </div>
+    <div id="ratesResultError" class="error hidden">
+        <h2>#label('admin.error.in.rate.update')</h2>
+        <p id="thisError"></p>
+        <p><a href="#" onclick="$('#ratesResultError').hide();">#label('admin.click.here.to.close.this.box')</a></p>
+    </div>
+    #surl('id=urlForm' "action=listcurrency")
+    <form action="$urlForm" method="post" class="validable">
+    #formErrors()
+    #if($util.isNotEmpty($currencies))
+        <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                <th>#label('admin.code')</th>
+                <th>#label('admin.symbol')</th>
+                <th style="text-align:right;">#label('admin.ratio')</th>
+                <th style="text-align:right;">#label('admin.reverse.ratio')</th>
+                <th style="text-align:center;width:1%;">#label('admin.active')</th>
+                <th>#label('admin.last.update')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($c in $currencies)
+                #surl('id=urlEdit' "action=editcurrency" "idCurrency=$!c.id")
+                <tr id="$!c.code">
+                    <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!c.id"/></td>
+                    <td>$!c.code</td>
+                    <td>$!c.symbol</td>
+                    <td class="ratio" style="text-align:right;">$!util.formatNumber($c.ratio,'decimal4')</td>
+                    <td class="reverse-ratio" style="text-align:right;">$!util.formatNumber($c.reverseRatio,'decimal4')</td>
+                    <td class="#if($c.active) chk_true #else chk_false #end ">&nbsp;</td>
+                    <td class="date">$!date.format('yyyy-MM-dd HH:mm',$c.lastUpdate)</td>
+                    <td class="link-bar">
+                        <a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a>
+                        <a href="#" onclick="return updateRate('$!c.code', $!c.id);"><span class="reload">#label('admin.update.rate')</span></a>
+                    </td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.currencies.not.found')</h2>
+            <p>#label('admin.currencies.not.found.text')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #surl('id=urlNew' "action=editcurrency")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.currency.configure.new')</span></button>
+
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

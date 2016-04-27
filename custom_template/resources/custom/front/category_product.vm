@@ -1,0 +1,39 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'list/')")
+#set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+<div class="product clearfix">
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail" class="image not-found"></a></div>
+    #end
+    <div class="data">
+        <div class="code"><a href="$urlDetail">$!p.partNumber</a></div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="desc"><a href="$urlDetail">$!util.abbreviate($pDesc,400)</a></div>
+        <div class="labels clearfix">
+            <ul>
+                #foreach($lab in $p.labels)
+                    #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                        <li>$!lab.getContentList($locale.language)</li>
+                    #end
+                #end
+            </ul>
+        </div>
+    </div>
+    #if($canCompare)
+        <div class="compare">
+            <a class="product-compare" href="#" data="$!p.idProduct">#label('compare')</a>
+        </div>
+    #end
+    <div class="actions clearfix">
+        #if($action.canShowPrices)
+            <div class="price">$!action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1))</div>
+            #control('addtocart' $util.map.add('product',$p))
+        #end
+    </div>
+</div>
+

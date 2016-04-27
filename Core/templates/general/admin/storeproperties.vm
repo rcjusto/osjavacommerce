@@ -1,0 +1,580 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    table.fija th {
+        width: 300px !important;
+    }
+</style>
+<div class="formulario">
+    #surl('id=urlForm' "action=storepropertiessave")
+    <form action="$urlForm" method="post" class="validable">
+        #langSelector()
+        #formErrors()
+        <input type="hidden" name="storeProperties_type" value="GENERAL"/>
+
+        <div id="propertiesTab">
+            <ul class="tabs">
+                <li><a href="#globals">#label('admin.global.settings')</a></li>
+                <li><a href="#mail">#label('admin.mail.settings')</a></li>
+                <li><a href="#products">#label('admin.product.settings')</a></li>
+                <li><a href="#customers">#label('admin.customer.settings')</a></li>
+                <li><a href="#seo">#label('admin.seo.settings')</a></li>
+                <li><a href="#social">#label('admin.social.settings')</a></li>
+                <li><a href="#jsplugins">#label('admin.js.plugins')</a></li>
+            </ul>
+
+            <div id="globals">
+                <table cellspacing="0" cellpadding="0" class="formulario fija">
+                    <tr>
+                        <th>#label('admin.admin.language')</th>
+                        <td>#storePropertyField($storeProperties 'language.admin' 'field string-short required' ['en','es','fr'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.store.name')</th>
+                        <td>#storePropertyField($storeProperties 'site.name' 'field string-medium required')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.default.country')</th>
+                        <td>
+                            <select name="storeProperties_value" class="field string-medium">
+                                #foreach($c in $action.getCountries(false))
+                                    <option value="$!c.code" #if($c.code==$storeProperties.get('country.default').value) selected="selected" #end >$!c.name</option>
+                                #end
+                            </select>
+                            <input type="hidden" name="storeProperties_id" value="country.default"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.available.languages')</th>
+                        <td>
+                            #foreach($l in ['en','es','fr'])
+                                <label>
+                                    <input type="checkbox" class="languages" value="$l" #if($list.contains($languages,$l)) checked="checked" #end >
+                                    $l
+                                </label>
+                            #end
+                            <input type="hidden" name="storeProperties_id" value="languages"/>
+                            <input type="hidden" id="languages" name="storeProperties_value" value="$!storeProperties.get('languages').value"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.default.language')</th>
+                        <td>#storePropertyField($storeProperties 'language.default' 'field string-short required' ['en','es','fr'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.default.currency')</th>
+                        <td>
+                            <select name="storeProperties_value" class="field string-short">
+                                #foreach($c in $action.currencyList)
+                                    <option value="$!c.code" #if($c.code==$storeProperties.get('currency.default').value) selected="selected" #end >$!c.code</option>
+                                #end
+                            </select>
+                            <input type="hidden" name="storeProperties_id" value="currency.default"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.use.secured.pages')</th>
+                        <td>#storePropertyField($storeProperties 'use.secured.pages' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.use.one-page.checkout')</th>
+                        <td>#storePropertyField($storeProperties 'onepage.checkout' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.use.ajax.add.to.cart')</th>
+                        <td>#storePropertyField($storeProperties 'enable.ajax.shopcart' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.automatically.save.shopcart')</th>
+                        <td>#storePropertyField($storeProperties 'shopcart.auto.save' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr id="rowShopCartCanSave">
+                        <th>#label('admin.allow.user.save.shopcart')</th>
+                        <td>#storePropertyField($storeProperties 'shopcart.can.save' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.user.request.quote')</th>
+                        <td>#storePropertyField($storeProperties 'shopcart.can.quote' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.invoice.number.auto')</th>
+                        <td>#storePropertyField($storeProperties 'invoice.number.automatic' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr class="invoice-auto">
+                        <th>#label('admin.invoice.number.format')</th>
+                        <td>#storePropertyField($storeProperties 'invoice.number.prefix' 'field string-short')</td>
+                    </tr>
+                    <tr class="invoice-auto">
+                        <th>#label('admin.invoice.start.from')</th>
+                        <td>#storePropertyField($storeProperties 'invoice.start.from' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.enable.quick.search')</th>
+                        <td>#storePropertyField($storeProperties 'search.autocomplete' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.search.max.results')</th>
+                        <td>#storePropertyField($storeProperties 'search.max.results' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.statistics.excluded.ips')</th>
+                        <td>
+                            #storePropertyField($storeProperties 'statistics.excluded.ips' 'field string-large')
+                            (#label('admin.coma.separated'))
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.close.store')</th>
+                        <td>#storePropertyField($storeProperties 'closed.store' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.catalog.only')</th>
+                        <td>#storePropertyField($storeProperties 'catalog.only' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="mail">
+                <table cellspacing="0" cellpadding="0" class="formulario fija">
+                    <tr>
+                        <th>#label('admin.mail.host')</th>
+                        <td>#storePropertyField($storeProperties 'mail.host' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.port')</th>
+                        <td>#storePropertyField($storeProperties 'mail.port' 'field string-short')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.ssl')</th>
+                        <td>#storePropertyField($storeProperties 'mail.ssl' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.tls')</th>
+                        <td>#storePropertyField($storeProperties 'mail.tls' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.user')</th>
+                        <td>#storePropertyField($storeProperties 'mail.user' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.password')</th>
+                        <td>#storePropertyField($storeProperties 'mail.password' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.repply.to')</th>
+                        <td>#storePropertyField($storeProperties 'mail.reply' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.from')</th>
+                        <td>#storePropertyField($storeProperties 'mail.from' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.bcc')</th>
+                        <td>#storePropertyField($storeProperties 'mail.bcc' 'field string-medium')
+                            (#label('admin.coma.separated'))
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.contact.us')</th>
+                        <td>#storePropertyField($storeProperties 'mail.contact.us' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.from.newsletter')</th>
+                        <td>#storePropertyField($storeProperties 'mail.from.newsletter' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.attempts')</th>
+                        <td>#storePropertyField($storeProperties 'mail.attempts' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.localhost')</th>
+                        <td>#storePropertyField($storeProperties 'mail.localhost' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.mail.debug')</th>
+                        <td>#storePropertyField($storeProperties 'mail.debug' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="products">
+                <table cellspacing="0" cellpadding="0" class="formulario fija">
+                    <tr>
+                        <th>#label('admin.image.size.list')</th>
+                        <td>#storePropertyFieldEx($storeProperties 'images.product.list' "$!action.getStoreProperty('images.product.list','100x100')" 'field string-short')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.image.size.detail')</th>
+                        <td>#storePropertyFieldEx($storeProperties 'images.product.detail' "$!action.getStoreProperty('images.product.detail','300x300')" 'field string-short')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.image.size.zoom')</th>
+                        <td>#storePropertyFieldEx($storeProperties 'images.product.zoom' "$!action.getStoreProperty('images.product.zoom','500x500')" 'field string-short')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.image.zoom.mode')</th>
+                        <td>#storePropertyField($storeProperties 'image.zoom.mode' 'field string-medium required' ['lightbox','zoom-panel'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.unit.dimension')</th>
+                        <td>#storePropertyField($storeProperties 'dimension.unit' 'field string-short required' ['Inch','cm','m'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.unit.weight')</th>
+                        <td>#storePropertyField($storeProperties 'weight.unit' 'field string-short required' ['Pound','Kg'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.volume.price.in.discounted')</th>
+                        <td>#storePropertyField($storeProperties 'price.offer.and.volume' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.products')</th>
+                        <td>#storePropertyField($storeProperties 'product.show.unavailable' 'field string-medium required' ['has-stock','has-stock-or-eta','all-active'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.buy.products')</th>
+                        <td>#storePropertyField($storeProperties 'product.buy.unavailable' 'field string-medium required' ['has-stock-and-price','has-stock','has-stock-or-eta','all-active'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.stock.info')</th>
+                        <td>#storePropertyField($storeProperties 'product.show.stock.info' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.label.new.products')</th>
+                        <td>#storePropertyField($storeProperties 'product.new.label.auto' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.stock.alerts.to')</th>
+                        <td>#storePropertyField($storeProperties 'mail.stock.alert' 'field string-medium')
+                            (#label('admin.coma.separated'))
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.default.page.items')</th>
+                        <td>#storePropertyField($storeProperties 'default.page.items' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.page.items.options')</th>
+                        <td>#storePropertyField($storeProperties 'page.items.options' 'field string_medium')
+                            (#label('admin.coma.separated'))
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.listing.default.style')</th>
+                        <td>#storePropertyField($storeProperties 'listing.default.style' 'field string-medium required' ['grid','list'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.enable.product.reviews')</th>
+                        <td>#storePropertyField($storeProperties 'enable.product.reviews' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.must.registered.to.review')</th>
+                        <td>#storePropertyField($storeProperties 'must.registered.to.review' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.product.review.automatically')</th>
+                        <td>#storePropertyField($storeProperties 'product.reviews.automatic.approve' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.product.reviews.list')</th>
+                        <td>#storePropertyField($storeProperties 'show.product.reviews.list' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.review.mailto')</th>
+                        <td>#storePropertyField($storeProperties 'product.review.mailto' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.home.hot.items')</th>
+                        <td>#storePropertyField($storeProperties 'home.hot.items' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.related.items')</th>
+                        <td>#storePropertyField($storeProperties 'product.related.items' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.shopcart.related.items')</th>
+                        <td>#storePropertyField($storeProperties 'shopcart.related.items' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.sort.options')</th>
+                        <td>
+                            #set($sortOptionsSel = $util.split($!action.getProductSortOptions(),','))
+                            <input type="hidden" name="storeProperties_id" value="product.sort.options"/>
+                            <input id="sortOptions" type="hidden" name="storeProperties_value" value="$!action.getProductSortOptions()"/>
+                            <div style="width:840px">
+                                #foreach($opt in ['hits:asc','hits:desc','ratingBy:asc','ratingBy:desc','stock:asc','stock:desc','manufacturer:asc','manufacturer:desc','productName:asc','productName:desc','costPrice:asc','costPrice:desc','price:asc','price:desc','calculatedPrice:asc','calculatedPrice:desc','partNumber:asc','partNumber:desc'])
+                                    <label style="float:left;width:400px;display:block;margin:2px 0;">
+                                        <input type="checkbox" class="sortOptions" value="$opt" #if($list.contains($sortOptionsSel, $opt)) checked="checked" #end >
+                                        <span>($opt)</span>
+                                        <span> = </span>
+                                        #label("navigator.sort.${opt}")
+                                    </label>
+                                #end
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.sort.default.option')</th>
+                        <td>
+                            <input type="hidden" name="storeProperties_id" value="product.sort.default.option"/>
+                            <select id="sortDefaultOption" name="storeProperties_value" class="field string-medium">
+                                #foreach($opt in $sortOptionsSel)
+                                    <option value="$opt" #if($action.getProductSortDefaultOption()==$opt) selected="selected" #end >$opt</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="customers">
+                <table cellspacing="0" cellpadding="0" class="formulario fija">
+                    <!--tr>
+                <th>#label('admin.save.password.encripted')</th>
+                <td>#storePropertyField($storeProperties 'customer.save.password.encripted' 'field string-short required' ['Y','N'])</td>
+            </tr-->
+                    <tr>
+                        <th>#label('admin.forget.password.action')</th>
+                        <td>#storePropertyField($storeProperties 'forget.password.action' 'field string-short required' ['reset','send'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.anonymous.checkout')</th>
+                        <td>#storePropertyField($storeProperties 'allow.anonymous.checkout' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.price.without.login')</th>
+                        <td>#storePropertyField($storeProperties 'show.price.without.login' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.stock.without.login')</th>
+                        <td>#storePropertyField($storeProperties 'show.stock.without.login' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.registrations')</th>
+                        <td>#storePropertyField($storeProperties 'allow.registrations' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.newsletters.registrations')</th>
+                        <td>#storePropertyField($storeProperties 'allow.newsletters' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.default.user.level')</th>
+                        <td>
+                            <select name="storeProperties_value" class="field string-short">
+                                #foreach($l in $action.getUserLevelList())
+                                    <option value="$!l.code" #if($!l.code==$storeProperties.get('default.user.level').value) selected="selected" #end >$!l.getName($defaultLanguage)</option>
+                                #end
+                            </select>
+                            <input type="hidden" name="storeProperties_id" value="default.user.level"/>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.user.level')</th>
+                        <td>#storePropertyField($storeProperties 'show.user.level' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.can.reorder')</th>
+                        <td>#storePropertyField($storeProperties 'can.re.order' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.enable.rma')</th>
+                        <td>#storePropertyField($storeProperties 'can.do.rma' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.use.email.as.login')</th>
+                        <td>#storePropertyField($storeProperties 'use.email.as.login' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.maximun.coupons')</th>
+                        <td>#storePropertyField($storeProperties 'promotional.codes.maximun' 'field integer')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.order.custom.reference')</th>
+                        <td>#storePropertyField($storeProperties 'allow.order.custom.reference' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.allow.order.custom.message')</th>
+                        <td>#storePropertyField($storeProperties 'allow.order.custom.message' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr class="block-title">
+                        <th colspan="2">#label('register.show.fields')</th>
+                    </tr>
+                    #foreach($fn in ['user_level','addresses','poll','subscription','captcha','agreement'])
+                        <tr>
+                            <th>#label("admin.register.show.${fn}")</th>
+                            <td>#storePropertyField($storeProperties "register.show.$!{fn}" 'field string-shortest required' ['Y','N'])</td>
+                        </tr>
+                    #end
+                    <tr class="block-title">
+                        <th colspan="2">#label('register.address.fields')</th>
+                    </tr>
+                    <tr class="header">
+                        <td>&nbsp;</td>
+                        <td style="text-align:center;">Show | Required</td>
+                    </tr>
+                    #foreach($fn in ['nickname','company','name','address1','address2','city','state_province','postal_code','phone','fax'])
+                        <tr>
+                            <th>#label("admin.address.field.${fn}")</th>
+                            <td nowrap="nowrap">#storePropertyField($storeProperties "address.show.$!{fn}" 'field string-shortest required' ['Y','N'])#storePropertyField($storeProperties "address.required.$!{fn}" 'field string-shortest required' ['Y','N'])</td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+
+            <div id="seo">
+                <table cellspacing="0" cellpadding="0" class="formulario">
+                    <tr>
+                        <th>#label('admin.meta.title')</th>
+                        <td>#storePropertyFieldLang($storeProperties 'seo.title' 'field string-large' 'metaTitle')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.meta.description')</th>
+                        <td>#storePropertyTextLang($storeProperties 'seo.description' 'field string-large' 'metaDescription')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.meta.keywords')</th>
+                        <td>#storePropertyTextLang($storeProperties 'seo.keywords' 'field string-large' 'metaKeywords')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.meta.abstract')</th>
+                        <td>#storePropertyTextLang($storeProperties 'seo.abstract' 'field string-large' 'metaAbstract')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.use.friendly.urls')</th>
+                        <td>#storePropertyField($storeProperties 'use.friendly.urls' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.product.backlinks')</th>
+                        <td>#storePropertyField($storeProperties 'show.product.backlinks' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.show.pinterest.button')</th>
+                        <td>#storePropertyField($storeProperties 'show.pinterest.button' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+
+                    <tr>
+                        <th>#label('admin.google.analytics.code')</th>
+                        <td>#storePropertyField($storeProperties 'google.analytics.code' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.google.ecommerce.tracking')</th>
+                        <td>#storePropertyField($storeProperties 'google.ecommerce.tracking' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                    <tr id="rowGoogleTrackingStatus">
+                        <th>#label('admin.google.ecommerce.tracking.status')</th>
+                        <td>
+                            #set($trackStatuses = $!storeProperties.get('google.ecommerce.tracking.status').value.split(','))
+                            #foreach($l in ['pending','approved','rejected'])
+                                <label>
+                                    <input type="checkbox" class="google-tracking-status" value="$l" #if($list.contains($trackStatuses,$l)) checked="checked" #end >
+                                    $l
+                                </label>
+                            #end
+                            <input type="hidden" name="storeProperties_id" value="google.ecommerce.tracking.status"/>
+                            <input type="hidden" id="googleTrackingStatus" name="storeProperties_value" value="$!storeProperties.get('google.ecommerce.tracking.status').value"/>
+                        </td>
+                    </tr>
+
+
+                    #if($xml_sitemap)
+                        <tr>
+                            <th>#label('admin.google.xml.sitemap')</th>
+                            <td><a class="external" target="_blank" href="$!action.storeFile('/')$!{xml_sitemap.name}">$!date.format('yyyy-MM-dd HH:mm', $date.toDate($xml_sitemap.lastModified()))</a></td>
+                        </tr>
+                    #end
+                    #if($xml_catalog)
+                        <tr>
+                            <th>#label('admin.google.xml.catalog')</th>
+                            <td>
+                                #foreach($f in $xml_catalog)
+                                    <a class="external" target="_blank" href="$!action.storeFile('/')$!{f.name}">$!date.format('yyyy-MM-dd HH:mm', $date.toDate($f.lastModified()))</a><br/>
+                                #end
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+
+            <div id="social">
+                <table cellspacing="0" cellpadding="0" class="formulario">
+                    #foreach($social in ['Twitter','Facebook','Flickr','Delicious','FriendFeed','Linked In','YouTube','Digg','Last.FM','Feedburner'])
+                        <tr>
+                            <th>#label($social)</th>
+                            <td>
+                                #set($social = $social.replaceAll('[.]','_'))
+                                #set($social = $social.replaceAll(' ','_'))
+                                #storePropertyField($storeProperties "social.url.${social}" 'field string-large')</td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+
+            <div id="jsplugins">
+                <table cellspacing="0" cellpadding="0" class="formulario">
+                    <tr>
+                        <th>#label('admin.header.javascript')</th>
+                        <td>#storePropertyText($storeProperties 'header.javascript' 'field string-large')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.header.javascript.home')</th>
+                        <td>#storePropertyField($storeProperties 'header.javascript.home' 'field string-short required' ['N','Y'])</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('input.languages').change(function () {
+            var cad = '';
+            $('input.languages:checked').each(function () {
+                if (cad != '') cad += ",";
+                cad += $(this).val();
+            });
+            $('#languages').val(cad);
+        }).trigger('change');
+        $('input.google-tracking-status').change(function () {
+            var cad = '';
+            $('input.google-tracking-status:checked').each(function () {
+                if (cad != '') cad += ",";
+                cad += $(this).val();
+            });
+            $('#googleTrackingStatus').val(cad);
+        }).trigger('change');
+        $('#google_ecommerce_tracking').change(function () {
+            if ($(this).val() == 'Y') $('#rowGoogleTrackingStatus').show(); else $('#rowGoogleTrackingStatus').hide();
+        }).trigger('change');
+        $('#propertiesTab').tabs();
+        $('#shopcart_auto_save').change(function () {
+            if ($(this).val() == 'Y') {
+                $('#rowShopCartCanSave').hide();
+                $('#shopcart_can_save').val('N');
+            }
+            else $('#rowShopCartCanSave').show();
+        }).trigger('change');
+        $('.sortOptions').change(function () {
+            var selSO = '';
+            $('#sortDefaultOption').find('option').each(function () {
+                $(this).remove()
+            });
+            $('input.sortOptions:checked').each(function () {
+                if (selSO != '') selSO += ',';
+                selSO += $(this).val();
+                var opt = $('<option>').val($(this).val()).html($(this).val());
+                if ("$storeProperties.get('product.sort.default.option').value" == $(this).val()) opt.attr('selected', 'selected');
+                opt.appendTo('#sortDefaultOption');
+            });
+            $('#sortOptions').val(selSO);
+        }).trigger('change');
+        $('#invoice_number_automatic').change(function () {
+            if ($(this).val() == 'Y') $('.invoice-auto').show();
+            else $('.invoice-auto').hide();
+        }).trigger('change');
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

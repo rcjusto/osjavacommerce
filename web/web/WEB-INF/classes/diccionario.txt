@@ -1,0 +1,4 @@
+procesador => procesador,cpu
+cpu => cpu,procesador
+serial ata => serial ata, sata
+sata => sata, serial ata

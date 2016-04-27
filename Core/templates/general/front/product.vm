@@ -1,0 +1,12 @@
+#set($templateName = $action.getParentProperty($product, 'productTemplate') )
+#if($util.isNotEmpty($templateName))
+    #set( $contentPage = "/WEB-INF/views/${template}/front/${templateName}.vm" )
+#else
+    #set( $contentPage = "/WEB-INF/views/${template}/front/product.vm" )
+#end
+#set($pageTitle = $action.getProductMeta($product,'title',$locale.language))
+#set($metaDescription = $action.getProductMeta($product,'description',$locale.language))
+#set($metaKeywords = $action.getProductMeta($product,'keywords',$locale.language))
+#set($metaAbstract = $action.getProductMeta($product,'abstract',$locale.language))
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")
+

@@ -1,0 +1,13 @@
+#if($news && $news.listado.size()>0)
+    <div class="news">
+        <h2>News</h2>
+        <ul>
+            #foreach($n in $news.listado)
+            <li>
+                <h3>$!n.title</h3>
+                <p>$!util.abbreviate($n.resume,300) <a target="_blank" href="$!n.link">more</a></p>
+            </li>
+            #end
+        </ul>
+    </div>
+#end

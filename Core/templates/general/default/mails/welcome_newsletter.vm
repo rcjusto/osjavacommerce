@@ -1,0 +1,15 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<p>$!{action.getText('mail.welcome.newsletter')}</p>
+<p>$!{action.getText('mail.your.credentials.are')}</p>
+<div style="padding: 10px;background-color: #f4f4f4;margin-top: 5px;margin-bottom: 50px;">
+    <p>$!{action.getText('admin.user')}: $!{user.userId}</p>
+    <p>$!{action.getText('admin.password')}: $!{password}</p>
+</div>
+
+<p>$!{action.getText('mail.cancel.subscription.text')}</p>
+<div style="padding: 10px;background-color: #f4f4f4;margin-top: 5px;">
+    $!{user.cancelSubscriptionLink}
+</div>

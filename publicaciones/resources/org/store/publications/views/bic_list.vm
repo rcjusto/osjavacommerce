@@ -1,0 +1,118 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.bic.list')</h1>
+<div class="listado">
+
+    <form action="$!action.url('biclistaction','admin')" method="post">
+        #formErrors()
+
+        <div id="filterContainer" class="filters formulario">
+            <table class="formulario" cellpadding="0" cellspacing="0" width="990">
+                <tr>
+                    <th>#label('admin.filter.by.code')</th>
+                    <td><input type="text" name="filterCode" value="$!filterCode" class="field string-short"/></td>
+                    <th>#label('admin.filter.active')</th>
+                    <td>
+                        <select name="filterActive"class="field string-short">
+                            <option value="all" #if($filterActive=='all') selected="selected" #end>#label('admin.show.all')</option>
+                            <option value="active" #if($filterActive=='active') selected="selected" #end >#label('admin.only.active')</option>
+                        </select>
+                    </td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td><select onchange="$('#$!{bics.name}_pagerows').val($(this).val());">
+                        #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                            <option value="$opt" #if($opt==$bics.pageRows) selected="selected" #end>$opt</option>
+                        #end
+                    </select>
+                    </td>
+                    <td style="text-align:right;">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        #if($util.isNotEmpty($bics.listado))
+            #set($nav=$bics)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th>#label('admin.id')</th>
+                    <th>#label('admin.code')</th>
+                    <th>#label('admin.name')</th>
+                    <th>#label('admin.active')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($bic in $bics.listado)
+                    #surl('id=urlEdit' "action=editmanufacturer" "id=$!bic.id")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!bic.id"/></td>
+                        <td>$!bic.id</td>
+                        <td>$!bic.code</td>
+                        <td>$!bic.getText($defaultLanguage)</td>
+                        <td class="#if($!bic.active) chk_true #else chk_false #end">&nbsp;</td>
+                        <td class="link-bar"><a href="$!action.url('biceditaction','admin', $util.getMap().add('id',$!bic.id))"><span class="edit">#label('admin.modify')</span></a></td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <p>#label('admin.bics.not.found')</p>
+            </div>
+        #end
+
+        <div class="button-bar">
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+            <button type="button" href="$!action.url('biceditaction','admin')"><span class="add">#label('admin.bics.new')</span></button>
+        </div>
+    </form>
+</div>
+
+<div class="formulario" style="margin-top: 20px;">
+    <h1>#label('admin.bic.level.operation')</h1>
+
+    <form action="$!action.url('biclevelsaction','admin')" method="post">
+        <table class="formulario" cellspacing="0" cellpadding="0" style="margin-left: 20px;width: 600px;">
+            <tr>
+                <th>#label('admin.action')</th>
+                <td>
+                    <select name="actionLevel" class="field string-short">
+                        <option value="">#label('admin.do.nothing')</option>
+                        <option value="enable">#label('admin.enable')</option>
+                        <option value="disable">#label('admin.disable')</option>
+                    </select>
+                </td>
+                <th>#label('admin.bic.level')</th>
+                <td>
+                    <select name="level" class="field string-short">
+                        #foreach($l in ['2','3','4','5','6'])
+                            <option value="$l">$l</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span>#label('admin.update')</span></button>
+        </div>
+    </form>
+</div>
+
+<div class="formulario" style="margin-top: 20px;">
+    <h1>#label('bic.import.csv')</h1>
+
+    <form action="$!action.url('bicimportaction','admin')" method="post" enctype="multipart/form-data">
+        <table class="formulario" cellspacing="0" cellpadding="0" style="margin-left: 20px;">
+            <tr>
+                <th>#label('admin.import.file')</th>
+                <td><input type="file" name="uploads" value="" size="60"/></td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span>#label('admin.import')</span></button>
+        </div>
+    </form>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

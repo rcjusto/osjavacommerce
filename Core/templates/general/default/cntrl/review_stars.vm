@@ -1,0 +1,7 @@
+#set($_value = 0)
+#set($_delta = 18)
+#if($_parameters) #set($_value = $math.round($_parameters) ) #end
+#if($math.mod($_value,2)==0) #set($dy = 0) #else #set($dy = $math.sub(0, $_delta)) #end
+#set($dx = $math.mul($math.sub($math.ceil($math.div($_value,2)), 5),$_delta))
+<div class="review-stars" style="background-position:$!{dx}px $!{dy}px;"></div>
+#set($_value = $util.null)

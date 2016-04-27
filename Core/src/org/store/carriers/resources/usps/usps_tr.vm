@@ -1,0 +1,1 @@
+<TrackRequest USERID="$!bean.user"><TrackID ID="$!bean.shipmentIdentificationNumber"></TrackID></TrackRequest>

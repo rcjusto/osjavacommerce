@@ -1,0 +1,56 @@
+#surl('id=urlEditDatabase' 'action=editDatabase' 'namespace=/config')
+#surl('id=urlDelDatabase' 'action=delDatabase' 'namespace=/config')
+#if($action.hasActionErrors())
+    <div class="errors">
+        #foreach($err in $action.getActionErrors())
+        <p>$!err</p>
+        #end
+    </div>
+#end
+<table class="listado" width="100%">
+    <tr>
+        <th>Id</th>
+        <th>Type</th>
+        <th>Connection Url</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Lucene</th>
+        <th>&nbsp;</th>
+    </tr>
+    #foreach($db in $databases.values())
+        <tr class="can_hover">
+            <td>$db.id</td>
+            <td>$db.type</td>
+            <td>$db.url</td>
+            <td>$db.user</td>
+            <td>$db.password</td>
+            <td #if($db.useLucene=='true') style="background: url('/struts/css/images/tick.png') no-repeat 50% 50%;" #else style="background: url('/struts/css/images/cross.png') no-repeat 50% 50%;" #end>&nbsp;</td>
+            <td style="text-align:right;">
+                <a href="#" rel="$!db.id" class="edit-database edit">Modify</a>
+                <span>&nbsp;&nbsp;&nbsp;</span>
+                <a href="#" rel="$!db.id" class="del-database delete">Delete</a>
+            </td>
+        </tr>
+    #end
+</table>
+<div style="margin:8px;">
+    <button type="button" class="new-database"><span class="new">Configure New Database Connection</span></button>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.edit-database').live('click', function(){
+            $('#databases').loading('Loading. Please wait ...');
+            $('#databases').load("$!urlEditDatabase",{id:$(this).attr('rel')});
+        });
+        $('.new-database').live('click', function(){
+            $('#databases').loading('Loading. Please wait ...');
+            $('#databases').load("$!urlEditDatabase");
+        });
+        $('.del-database').live('click', function(){
+            if (confirm('Remove database configuration with id: '+$(this).attr('rel')+'?')) {
+               $('#databases').loading('Deleting. Please wait ...');
+                $('#databases').load("$urlDelDatabase",{id:$(this).attr('rel')});
+            }
+        });
+    });
+</script>

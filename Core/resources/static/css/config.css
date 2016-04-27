@@ -1,0 +1,20 @@
+body, table {font-family: Verdana, Arial, serif;font-size: 10pt;padding: 10px;}
+label {display: block;margin: 4px;line-height: 24px;}
+label span {display: inline-block;width: 250px;zoom: 1;font-weight: bold;}
+input, select {border: 1px solid #d0d0d0;padding: 1px 1px 1px 4px;height: 24px;background-color: #f6f6f6;}
+input.focus, select.focus {border: 1px solid #b0b0b0;padding: 1px 1px 1px 4px;height: 24px;background-color: #ffffff;}
+a {color: #8b0000;text-decoration:none;}
+a:hover {text-decoration:underline}
+h1 {font-size: 16pt;margin: 8px 0;}
+h2 {font-size: 12pt;margin: 4px 0;}
+h3 {font-size: 14pt;margin: 3px 0;}
+h2.ok {color: #008800;}
+h2.error {color: #bb0000;}
+div.error-msg {background-color: #f6f6f6;color: #bb0000;padding: 6px;margin-bottom: 10px;}
+.store-props p {margin: 3px;}
+.field {border: 1px solid #d0d0d0;padding: 1px 1px 1px 4px;height: 24px;background-color: #f6f6f6;}
+.field.focus {border: 1px solid #b0b0b0;padding: 1px 1px 1px 4px;height: 24px;background-color: #ffffff;}
+th {padding: 0 8px;}
+td {padding: 3px;}
+table.listado th {padding:6px;background-color: #333;color:white}
+table.listado td {padding:6px;border-bottom:1px solid #333;}

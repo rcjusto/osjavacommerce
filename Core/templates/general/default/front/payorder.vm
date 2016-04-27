@@ -1,0 +1,276 @@
+<div id="blockContent" class="paystep-payment">
+<div id="blockOrderItems">
+    <div class="block">
+        <h1>#label('order.items')</h1>
+
+        <div class="content-data">
+            <table class="table-items">
+                <tr>
+                    <th class="code">#label('shopcart.code')</th>
+                    <th class="name">#label('shopcart.product')</th>
+                    <th class="quantity">#label('shopcart.quantity')</th>
+                    <th class="price">#label('shopcart.unitary.price')</th>
+                    <th class="price">#label('shopcart.line.price')</th>
+                </tr>
+                #foreach($detail in $order.orderDetails)
+                    <tr class="product">
+                        <td class="name">
+                            #foreach($odp in $detail.orderDetailProducts)
+                                <span>$!odp.product.partNumber</span>
+                            #end
+                        </td>
+                        <td class="name">
+                            #foreach($odp in $detail.orderDetailProducts)
+                                <div>
+                                    $!odp.product.getProductName($locale.language)
+                                    #if($detail.promotionCode && $util.isNotEmpty($detail.promotionCode))
+                                        <div class="promo">#label('promo') $!detail.promotionCode - $!detail.promotionName</div>
+                                    #end
+                                </div>
+                            #end
+                        </td>
+                        <td class="quantity">$!detail.quantity</td>
+                        <td class="price">$!action.formatActualCurrency($detail.price,$order.currency)</td>
+                        <td class="price">$!action.formatActualCurrency($detail.subTotal,$order.currency)</td>
+                    </tr>
+                    #foreach($odp in $detail.orderDetailProducts)
+                        #if($odp.feeValue)
+                            <tr class="fee">
+                                <td class="name" colspan="2">#label('fee') $!odp.feeName</td>
+                                <td class="quantity">$!detail.quantity</td>
+                                <td class="price">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
+                                <td class="price">$!action.formatActualCurrency($math.mul($odp.feeValue,$detail.quantity),$order.currency)</td>
+                            </tr>
+                        #end
+                    #end
+                    #if($util.isNotEmpty($detail.complementName))
+                        <tr class="complement">
+                            <td class="name" colspan="2">#label('complement') $!detail.complementName</td>
+                            <td class="quantity">$!detail.quantity</td>
+                            <td class="price">$!action.formatActualCurrency($detail.complementValue,$order.currency)</td>
+                            <td class="price">$!action.formatActualCurrency($math.mul($detail.complementValue,$detail.quantity),$order.currency)</td>
+                        </tr>
+                    #end
+                #end
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="blockPaymentData">
+
+<form id="formNext" action="$!action.url('paystepPayOrder')" method="post" class="validable">
+    <input type="hidden" name="idOrder" value="$!order.idOrder" />
+        #stoken()
+        <div class="block">
+            <div class="clearfix">
+                <div id="blockOrderBillingAddress">
+                    <h1>#label('billing.address')</h1>
+
+                    <div class="content-data">
+                        #set($billingAddress = $order.billingAddress)
+                        <p>$!billingAddress.titulo $!billingAddress.fullName</p>
+
+                        <p>$!billingAddress.address</p>
+                        #if($util.isNotEmpty($billingAddress.address2))<p>$!billingAddress.address2</p>#end
+                        <p>$!billingAddress.city $!billingAddress.stateCode $!billingAddress.zipCode $!billingAddress.idCountry</p>
+                        #if($util.isNotEmpty($billingAddress.phone))<p>$!billingAddress.phone</p>#end
+                    </div>
+                        #if($order.pickInStore)
+                            <h1>#label('pick.in.store')</h1>
+
+                            <div class="content-data">
+                                #set($shippingStore = $order.pickInStore)
+                                <p>$!shippingStore.storeName</p>
+
+                                <p>$!shippingStore.address</p>
+                                #if($util.isNotEmpty($shippingStore.address2))<p>$!shippingStore.address2</p>#end
+                                <p>$!shippingStore.city $!shippingStore.stateCode $!shippingStore.zipCode $!shippingStore.idCountry</p>
+                                #if($util.isNotEmpty($shippingStore.email))<p>$!shippingStore.email</p>#end
+                                #if($util.isNotEmpty($shippingStore.phone))<p>$!shippingStore.phone</p>#end
+                            </div>
+                        #end
+                    #if($order.shippingMethod && $order.deliveryAddress)
+                            <h1>#label('shipping.address')</h1>
+
+                            <div class="content-data">
+                                #set($shippingAddress = $order.deliveryAddress)
+                                <p>$!shippingAddress.titulo $!shippingAddress.fullName</p>
+
+                                <p>$!shippingAddress.address</p>
+                                #if($util.isNotEmpty($shippingAddress.address2))<p>$!shippingAddress.address2</p>#end
+                                <p>$!shippingAddress.city $!shippingAddress.stateCode $!shippingAddress.zipCode $!shippingAddress.idCountry</p>
+                                #if($util.isNotEmpty($shippingAddress.phone))<p>$!shippingAddress.phone</p>#end
+                            </div>
+                    #end
+                </div>
+
+                <div id="blockOrderBilling">
+                    #if($order.shippingMethod)
+                        <div id="blockOrderShippingMethod">
+                            <h1>#label('shipping.method')</h1>
+                            #if($order.pickInStore)
+                            <div class="content-data"><p>#label('shipping.type.pickinstore')</p></div>
+                            #else
+                            <div class="content-data">
+                                <p>
+                                    <span>$!order.shippingMethod.getMethodName($locale.language)</span>
+                                    <span>$!action.formatActualCurrency($order.totalShipping, $order.currency)</span>
+                                </p>
+                            </div>
+                            #end
+                        </div>
+                    #end
+                    <h1>#label('order.sumary')</h1>
+
+                    <div class="content-data">
+                        <table width="100%">
+                            <tr class="subtotal">
+                                <td colspan="4">#label('order.id')</td>
+                                <td class="price">$!order.idOrder</td>
+                            </tr>
+                            <tr class="subtotal">
+                                <td colspan="4">#label('order.created')</td>
+                                <td class="price">$!util.formatDate($order.createdDate,$locale.language)</td>
+                            </tr>
+                            <tr class="subtotal">
+                                <td colspan="4">#label('subtotal.products')</td>
+                                <td class="price">$!action.formatActualCurrency($order.totalProducts, $order.currency)</td>
+                            </tr>
+                            #if($order.interestPercent && $order.interestPercent>0)
+                                <tr class="subtotal">
+                                    <td colspan="4">#label('interest.percent') $!number.format('0.##',$order.interestPercent)</td>
+                                    <td class="price">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
+                                </tr>
+                            #end
+                            #foreach($prom in $order.getPromotions('discount-percent'))
+                                <tr class="promotion">
+                                    <td colspan="4" class="promo">#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+                                    <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+                                </tr>
+                            #end
+                            #foreach($prom in $order.getPromotions('discount'))
+                                <tr class="promotion" class="promo">
+                                    <td colspan="4">#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+                                    <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+                                </tr>
+                            #end
+                            <tr class="subtotal">
+                                #set($freeShipPromList = $order.getPromotions('free-shipping') )
+                                #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                                    #set( $freeShipProm = $list.get($freeShipPromList,0))
+                                    <td colspan="4">PROMO: $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
+                                #else
+                                    <td colspan="4">#label('subtotal.shipping')</td>
+                                #end
+                                <td class="price">$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
+                            </tr>
+                            #if($order.totalInsurance && $order.totalInsurance>0)
+                                <tr class="subtotal">
+                                    <td colspan="4">#label('subtotal.shipping.insurance')</td>
+                                    <td>$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
+                                </tr>
+                            #end
+                            #set($taxesl = $order.getTaxes())
+                            #if($taxesl && !$taxesl.isEmpty())
+                                #foreach($tax in $taxesl)
+                                    <tr class="subtotal">
+                                        <td colspan="4">#label('subtotal.tax') $!tax.name
+                                            #if($tax.totax)<span class="tax-detail">( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
+                                        </td>
+                                        <td class="price">$!action.formatActualCurrency($tax.value,$order.currency)</td>
+                                    </tr>
+                                #end
+                            #end
+                            #if($order.totalRewards && $order.totalRewards>0)
+                                <tr class="subtotal">
+                                    <td colspan="4">#label('used.rewards')</td>
+                                    <td class="price">- $!action.formatActualCurrency($order.totalRewards,$order.currency)</td>
+                                </tr>
+                            #end
+                            <tr class="total">
+                                <td colspan="4">#label('subtotal.total')</td>
+                                <td class="price">$!action.formatActualCurrency($order.total,$order.currency)</td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+
+                <div id="blockOrderPayment">
+                    <h1>#label('payment.options')</h1>
+                    #actionErrors()
+                    #if($metodos && $metodos.size()>0)
+                        <div class="content-data">
+                            <ul>
+                                #foreach($m in $metodos)
+                                    <li>
+                                        <label>
+                                            <input type="radio" name="paymentService" #if($paymentService==$m.get('name')) checked="checked" #end id="payment_$!{m.get('id')}" class="serviceName #if($m.containsKey('form')) has-form #end " value="$!m.get('name')">
+                                            #label("$!m.get('label')")
+                                        </label>
+                                    </li>
+                                #end
+                            </ul>
+                        </div>
+                    #else
+                        #if($metodoExterno)
+                            <div class="content-data">
+                                <ul>
+                                    <li>#label("$!metodoExterno.visibleName")</li>
+                                </ul>
+                            </div>
+                        #end
+                    #end
+
+                    #foreach($m in $metodos)
+                        #if($m.containsKey('form'))
+                            <div id="form_payment_$!{m.get('id')}" class="payment_form" style="display:none;">$m.get('form')</div>
+                        #end
+                    #end
+
+                    <div id="blockCustomData">
+                        #if($action.getStoreProperty('allow.order.custom.reference','N')=='Y')
+                            <label>
+                                <span class="label">#label('order.custom.reference')</span>
+                                <input type="text" name="customReference" value="" class="field string-300" />
+                            </label>
+                        #end
+                        #if($action.getStoreProperty('allow.order.custom.message','N')=='Y')
+                            <label>
+                                <span class="label">#label('order.custom.message')</span>
+                                <textarea name="customMessage" class="field string-300" rows="3"></textarea>
+                            </label>
+                        #end
+                    </div>
+
+                </div>
+            </div>
+            <div id="blockPaymentButtons">
+                <button type="submit"><span class="next">#label('pay.order')</span></button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('input.serviceName').change(
+                function() {
+                    $('.payment_form').hide();
+                    var selected = $('input.serviceName:checked');
+                    if (selected.size() > 0) {
+                        if (selected.hasClass('has-form')) $('#form_' + selected.attr('id')).show();
+                    }
+                }).trigger('change');
+        $('#formNext').submit(function() {
+            $(this).find('div.validation-error').html('').hide();
+            if ($('input.serviceName').size() == 0) return true;
+            if ($('input.serviceName:checked').size() == 0) {
+                $(this).find('div.validation-error').error("$!action.getText('error.payment.method')", "$!action.getText('error.payment.method.empty')");
+                return false;
+            }
+            return ($(this).validForm());
+        });
+    });
+</script>

@@ -1,0 +1,6 @@
+#foreach($l in $links)
+<p style="padding-top: 6px;">
+    <strong>$!{l.product.getProductName($!order.user.language)}</strong><br/>
+    <a href="$!{l.downloadLink}">$!{l.downloadLink}</a>
+</p>
+#end

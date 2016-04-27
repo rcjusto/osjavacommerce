@@ -1,0 +1,83 @@
+#set($menuSelected='purchases')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<div style="width: 990px;">
+
+    <h1>#label('alerts.for.purchases')</h1>
+
+    #if($alerts && !$alerts.isEmpty())
+    <div class="listado">
+        #set($index = 0)
+        #foreach($pEntry in $alerts.entrySet())
+            <form action="$!action.url('createpurchase')" method="post">
+                <input type="hidden" name="idProvider" value="$!pEntry.key.idProvider" />
+                <h3>$!pEntry.key.providerName</h3>
+                <table class="grid" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>#label('admin.part.number')</th>
+                        <th>#label('admin.name')</th>
+                        <th style="text-align: center;">#label('admin.needed')</th>
+                        <th style="text-align: center;">#label('admin.requested')</th>
+                        <th style="text-align: center;">#label('admin.to.request')</th>
+                    </tr>
+                #foreach($p in $!pEntry.value)
+                <tr>
+                    <td><input type="checkbox" name="idProduct" id="sp${index}" class="sel-purchase" #if($!p.getProperty('toRequest')>0) checked="checked" #end value="$!p.idProduct"/></td>
+                    <td>$!p.partNumber</td>
+                    <td>$!p.getProductName($defaultLanguage)</td>
+                    <td style="text-align: center;">$!math.sub(0, $p.stock)</td>
+                    <td style="text-align: center;">$!p.getProperty('requestedPending')</td>
+                    <td style="text-align: center;"><input style="float: none;" id="fld_sp${index}" type="text" name="quantity" value="$!p.getProperty('toRequest')" class="field integer"/></td>
+                </tr>
+                    #set($index = $math.add($index,1))
+                #end
+                </table>
+                <div class="button-bar">
+                    <button type="submit"><span>#label('admin.create.purchase')</span></button>
+                </div>
+            </form>
+        #end
+    </div>
+    #end
+    #if($withoutSupplier && !$withoutSupplier.isEmpty())
+    <div class="listado">
+        <h3>#label('products.without.supplier')</h3>
+                <table class="grid" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th>#label('admin.part.number')</th>
+                        <th>#label('admin.name')</th>
+                        <th style="text-align: center;">#label('admin.needed')</th>
+                    </tr>
+                #foreach($p in $!withoutSupplier)
+                <tr>
+                    <td>$!p.partNumber</td>
+                    <td>$!p.getProductName($defaultLanguage)</td>
+                    <td style="text-align: center;">$!math.sub(0, $p.stock)</td>
+                </tr>
+                #end
+                </table>
+    </div>
+    #end
+
+    #if($alerts.isEmpty() && $withoutSupplier.isEmpty())
+        <div class="info">
+            <p>#label('purchase.alerts.not.founded')</p>
+        </div>
+    #end
+
+
+</div>
+
+<script type="text/javascript">
+    $(function(){
+        $('.sel-purchase').change(function(){
+            if ($(this).is(':checked')) {
+                $('#fld_'+$(this).attr('id')).show().attr('disabled', '');
+            } else {
+                $('#fld_'+$(this).attr('id')).attr('disabled', 'disabled').hide();
+            }
+        }).trigger('change');
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

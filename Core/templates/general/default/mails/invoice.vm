@@ -1,0 +1,79 @@
+<table width="100%" cellpadding="0" cellspacing="0" xmlns:velocity="http://www.w3.org/1999/html">
+    <tr>
+        <td>
+            $!{action.mailGlobalTop}
+        </td>
+        <td style="text-align: right;">
+            <table class="with-border" align="right" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>Invoice No.</th>
+                    <td>$!{order.invoiceNo}.</td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td>$!{order.invoiceDate}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p><br/></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" class="with-border">
+    <tr style="vertical-align:top">
+        <th>Bill To</th>
+        <th>Ship To</th>
+    </tr>
+    <tr style="vertical-align:top">
+        <td width="50%" valign="top">
+            <p>$!{order.billingFullName}</p>
+            <p>$!{order.billingAddressLine1}<br/>$!{order.billingAddressLine2}</p>
+            <p>$!{order.billingCity} $!{order.billingState} $!{order.billingPostalCode} $!{order.billingCountry}</p>
+            <p>$!{order.billingPhone}</p>
+        </td>
+        <td width="50%" valign="top">
+            #if($order.data.shippingMethod)
+                <p>$!{order.shippingFullName}</p>
+                <p>$!{order.shippingAddressLine1}<br/>$!{order.shippingAddressLine2}</p>
+                <p>$!{order.shippingCity} $!{order.shippingState} $!{order.shippingPostalCode} $!{order.shippingCountry}</p>
+                <p>$!{order.shippingPhone}</p>
+            #else
+                #if($order.data.pickInStore)
+                    <p>$!action.getText('shipping.type.pickinstore')</p>
+                #end
+            #end
+        </td>
+    </tr>
+</table>
+<p><br/></p>
+
+<!-- general data -->
+
+<table width="100%" class="with-border" cellpadding="0" cellspacing="0">
+    <tr>
+        <th width="20%">Account No.</th>
+        <td width="15%"></td>
+        <th width="25%">Customer Email</th>
+        <td width="40%">$!{user.email}</td>
+    </tr>
+</table>
+<p><br/></p>
+<table width="100%" class="with-border" cellpadding="0" cellspacing="0">
+    <tr>
+        <th width="20%">PO No</th>
+        <th width="15%">Order ID</th>
+        <th width="25%">Payment Method</th>
+        <th width="25%">Ship Via</th>
+        <th width="15%">Ship Date</th>
+    </tr>
+    <tr>
+        <td align="center">$!{order.purchaseOrder}</td>
+        <td align="center">$!{order.code}</td>
+        <td align="center">$!{order.paymentMethod}</td>
+        <td align="center">$!{order.shippingMethod}</td>
+        <td align="center">$!{order.sentDate}</td>
+    </tr>
+</table>
+<p><br/></p>
+$!{order.invoiceItems}

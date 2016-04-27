@@ -1,0 +1,32 @@
+#set($categoryHierarchyId = $action.getCategoryHierarchyId($category.idCategory))
+#set($_treeCategories = $action.sortCategories($action.getSubCategories($util.null, true)))
+#if ($_treeCategories && !$_treeCategories.isEmpty())
+<div class="tree-menu block categories template-block">
+    <h2>#label('shop.by.categories')</h2>
+    <ul>
+        #foreach($cat in $_treeCategories)
+            #set($openThisCat = $util.isEmpty($categoryHierarchyId) && $velocityCount<1)
+            #control('category_tree')
+        #end
+    </ul>
+</div>
+#end
+#set($_treeCategories = $util.null)
+<script type="text/javascript">
+    $(function(){
+        $('.category-link').click(function(){
+            var ul = $(this).parent().children('ul');
+            if (ul.size()>0) {
+                if (ul.is(':visible')) {
+                    $(this).addClass('collapsed');
+                    ul.hide();
+                } else {
+                    $(this).removeClass('collapsed');
+                    ul.show();
+                }
+                return false;
+            }
+            return true;
+        });
+    });
+</script>

@@ -1,0 +1,123 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function() {
+        $('#treecat').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20 + 4;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        $("#taskPercent").progressbar({ value: 0 });
+        $('.cookie-saved').change(function(){jQuery.cookie('processing.page.'+$(this).attr('name'), $(this).val(), { expires: 100})});
+        $('.cookie-saved').each(function(){
+            if ($(this).val()=='' && jQuery.cookie('processing.page.'+$(this).attr('name'))) $(this).val(jQuery.cookie('processing.page.'+$(this).attr('name')))});
+    });
+    function proccessAll() {
+        $('#tasMsg').html('');
+        $('#taskError').hide();
+        $('#taskErrorDet').html('');
+        $("#taskPercent").progressbar('option', 'value', 0 ).show();
+        $('#jobState').show();
+        processProduct(0);
+    }
+    function processProduct(index) {
+        if (products.length>index) {
+            $('#taskMsg').html('Processing product ' + (index+1) + ' of '+products.length);
+            jQuery.getJSON("${action.url('productprocessrun','admin')}?idProduct="+products[index],$('#mainForm').serialize(), function(data){
+                $("#taskPercent").progressbar('option', 'value', (index+1)*100/products.length ).show();
+                if (data.msg) {
+                    $('#taskErrorDet').append("<div>"+data.msg+"</div>");
+                    $('#taskError').show();
+                }
+                processProduct(index+1);
+            });
+        } else {
+            $('#taskMsg').html('Product processing complete.');
+        }
+    }
+
+    var products = [];
+#if($util.isNotEmpty($products))
+    #foreach($p in $products)
+        products[$velocityCount] = $p;
+    #end
+#end
+</script>
+<h1>#label('admin.product.processing')</h1>
+<div class="formulario">
+    <form id="mainForm" action="$!action.url('productprocesslist','admin')" method="post">
+        <h2>1. Select products to process</h2>
+        <table class="formulario" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>Category</th>
+                <td>
+                    #set($catTree = $dao.getCategoryTree(false))
+                    <select id="treecat" name="idCategory" class="field myselect string-medium" onchange="$('#mainForm').submit()">
+                        <option value="" level="0">#label('admin.not.filter')</option>
+                        #categoryOption($catTree 0 $!idCategory)
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Manufacturer</th>
+                <td>
+                    <select name="idManufacturer" class="field myselect string-medium" onchange="$('#mainForm').submit()">
+                        <option value="">#label('admin.not.filter')</option>
+                        #foreach($opt in $manufacturerList)
+                            <option value="$opt.idManufacturer" #if($idManufacturer==$opt.idManufacturer) selected="selected" #end >$!{opt.manufacturerName}</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Supplier</th>
+                <td>
+
+                </td>
+            </tr>
+        </table>
+        #if($util.isNotEmpty($products))
+            <p>$products.size() productos seleccionados</p>
+        #else
+            <div class="error">
+                <h2>Error</h2>
+                <p>No hay productos seleccionados</p>
+            </div>
+        #end
+
+        <h2>2. Select what to do</h2>
+        <table class="formulario" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>Script to execute</th>
+                <td>
+                    <select name="code" class="field string-medium" onchange="$('#mainForm').submit()">
+                        <option value="">Select a script ...</option>
+                        #foreach($c in $scripts)
+                        <option value="$!c.get('code')" #if($code==$!c.get('code')) selected="selected" #end >$!c.get('name')</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+        #if($info)
+            <p>$!info.get('description')</p>
+        #end
+        #if($util.isNotEmpty($config))
+            <div class="report clearfix">$config</div>
+        #end
+    </form>
+    #if($util.isNotEmpty($code) && $util.isNotEmpty($products))
+        <div id="jobState" class="box" style="display:none;">
+            <div id="taskMsg" style="margin:4px;"></div>
+            <div id="taskPercent"></div>
+            <div id="taskError" style="margin:4px;display:none;">
+            <div id="taskErrorLink" ><a href="#" onclick="$('#taskErrorDet').toggle();return false;">Ver resultados</a></div>
+            <div id="taskErrorDet" style="display:none; height:100px; overflow:auto;padding:6px;background:white;border:1px solid #aaa;"></div>
+            </div>
+        </div>
+        <div id="buttonBar" class="button-bar">
+        <button type="button" onclick="proccessAll()"><span>Execute Task</span></button>
+        </div>
+    #end
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,5 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<p>$!{action.getText('mail.stock.alert')} <strong>$!{product.name}</strong>, $!{action.getText('admin.stock')}: $!{product.data.stock}</p>

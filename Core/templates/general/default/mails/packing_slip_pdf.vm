@@ -1,0 +1,118 @@
+#* @vtlvariable name="order" type="org.store.core.beans.mail.MOrder" *#
+
+<table width="100%" cellpadding="0" cellspacing="0" xmlns:velocity="http://www.w3.org/1999/html">
+    <tr>
+        <td>
+            $!{action.mailGlobalTop}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><br/><br/></p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th style="vertical-align: top;text-align: right;">Order:&nbsp;</th>
+                    <td style="vertical-align: top">$!{order.code}</td>
+                    <th style="vertical-align: top;text-align: right;">Delivery Date:&nbsp;</th>
+                    <td style="vertical-align: top">$!{order.createdDate}</td>
+                    <th style="vertical-align: top;text-align: right;">Packing Slip:&nbsp;</th>
+                    <td style="width:210px;vertical-align: top">
+                        <div style="border-bottom:1px solid black; width:200px;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                        <div style="text-align:center;font-size:6pt;">signature</div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p><br/></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" class="with-border">
+    <tr style="vertical-align:top">
+        <th style="font-size:12pt;text-align:center" colspan="2">Billing Information</th>
+        <th style="font-size:12pt;text-align:center" colspan="2">Shipping Information</th>
+    </tr>
+    <tr>
+        <th>Company</th>
+        <td>$!{order.billingCompany}</td>
+        <th>Company</th>
+        <td>$!{order.shippingCompany}</td>
+    </tr>
+    <tr>
+        <th>Name</th>
+        <td>$!{order.billingFullName}</td>
+        <th>Name</th>
+        <td>$!{order.shippingFullName}</td>
+    </tr>
+    <tr>
+        <th>Address</th>
+        <td>$!{order.billingAddressLine1} $!{order.billingAddressLine2}</td>
+        <th>Address</th>
+        <td>$!{order.shippingAddressLine1} $!{order.shippingAddressLine2}</td>
+    </tr>
+    <tr>
+        <th>City</th>
+        <td>$!{order.billingCity}</td>
+        <th>City</th>
+        <td>$!{order.shippingCity}</td>
+    </tr>
+    <tr>
+        <th>State</th>
+        <td>$!{order.billingState}</td>
+        <th>State</th>
+        <td>$!{order.shippingState}</td>
+    </tr>
+    <tr>
+        <th>Postal Code</th>
+        <td>$!{order.billingPostalCode}</td>
+        <th>Postal Code</th>
+        <td>$!{order.shippingPostalCode}</td>
+    </tr>
+    <tr>
+        <th>Country</th>
+        <td>$!{order.billingCountry}</td>
+        <th>State</th>
+        <td>$!{order.shippingCountry}</td>
+    </tr>
+    <tr>
+        <th>Phone</th>
+        <td>$!{order.billingPhone}</td>
+        <th>Phone</th>
+        <td>$!{order.shippingPhone}</td>
+    </tr>
+</table>
+<p><br/></p>
+
+
+<table width="100%" class="with-border" cellpadding="0" cellspacing="0">
+    <tr>
+        <th nowrap="nowrap" style="font-size:8pt;text-align:left">MFG Part #</th>
+        <th nowrap="nowrap" style="font-size:8pt;text-align:left">Internal Part #</th>
+        <th nowrap="nowrap" style="font-size:8pt;text-align:left">Product Name</th>
+        <th nowrap="nowrap" style="font-size:8pt;text-align:center">On Order</th>
+        <th style="font-size:8pt;text-align:center">Picked</th>
+        <th style="font-size:8pt;text-align:center">Initials</th>
+        <th style="font-size:8pt;text-align:center">Backorder</th>
+    </tr>
+    #foreach($detail in $order.data.orderDetails)
+        #foreach($odp in $detail.orderDetailProducts)
+            <tr class="product">
+                <td>$!odp.product.mfgPartnumber</td>
+                <td>$!odp.product.partNumber</td>
+                <td>$!odp.product.getProductName($locale.language)</td>
+                <td style="text-align:center">$!detail.quantity</td>
+                <td style="text-align:center">
+                    <div style="width:60px;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                </td>
+                <td style="text-align:center">
+                    <div style="width:60px;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                </td>
+                <td style="text-align:center">
+                    <div style="width:60px;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                </td>
+            </tr>
+        #end
+    #end
+
+</table>

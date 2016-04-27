@@ -1,0 +1,8 @@
+<table width="100%" cellpadding="2" cellspacing="0" style="font-size: 8pt;">
+    #foreach($c in $clicks)
+    <tr>
+        <td style="font-weight: bold;border-right: 0;">$!date.format('yyyy-MM-dd HH:mm', $c.clicked): </td>
+        <td style="border-right: 0;"><a target="_blank" href="$!c.url">$!c.url</a></td>
+    </tr>
+    #end
+</table>

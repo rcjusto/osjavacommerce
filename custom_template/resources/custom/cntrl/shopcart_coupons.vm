@@ -1,0 +1,35 @@
+#if($maxPromoCodes>0)
+    #if($promotions) #set($numPromotions=$promotions.size()) #else #set($numPromotions=0) #end
+<div class="shopcart-coupons block">
+    <h2>#label('coupons')</h2>
+
+    <div class="shopcart-coupons-content clearfix">
+        <div class="add-promotions">
+            #fieldErrors('promotions' "$!action.getText('error')")
+            #if($maxPromoCodes>$numPromotions)
+                <h4>#label('have.coupon')</h4>
+                <form id="formaddpromotion" action="$action.url('shopcartPromotion')" method="post">
+                    <input type="hidden" name="output" value="add"/>
+                    <label>
+                        <input type="text" name="code" class="field string-200 required"/>
+                    </label>
+                    <button type="submit"><span class="ok">#label('apply.coupon')</span></button>
+                </form>
+            #end
+        </div>
+        #if($promotions)
+            <div class="applied-promotions">
+                <h4>#label('promotional.codes.applied')</h4>
+                <table>
+                    #foreach($pcMap in $promotions)
+                        <tr>
+                            <td>$!pcMap.get('code') - $!pcMap.get('name')</td>
+                            <td><a href="$!action.url('shopcartPromotion','',$util.toMap(['output','del','code',$!pcMap.get('code')]))" class="remove"></a></td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+        #end
+    </div>
+</div>
+#end

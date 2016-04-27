@@ -1,0 +1,84 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($resource.id)
+        #label('admin.resource.modify') ID: $!resource.id
+    #else
+        #label('admin.resource.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveresource")
+<form action="$urlForm" method="post" enctype="multipart/form-data" class="validable">
+#shidden('name=idResource' "value=$!resource.id")
+#shidden('name=resource.id')
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.resource.type')</th>
+            <td>
+                <select name="resource.resourceType">
+                    #foreach($opt in ['rebate','other'])
+                        <option value="$opt" #if($opt==$resource.resourceType) selected="selected" #end >$!action.getText("resource.type.$opt")</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td>
+                <input name="vis_resourceName" class="multilang field string-large" value=""/>
+                #foreach($l in $languages )
+                    <input type="hidden" class="$l" name="resourceName" value="$!resource.getResourceName($l)"/>
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.description')</th>
+            <td>
+                <textarea name="vis_resourceDescription" class="multilang field string-large" rows="3"></textarea>
+                #foreach($l in $languages )
+                    <input type="hidden" class="$l" name="resourceDescription" value="$!resource.getResourceDescription($l)"/>
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.expire.date')</th>
+            <td>
+                <input type="text" name="resourceDate" value="$!util.formatDate($resource.resourceDate)" class="field date"/>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.value')</th>
+            <td>
+                #stextfield('name=resource.resourceValue' 'cssClass=field decimal')
+            </td>
+        </tr>
+        #if($resource && $util.isNotEmpty($resource.fileName))
+            <tr>
+                <th>#label('admin.current.file')</th>
+                <td>
+                    #surl('id=urlDownload' "action=resourcedownload" "idResource=$!resource.id" )
+                    <a target="_blank" href="$!urlDownload">$!resource.fileName</a>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.change.file')</th>
+                <td>#sfile('name=resourceFile' 'size=40' 'value=Browse...' )</td>
+            </tr>
+        #else
+            <tr>
+                <th>#label('admin.file')</th>
+                <td>#sfile('name=resourceFile' 'size=40' 'value=Browse...' )</td>
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listresource" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

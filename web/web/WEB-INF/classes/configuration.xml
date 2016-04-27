@@ -1,0 +1,84 @@
+<commerces>
+<database id="lexus">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/dewlexus</url>
+<user>root</user>
+<password/>
+</database>
+<database id="books">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/books</url>
+<user>root</user>
+<password/>
+</database>
+<database id="sew">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/sew</url>
+<user>root</user>
+<password/>
+</database>
+<database id="photochoice">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/photochoice</url>
+<user>root</user>
+<password/>
+</database>
+<database id="cartronicrest">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/cartronicrest</url>
+<user>root</user>
+<password/>
+</database>
+<database id="naturabela">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/naturabela</url>
+<user>root</user>
+<password/>
+</database>
+<database id="eel">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/eel</url>
+<user>root</user>
+<password/>
+</database>
+<database id="mycartronic">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/cartronic</url>
+<user>root</user>
+<password/>
+</database>
+<database id="crohns">
+<type>MySQL</type>
+<url>jdbc:mysql://localhost/crohns</url>
+<user>root</user>
+<password>root</password>
+</database>
+<commerce id="cartronic">
+<database>mycartronic</database>
+<url domain="www.store2.cu" path="cartronic"/>
+</commerce>
+<commerce id="sew">
+<database>sew</database>
+<url domain="www.store2.cu" path="sew"/>
+</commerce>
+<commerce id="cartronicr">
+<database>cartronicrest</database>
+<url domain="www.store2.cu" path="cartronicr"/>
+</commerce>
+<commerce id="spanishb">
+<database>books</database>
+<url domain="www.store2.cu" path="spanishb"/>
+</commerce>
+<commerce id="naturabela">
+<database>naturabela</database>
+<url domain="www.store2.cu" path="naturabella"/>
+</commerce>
+<commerce id="eel">
+<database>eel</database>
+<url domain="www.store2.cu" path="eelighting"/>
+</commerce>
+<commerce id="fotochoice">
+<database>photochoice</database>
+<url domain="www.store2.cu" path="photochoice"/>
+</commerce>
+</commerces>

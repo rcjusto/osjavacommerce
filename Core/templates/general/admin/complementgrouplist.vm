@@ -1,0 +1,42 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.complement.group.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=complementgrouplist")
+    <form action="$urlForm" class="validable" method="post">
+        #formErrors()
+        #if($util.isNotEmpty($complementGroups))
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th>#label('admin.group.name')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($g in $complementGroups)
+                    #surl('id=urlEdit' "action=complementgroupedit" "idGroup=$!g.idGroup")
+                    #surl('id=urlComplements' "action=complementlist" "idGroup=$!g.idGroup")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!g.idGroup"/></td>
+                        <td>$!g.getGroupName($defaultLanguage)</td>
+                        <td class="link-bar">
+                            <a href="$urlComplements"><span class="edit">#label('complement.list')</span></a>
+                            <a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a>
+                        </td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.complement.groups.not.found')</h2>
+
+                <p>#label('admin.complement.groups.not.found.text')</p>
+            </div>
+        #end
+        <div class="button-bar">
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+            #surl('id=urlNew' "action=complementgroupedit")
+            <button type="button" href="$urlNew"><span class="add">#label('admin.complement.group.new')</span></button>
+        </div>
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

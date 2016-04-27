@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+
+    <bean class="org.store.core.velocity.StoreVelocityManager"/>
+    <bean class="org.store.core.globals.MyTextProvider" name="myTextProvider" type="com.opensymphony.xwork2.TextProvider"/>
+    <bean class="org.store.core.globals.YahooCurrencyRatesUpdater" type="org.store.core.globals.CurrencyRatesUpdater"/>
+    <bean class="org.store.core.global.StoreStaticContentLoader" name="myContentLoader"  type="org.apache.struts2.dispatcher.StaticContentLoader"/>
+
+    <constant name="struts.staticContentLoader" value="myContentLoader" />
+    <constant name="struts.i18n.reload" value="true"/>
+    <constant name="struts.devMode" value="false"/>
+    <constant name="struts.configuration.xml.reload" value="true"/>
+    <constant name="struts.custom.i18n.resources" value="applicationMessages"/>
+    <constant name="struts.velocity.toolboxlocation" value="/WEB-INF/classes/toolbox.xml"/>
+    <constant name="struts.url.includeParams" value="none"/>
+    <constant name="struts.ui.theme" value="simple"/>
+    <constant name="struts.locale" value="en"/>
+    <constant name="struts.action.extension" value="jsp"/>
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
+    <constant name="struts.mapper.class" value="org.store.core.globals.StoreActionMapper"/>
+    <constant name="struts.xworkTextProvider" value="myTextProvider"/>
+    <constant name="struts.multipart.maxSize" value="10000000" />
+    <!--constant name="struts.convention.action.packages" value="org.store.core.admin,org.store.core.front" /-->
+    <constant name="struts.convention.package.locators" value="admin,front,config,supplier" />
+    <constant name="struts.convention.action.includeJars" value="(.*)store20(.*).jar(!/)?" />
+    <constant name="struts.convention.default.parent.package" value="store-default"/>
+
+    <package name="store-default" extends="struts-default" namespace="/">
+
+        <result-types>
+            <result-type name="velocity" class="org.store.core.velocity.StoreVelocityResult"/>
+            <result-type name="json" class="org.apache.struts2.json.JSONResult"/>
+        </result-types>
+
+        <interceptors>
+            <interceptor name="hibernateSessionInterceptor" class="org.store.core.hibernate.SessionTransactionInjectorInterceptor"/>
+            <interceptor name="storeDetectInterceptor" class="org.store.core.globals.StoreDetectInterceptor"/>
+            <interceptor name="storeSessionInterceptor" class="org.store.core.globals.StoreSessionInterceptor"/>
+            <interceptor name="adminSecurityInterceptor" class="org.store.core.admin.SecurityInterceptor"/>
+            <interceptor name="secure"  class="org.store.sslplugin.interceptors.SSLInterceptor"/>
+            <interceptor name="frontSecurityInterceptor" class="org.store.core.front.SecurityInterceptor"/>
+            <interceptor-stack name="storeDefaultStack">
+                <interceptor-ref name="exception"/>
+                <interceptor-ref name="alias"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="prepare"/>
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="debugging"/>
+                <interceptor-ref name="profiling"/>
+                <interceptor-ref name="fileUpload">
+                    <param name="maximumSize">10000000</param>
+                </interceptor-ref>
+                <interceptor-ref name="checkbox"/>
+                <interceptor-ref name="staticParams"/>
+                <interceptor-ref name="params">
+                    <param name="excludeParams">dojo\..*,^struts\..*</param>
+                </interceptor-ref>
+                <interceptor-ref name="conversionError"/>
+                <interceptor-ref name="workflow">
+                    <param name="excludeMethods">input,back,cancel,browse</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="storeDefaultStack"/>
+
+        <global-results>
+            <result name="configStore" type="redirectAction">config/home</result>
+        </global-results>
+
+    </package>
+
+    <include file="struts-supplier.xml"/>
+    <include file="struts-admin.xml"/>
+    <include file="struts-front.xml"/>
+    <include file="struts-config.xml"/>
+
+</struts>

@@ -1,0 +1,3 @@
+<div id="adminCopyright">
+    #label('admin.copyright')
+</div>

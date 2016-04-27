@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>$!pageTitle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="/templates/$!{template}/skins/${skin}/css/print.css"/>
+</head>
+<body>
+<div id="printContent">
+    <div id="topBar" class="clearfix">
+        <img id="logo" alt="Logo" src="$!action.storeFile('images/custom/print_logo.gif')"/>
+        <span id="pageTitle">$!pageTitle</span>
+    </div>
+
+    #if($util.isNotEmpty($contentPage))
+        <div>#parse($contentPage)</div>
+    #end
+
+</div>
+</body>
+</html>

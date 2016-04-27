@@ -1,0 +1,35 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($payterm.idPayterms)
+        #label('admin.payterm.modify')
+    #else
+        #label('admin.payterm.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savepayterm")
+<form action="$urlForm" method="post">
+#shidden('name=payterm.idPayterms')
+<div class="formulario">
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th>#label('admin.description')</th>
+        <td>
+            #stextfield('name=payterm.description' 'size=60')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.days.number')</th>
+        <td>
+            #stextfield('name=payterm.numDays' "value=$!number.format('#',$payterm.numDays)" 'size=10')
+        </td>
+    </tr>
+</table>
+</div>
+<div class="button-bar">
+    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    #surl('id=urlCancel' "action=listpayterm" )
+    <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

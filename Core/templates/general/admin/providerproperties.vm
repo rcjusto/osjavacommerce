@@ -1,0 +1,23 @@
+#if($propertyNames)
+<table>
+    #foreach($p in $propertyNames)
+    <tr>
+        <th>#label("supplier.service.$!p.name")</th>
+        <td>
+            <input type="hidden" name="servicePropName" value="$!p.name"/>
+            #if($p.options.size()>0)
+                <select name="servicePropValue" class="field required string-short">
+                    #foreach($opt in $p.options)
+                    <option value="$opt" #if($opt==$provider.getServiceProperty($p.name)) selected="selected" #end >$opt</option>
+                    #end
+                </select>
+            #else
+                <input type="text" name="servicePropValue" value="$!provider.getServiceProperty($p.name)" class="field required string-short"/>
+            #end
+        </td>
+    </tr>
+    #end
+</table>
+#else
+  #label('admin.service.not.selected')
+#end

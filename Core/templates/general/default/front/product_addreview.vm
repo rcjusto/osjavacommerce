@@ -1,0 +1,130 @@
+#surl('id=urlCaptcha' "action=captcha")
+<div id="productReviewNew" class="add-review" style="display:none;">
+    #surl('id=urlformAddReview' "action=addreview")
+    <form id="formAddReview" action="$urlformAddReview" method="post">
+        #stoken()
+        #shidden('name=code' "value=$!product.urlCode")
+        <div class="dialog-header">
+            <h2>#label('product.review.add.title')</h2>
+            <h4>#label('product.review.add.subtitle')</h4>
+        </div>
+        <div class="dialog-data">
+            <div id="reviewError" class="error" style="display:none;margin:10px;text-align:left;">
+                <h2>#label('error.review')</h2>
+
+                <p>#label('error.review.text')</p>
+            </div>
+            <table>
+                #set($revCategories = $util.split($action.getParentProperty($product.category,'reviewCategories'),','))
+                #if($revCategories)
+                    #foreach($revC in $revCategories)
+                        <tr>
+                            <th><input type="hidden" name="review_score_name" value="$!revC"/>#label("$revC")</th>
+                            <td>
+                                <div id="stars-$velocityCount" class="stars">
+                                    <input type="radio" value="1" checked="checked"/>
+                                    <input type="radio" value="2"/>
+                                    <input type="radio" value="3"/>
+                                    <input type="radio" value="4"/>
+                                    <input type="radio" value="5"/>
+                                    <input type="radio" value="6"/>
+                                    <input type="radio" value="7"/>
+                                    <input type="radio" value="8"/>
+                                    <input type="radio" value="9"/>
+                                    <input type="radio" value="10"/>
+                                </div>
+                                <span id="cap-stars-$velocityCount" class="review-value"></span>
+                                <input type="hidden" id="input-stars-$velocityCount" name="review_score_value" value="0"/>
+                            </td>
+                        </tr>
+                    #end
+                #else
+                    <tr>
+                        <th>#label('review.score')</th>
+                        <td>
+                            <div id="stars-1" class="stars">
+                                <input type="radio" value="1" checked="checked"/>
+                                <input type="radio" value="2"/>
+                                <input type="radio" value="3"/>
+                                <input type="radio" value="4"/>
+                                <input type="radio" value="5"/>
+                                <input type="radio" value="6"/>
+                                <input type="radio" value="7"/>
+                                <input type="radio" value="8"/>
+                                <input type="radio" value="9"/>
+                                <input type="radio" value="10"/>
+                            </div>
+                            <span id="cap-stars-1" class="review-value"></span>
+                            <input type="hidden" id="input-stars-1" name="review.averageScore" value="0"/>
+                        </td>
+                    </tr>
+                #end
+                #if($frontUser) #else
+                    <tr>
+                        <th>#label('review.username')</th>
+                        <td>
+                            <input type="text" name="review.userName" value="" class="field required string-500"/>
+                        </td>
+                    </tr>
+                #end
+                <tr>
+                    <th>#label('review.title')</th>
+                    <td>
+                        <input type="text" id="reviewtitle" name="review.title" value="" class="field required string-500"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('review.content')</th>
+                    <td>
+                        <textarea id="reviewopinion" name="review.opinion" class="field required string-500" rows="6"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('review.captcha')</th>
+                    <td>
+                        <div id="captchaError" class="error" style="display:none;">
+                            <h2>#label('error.wrong.captcha')</h2>
+
+                            <p>#label('error.wrong.captcha.text')</p>
+                        </div>
+                        <div class="clearfix">
+                            <div style="width:220px;float:left;">
+                                <img id="captchaImg" src="$urlCaptcha" alt=""/>
+                            </div>
+                            <div style="margin-bottom:10px;"><a href="#" onclick="return reloadCaptcha();">#label('another.captcha')</a></div>
+                            <input id="captcha" class="field string-200" onkeypress="$('#captchaError').hide()"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="saveReview();"><span class="ok">#label('review.send')</span></button>
+            <button type="button" onclick="$('#productReviewNew').dialog('close')"><span class="cancel">#label('cancel')</span></button>
+        </div>
+    </form>
+</div>
+#surl('id=urlValidateCaptcha' "action=validcaptcha")
+<script type="text/javascript">
+    function reloadCaptcha() {
+        var url = "$!urlCaptcha" + '?rnd=' + Math.random();
+        $('#captchaImg').attr('src', url);
+        return false;
+    }
+    function saveReview() {
+        $('#reviewError').hide();
+        if ($('#formAddReview').validForm()) {
+            jQuery.getJSON("$urlValidateCaptcha", {captcha:$('#captcha').val()}, function(data) {
+                if (data == 'ok') {
+                    $('#formAddReview').submit();
+                } else {
+                    reloadCaptcha();
+                    $('#captchaError').show();
+                    $('#captcha').val('');
+                }
+            });
+        } else {
+            $('#reviewError').show();
+        }
+    }
+</script>

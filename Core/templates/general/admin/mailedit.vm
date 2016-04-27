@@ -1,0 +1,74 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($mail.idMail)
+        #label('admin.mail.details') ID: $!mail.idMail
+    #else
+        #label('admin.mail.new')
+    #end
+</h1>
+#surl('id=urlformMail' "action=savemail")
+<form id="formMail" action="$urlformMail" method="post" enctype="multipart/form-data" class="validable">
+#shidden('name=idMail' "value=$!mail.idMail")
+<div class="formulario">
+#formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.status'):</th>
+            <td class="mail-${mail.sentStatus}">
+                #label("mail.status.${mail.sentStatus}")
+                #if($mail.sentStatus=='error')($mail.status #label('admin.attemps'))#end
+            </td>
+        </tr>
+        #if($mail.sentStatus=='error' || $mail.sentStatus=='fatal' )
+        <tr>
+            <th>#label('admin.errors'):</th>
+            <td class="mail-errors">$!mail.errors</td>
+        </tr>
+        #end
+        <tr>
+            <th class="required">#label('admin.sendto'):</th>
+            <td>
+                #stextfield('name=mail.toAddress' 'cssClass=field required email')
+            </td>
+        </tr>
+        <tr>
+            <th nowrap="nowrap">#label('admin.sendcopyto'):</th>
+            <td>
+                #stextfield('name=mail.ccAddress' 'cssClass=field email')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.subject'):</th>
+            <td>
+                #stextfield('name=mail.subject' 'cssClass=field required string-large')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.body'):</th>
+            <td colspan="" >
+                <a href="#" onclick="$('#mailcontent').toggle()">#label('admin.show.hide.body')</a>
+                <div id="mailcontent" style="padding:20px;background:#f5f5f5;display:none;">
+                $!mail.body
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listmail" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        <span style="margin-left:40px;">&nbsp;</span>
+        <button type="button" onclick="reSendEmail();"><span class="mail">#label('admin.resend.mail')</span></button>
+    </div>
+</div>
+</form>
+#surl('id=urlResend' "action=mailresend")
+<script type="text/javascript">
+    function reSendEmail() {
+        if ($('#formMail').validForm()) {
+            $('#formMail').attr('action',"$urlResend").submit();
+        }
+    }
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

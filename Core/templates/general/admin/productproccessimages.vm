@@ -1,0 +1,121 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=urlAddImgs' "action=productmassiveupload")
+#surl('id=urlDeleteAll' "action=productmassivedelete")
+#surl('id=urlExportWithoutImage' "action=productwithoutimage")
+
+<link rel="stylesheet" href="/struts/js/plupload2/jquery.plupload.queue/css/jquery.plupload.queue.css" type="text/css" media="screen" />
+
+<script type="text/javascript" src="/struts/js/plupload2/plupload.full.min.js"></script>
+<script type="text/javascript" src="/struts/js/plupload2/jquery.plupload.queue/jquery.plupload.queue.js"></script>
+
+<h1>#label('admin.product.massive.image.upload')</h1>
+
+<div class="listado">
+    #if($processed)
+        <div class="info">
+            <h2>$processed #label('admin.images.successfully.processed')</h2>
+        </div>
+        #formErrors()
+    #end
+
+    #surl('id=urlForm' "action=productproccessimages")
+    <form action="$urlForm" method="post">
+    <div class="formulario">
+        #if($listOk && $listOk.size()>0)
+            <div style="float:left;width:600px;margin-right:40px;">
+                <h2 class="block-title">#label('admin.matched.images')</h2>
+                <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                    #foreach($map in $listOk)
+                        <tr>
+                            <th style="width:1%;">
+                                <img src="$!action.storeFile('uploads')/$!{map.get('file')}" style="height:24px;max-height:24px;"/>
+                            </th>
+                            <th style="text-align:left;">
+                                $!map.get('file')
+                            </th>
+                            <td>
+                                $!map.get('product').getProductName($defaultLanguage)
+                                <input type="hidden" name="productImage" value="$!map.get('file')"/>
+                                <input type="hidden" name="productPartNumber" value="$!map.get('product').partNumber"/>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+        #end
+        #if($listErr && $listErr.size()>0)
+            <div style="float:left;width:600px;">
+                <h2 class="block-title">#label('admin.not matched.images')</h2>
+                <p>#label('admin.enter.product.part.number.to import')</p>
+                <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                    #foreach($cad in $listErr)
+                        <tr>
+                            <th style="width:1%;">
+                                <img src="$!action.storeFile('uploads')/$!{cad}" style="height:24px;max-height:24px;"/>
+                            </th>
+                            <th style="text-align:left;">$!cad</th>
+                            <td>
+                                <input type="hidden" name="productImage" value="$!cad"/>
+                                <input type="text" name="productPartNumber" value="" class="field string"/>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+        #end
+        <div class="button-bar" style="clear:both;">
+            <button type="submit"><span>#label('admin.proccess.images')</span></button>
+            <button type="button" id="btnDeleteAll" style="float: right;"><span>#label('admin.delete.all.images')</span></button>
+        </div>
+    </div>
+</form>
+</div>
+<form id="formDeleteAll" action="$urlDeleteAll" method="post"></form>
+<h2 class="block-title">#label('admin.updaload.images')</h2>
+<p>#label('admin.add.files.and.click.start.button')</p>
+
+<div id="uploader">
+    <p>Your browser doesn't have Flash, Silverlight or HTML5 support.</p>
+</div>
+
+<div style="margin: 20px">
+    <a href="$!urlExportWithoutImage">#label('admin.products.without.images')</a>
+</div>
+<script type="text/javascript">
+
+    // Initialize the widget when the DOM is ready
+    $(function() {
+
+        $("#btnDeleteAll").click(function(){
+            if (confirm("$action.getText('admin.delete.all.images')")) $('#formDeleteAll').submit();
+        });
+
+        $("#uploader").pluploadQueue({
+            // General settings
+            runtimes : 'html5,flash,silverlight,html4',
+            url : "$!urlAddImgs",
+            rename : true,
+            dragdrop: true,
+
+            filters : {
+                max_file_size : '10mb',
+                mime_types: [
+                    {title : "Image files", extensions : "jpg,gif,png"},
+                    {title : "Zip files", extensions : "zip"}
+                ]
+            },
+
+            flash_swf_url : '/struts/js/plupload2/Moxie.swf',
+            silverlight_xap_url : '/struts/js/plupload2/Moxie.xap'
+        });
+        var uploader = $('#uploader').pluploadQueue();
+        uploader.bind('UploadComplete',function(){
+            document.location.reload();
+        });
+
+    });
+</script>
+
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

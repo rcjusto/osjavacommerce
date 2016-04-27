@@ -1,0 +1,117 @@
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>$!{action.mailGlobalTop}</td>
+    </tr>
+</table>
+
+<p><br/></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" class="with-border">
+    <tr>
+        <th>$!{action.getText('order.id')}</th>
+        <th>$!{action.getText('order.status')}</th>
+        <th>$!{action.getText('order.created')}</th>
+        <th>$!{action.getText('order.payment')}</th>
+        #if($order.hasCodeMerchant())
+            <th>$!{action.getText('order.payment.transaction')}</th>
+        #end
+        <th>$!{action.getText('shipping.method')}</th>
+        #if($order.hasInvoiceNo())
+            <th>$!{action.getText('invoice.no')}</th>
+        #end
+        #if($order.hasInvoiceDate())
+            <th>$!{action.getText('invoice.date')}</th>
+        #end
+        #if($order.hasPurchaseOrder())
+            <th>$!{action.getText('purchase.no')}</th>
+        #end
+        #if($order.hasCustomReference())
+            <th>$!{action.getText('custom.reference')}</th>
+        #end
+    </tr>
+    <tr>
+        <td>$!{order.code}</td>
+        <td>$!{order.status}</td>
+        <td>$!{order.createdDate}</td>
+        <td>$!{order.paymentMethod}</td>
+        #if($order.hasCodeMerchant())
+            <td>$!{order.codeMerchant}</td>
+        #end
+        <td>$!{order.shippingMethod}</td>
+        #if($order.hasInvoiceNo())
+            <td>$!{order.invoiceNo}</td>
+        #end
+        #if($order.hasInvoiceDate())
+            <td>$!{order.invoiceDate}</td>
+        #end
+        #if($order.hasPurchaseOrder())
+            <td>$!{order.purchaseOrder}</td>
+        #end
+        #if($order.hasCustomReference())
+            <td>$!{order.customReference}</td>
+        #end
+    </tr>
+</table>
+<p><br/></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" class="with-border">
+    <tr>
+        <th>$!{action.getText('address.billingAddress')}</th>
+        #if($order.data.shippingMethod)
+            <th>$!{action.getText('address.shippingAddress')}</th>
+        #end
+        #if($order.data.shippingMethod)
+            <th>$!{action.getText('shipping.method')}</th>
+        #elseif($order.data.pickInStore)
+            <th>$!{action.getText('shipping.method')}</th>
+        #end
+    </tr>
+    <tr>
+        <td width="33%" style="vertical-align: top">
+            <p>$!{order.billingFullName}</p>
+            <p>$!{user.email}</p>
+            <p>$!{order.billingAddressLine1}<br/>$!{order.billingAddressLine2}</p>
+            <p>$!{order.billingCity} $!{order.billingState} $!{order.billingPostalCode} $!{order.billingCountry}</p>
+            <p>$!{order.billingPhone}</p>
+        </td>
+        #if($order.data.shippingMethod)
+            <td width="33%" style="vertical-align: top">
+                <p>$!{order.shippingFullName}</p>
+                <p>$!{order.shippingAddressLine1}<br/>$!{order.shippingAddressLine2}</p>
+                <p>$!{order.shippingCity} $!{order.shippingState} $!{order.shippingPostalCode} $!{order.shippingCountry}</p>
+                <p>$!{order.shippingPhone}</p>
+            </td>
+        #end
+        #if($order.data.shippingMethod)
+            <td width="33%" style="vertical-align: top">
+                <p>
+                    <span class="shipping-method-name">$!{order.shippingMethod}</span>
+                    <span class="shipping-method-price">$!{order.subtotalShipping}</span>
+                </p>
+            </td>
+        #elseif($order.data.pickInStore)
+            <td width="33%" style="vertical-align: top">
+                <p><span class="shipping-method-name">$!{action.getText('shipping.type.pickinstore')}</span></p>
+                <p>$!{order.pickInStoreName}</p>
+                <p>$!{order.pickInStoreEmail}</p>
+                <p>$!{order.pickInStoreAddressLine1} <br/> $!{order.pickInStoreAddressLine2}</p>
+                <p>$!{order.pickInStoreCity} $!{order.pickInStoreState} $!{order.pickInStorePostalCode} $!{order.pickInStoreState}</p>
+                <p>$!{order.pickInStorePhone}</p>
+            </td>
+        #end
+    </tr>
+</table>
+<p><br/></p>
+
+$!{order.orderItems}
+
+#if($util.isNotEmpty($order.data.customMessage))
+<p><br/></p>
+<table width="100%" cellpadding="0" cellspacing="0" class="with-border">
+    <tr>
+        <td><strong>#label('admin.customer.message'):</strong> $!order.data.customMessage</td>
+    </tr>
+</table>
+#end
+
+

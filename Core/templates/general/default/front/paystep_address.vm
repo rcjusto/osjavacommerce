@@ -1,0 +1,47 @@
+<div id="blockContent" class="paystep-address">
+    <div class="block">
+        <div class="clearfix">
+            <div id="blockAddressBilling">
+                <h1>#label('billing.address')</h1>
+
+                <div id="blockAddressBillingDetail">#parse("/WEB-INF/views/front/paystep_address_billing.vm")</div>
+            </div>
+            <div id="blockAddressShipping">
+                <h1>#label('shipping.address')</h1>
+                <div id="blockAddressShippingDetail">#parse("/WEB-INF/views/front/paystep_address_shipping.vm")</div>
+            </div>
+        </div>
+        <div id="blockAddressButtons">
+            <input type="hidden" id="canContinue" value="$!userSession.readyToPay"/>
+            <button id="nextButton" type="button"><span class="next">#label('next')</span></button>
+        </div>
+    </div>
+</div>
+#surl('id=urlBilling' "action=paystepAddress_billing" "rnd=$!math.random")
+#surl('id=urlShipping' "action=paystepAddress_shipping" "rnd=$!math.random")
+<script type="text/javascript">
+    function updateBilling(data) {
+        $('#nextButton').hide();
+        $('#blockAddressBillingDetail').html('').append($('<div>').loading('Update billing address', 'Please wait'));
+        $('#blockAddressBillingDetail').load("$urlBilling", data, function() {
+            $('#nextButton').show();
+        });
+
+    }
+    function updateShipping(data) {
+        $('#nextButton').hide();
+        $('#blockAddressShippingDetail').html('').append($('<div>').loading('Update shipping address', 'Please wait'));
+        $('#blockAddressShippingDetail').load("$urlShipping", data, function(){
+            $('#nextButton').show();
+        });
+    }
+    $(function() {
+        $('#nextButton').click(function() {
+            if ($('#canContinue').val() == '') {
+                $('#formNext').submit();
+            } else {
+                alert($('#canContinue').val());
+            }
+        });
+    });
+</script>

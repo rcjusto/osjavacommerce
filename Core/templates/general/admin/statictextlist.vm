@@ -1,0 +1,100 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label("admin.static.${filterType}.list")</h1>
+<div class="listado">
+    #surl('id=urlformlistado' "action=liststatic$!{filterType}")
+    <form id="formlistado" action="$urlformlistado" method="post">
+        <div id="filterContainer" class="filters formulario">
+            <table class="formulario" cellpadding="0" cellspacing="0" width="600">
+                <tr>
+                    <th>#label('admin.title')</th>
+                    <td><input type="text" name="filterName" value="$!filterName" class="field string-short"/></td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td><select onchange="$('#$!{staticTextList.name}_pagerows').val($(this).val());">
+                    #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                        <option value="$opt" #if($opt==$staticTextList.pageRows) selected="selected" #end>$opt</option>
+                    #end
+                    </select>
+                    </td>
+                    <td style="text-align:right;">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <input type="hidden" id="staticTextId" name="staticTextId" value=""/>
+        #if($util.isNotEmpty($staticTextList.listado))
+            #set($nav=$staticTextList)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th>#label('admin.id')</th>
+                    #if($filterType=='page')
+                        <th>#label('admin.code')</th>#end
+                    #if($filterType=='news')
+                        <th>#label('admin.date')</th>#end
+                    <th>#label('admin.title')</th>
+                    <th>#label('admin.url')</th>
+                    <th colspan="2">&nbsp;</th>
+                </tr>
+                #foreach($s in $staticTextList.listado)
+                    #surl('id=urlMod' "action=editstatic$!{filterType}" "staticTextId=$!s.id")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!s.id"/></td>
+                        <td>$!s.id</td>
+                        #if($filterType=='page')
+                            <td>$!s.code</td>#end
+                        #if($filterType=='news')
+                            <td>$!util.formatDate($s.contentDate)</td>#end
+                        <td>$!s.getTitle($defaultLanguage)</td>
+                        <td><a target="_blank" href="$!action.urlPage($s,true)">$!action.urlPage($s,true)</a></td>
+                        <td class="link-bar">
+                            <a href="$urlMod"><span class="edit">#label('admin.modify')</span></a>
+                        </td>
+                        <td class="link-bar">
+                            <a href="#" onclick="return deleteConfirm(function(){ $('#staticTextId').val($!s.id);$('#formlistado').submit(); },'$!s.getTitle($defaultLanguage)');"><span class="del">#label('admin.delete')</span></a>
+                        </td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label("admin.static.${filterType}.list")</h2>
+
+                <p>#label("admin.static.${filterType}.list.not.found")</p>
+            </div>
+        #end
+
+    <div class="button-bar">
+        #if($util.isNotEmpty($staticTextList.listado))
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #end
+        #surl('id=urlButton' "action=editstatic$!{filterType}")
+        <button type="button" href="$urlButton"><span class="add">#label("admin.static.$!{filterType}.new")</span></button>
+    </div>
+    </form>
+    #if($!{filterType}=='news')
+        <div>
+            <h2 class="block-title">#label('admin.import.from.rss')</h2>
+            #surl('id=urlForm' "action=importstaticnews")
+            <form action="$urlForm" class="validable" method="post">
+                #formErrors()
+                <table class="formulario" cellpadding="0" cellspacing="6">
+                    <tr>
+                        <th>URL:</th>
+                        <td><input type="text" name="fileName" value="" class="field required string-large"></td>
+                    </tr>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <td>
+                            <button type="submit"><span class="ok">#label('admin.import')</span></button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    #end
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,50 @@
+<div class="dialog-header">
+    <h2>#label('admin.order.payment')</h2>
+    <h4>#label('admin.order.payment.edit')</h4>
+</div>
+<form action="$action.url('orderpaymentsave','admin')" class="validable" method="post">
+<div class="dialog-data" style="padding:0 30px;">
+        #shidden('name=idOrder' "value=$!order.idOrder")
+        #shidden('name=idPayment' "value=$!orderPayment.id")
+        <div class="formulario" style="margin:10px 0;">
+            #formErrors()
+            <table class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.expected.date')</th>
+                    <td><input type="text" readonly="readonly" class="field readonly date" value="$!util.formatDate($orderPayment.expectedDate)"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.amount')</th>
+                    <td><input type="text" readonly="readonly" class="field readonly decimal" value="$!util.formatNumber($orderPayment.amount,'0.00')"/></td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.payment.date')</th>
+                    <td><input type="text" name="paymentDate" value="$!util.formatDate($orderPayment.paymentDate,$defaultLanguage)" class="field date"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.reference')</th>
+                    <td>#stextarea('name=orderPayment.reference' 'cssClass=field string-medium')</td>
+                </tr>
+                <tr>
+                    <th >#label('admin.status')</th>
+                    <td>
+                        #sselect('id=countryCode' 'name=orderPayment.status' "list=#{'Pending':'Pending', 'Complete':'Complete', 'Cancelled':'Cancelled'}" 'cssClass=myselect field string-medium')
+                    </td>
+                </tr>
+            </table>
+        </div>
+</div>
+<div class="button-bar">
+    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+</form>
+<script type="text/javascript">
+$(function(){
+    $('input.date').each(function(){
+        if (!$(this).hasClass('readonly')) {
+            $(this).datepicker({ dateFormat: params.dateFormat });
+        }
+    });
+});
+</script>

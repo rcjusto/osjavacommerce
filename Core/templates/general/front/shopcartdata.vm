@@ -1,0 +1,2 @@
+#set( $contentPage = "/WEB-INF/views/${template}/front/shopcartdata.vm" )
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")

@@ -1,0 +1,47 @@
+#set($_dataNavigator = $_parameters.get('data'))
+<div class="category_navigator">
+    <div class="row row1 clearfix">
+        <span class="total-items">$!_dataNavigator.totalRows #label('navigator.item.number')</span>
+        <span class="view clearfix">
+            <a class="grid" href="#"></a>
+            <a class="list" href="#"></a>
+        </span>
+        <label class="items-per-page">
+            <select name="${_dataNavigator.name}.pagerows" class="reload items-select">
+                #foreach($opt in $pageItemsOptions)
+                    <option value="$opt" #if($opt==$!products.pageRows) selected="selected" #end >$opt #label('items.per.page')</option>
+                #end
+                <option value="0" #if($!products.pageRows==0) selected="selected" #end>$!action.getText('navigator.items.per.page.all')</option>
+            </select>
+        </label>
+        <input type="hidden" name="${_dataNavigator.name}.currentpage" value="$!products.currentPage" class="nav-page current-page"/>
+
+    </div>
+    #if($_dataNavigator.needPagination())
+    <div class="row row2 clearfix">
+        <div class="nav_wrapper_pages">
+            <div class=" clearfix">
+                #if($_dataNavigator.isPrevPage())
+                    <a href="#" data="1" class="gotopage navigator-first"></a>
+                    <a href="#" data="$!_dataNavigator.getPrevPage()" class="gotopage navigator-prev"></a>
+                #end
+                <div class="page">
+                    #set($_navArr = $!_dataNavigator.getPageListLikeGoogle(5))
+                    #foreach($_p in [$list.get($_navArr,0)..$list.get($_navArr,1)])
+                        #if($_p==$_dataNavigator.currentPage)
+                            <span>$!_p</span>
+                        #else
+                            <a href="#" data="$!_p" class="gotopage">$!_p</a>
+                        #end
+                    #end
+                </div>
+                #if($_dataNavigator.isNextPage())
+                    <a href="#" data="$!_dataNavigator.getNextPage()" class="gotopage navigator-next"></a>
+                    <a href="#" data="$!_dataNavigator.getPageCount()" class="gotopage navigator-last"></a>
+                #end
+            </div>
+        </div>
+    </div>
+    #end
+</div>
+#set($_dataNavigator = $util.null)

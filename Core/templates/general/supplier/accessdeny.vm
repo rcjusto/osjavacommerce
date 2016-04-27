@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+    #parse('/WEB-INF/views/supplier/head.vm')
+</head>
+<body>
+<div id="all">
+    <div id="header">#parse('/WEB-INF/views/supplier/top.vm')</div>
+    <div id="content">
+        <form action="$action.url('login','supplier')" method="post" class="validable">
+            <input type="hidden" name="redirectUrl" value="$!thisUrl" />
+        <div class="formulario box" style="width:330px;padding:12px 20px 12px 130px;margin:40px auto;background: #fcfcfc url('/struts/css/images/candado.png') no-repeat 18px 12px;"  >
+            <h3 style="margin-top:0;">#label('admin.enter.credentials').</h3>
+            <table class="formulario" style="margin-left:20px;">
+                <tr>
+                    <th>#label('admin.user')</th>
+                    <td>#stextfield('name=userId' 'cssClass=field required string-short')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.password')</th>
+                    <td>#spassword('name=password' 'cssClass=field required string-short')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.remember.me')</th>
+                    <td>#scheckbox('name=rememberMe')</td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td><button type="submit"><span class="ok">#label('admin.submit')</span></button></td>
+                </tr>
+            </table>
+            #formErrors("$action.getText('admin.authentication.fails')")
+        </div>
+        </form>
+
+    </div>
+    <div id="footer">#parse('/WEB-INF/views/supplier/footer.vm')</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,212 @@
+#surl('id=urlAddImg' "action=productsaveimages" "idProduct=$!product.idProduct")
+#surl('id=urlAddImgEx' "action=productsaveimagesex" "idProduct=$!product.idProduct")
+#surl('id=urlDelImg' "action=productdelimages")
+#surl('id=urlMainImage' "action=productmainimage")
+    <div class="listado">
+        <div style="float:left;margin-right:50px;">
+        #if($productImages && $productImages.size()>0)
+            <table border="0" cellspacing="10">
+                <tr>
+                    <td style="text-align:center;">
+                        <h3 style="margin:0;padding:0;">#label('admin.zoom')</h3>
+                        ($!action.getStoreProperty('images.product.zoom',''))
+                    </td>
+                    <td style="text-align:center;">
+                        <h3 style="margin:0;padding:0;">#label('admin.detail')</h3>
+                        ($!action.getStoreProperty('images.product.detail',''))
+                    </td>
+                    <td style="text-align:center;">
+                        <h3 style="margin:0;padding:0;">#label('admin.list')</h3>
+                        ($!action.getStoreProperty('images.product.list',''))
+                    </td>
+                    <th></th>
+                </tr>
+                #foreach($img in $productImages)
+                    <tr>
+                        <td>
+                            #set( $fs = $util.fileSize($!action.storeFile("images/products/zoom/$!img") ))
+                            #if($fs>0)
+                                <img src="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)?rnd=$math.random" style="max-height:80px;height:80px;"/>
+                                <div>$!util.formatFileSize($fs)</div>
+                            #else
+                            #end
+                        </td>
+                        <td>
+                            #set( $fs = $util.fileSize($!action.storeFile("images/products/$!img") ))
+                            #if($fs>0)
+                                <img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)?rnd=$math.random" style="max-height:80px;height:80px;"/>
+                                <div>$!util.formatFileSize($fs)</div>
+                            #else
+                            #end
+                        </td>
+                        <td>
+                            #set( $fs = $util.fileSize($!action.storeFile("images/products/list/$!img") ))
+                            #if($fs>0)
+                                <img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)?rnd=$math.random" style="max-height:80px;height:80px;"/>
+                                <div>$!util.formatFileSize($fs)</div>
+                            #else
+                            #end
+                        </td>
+                        <th id="cell_$velocityCount">
+                            <input type="hidden" id="image_$velocityCount" value="$!img"/>
+                            #if($product.mainImage==$img)
+                                <h3 class="mainImage" style="margin:0 0 6px 0;padding:0;">#label('admin.main.image')</h3>
+                            #else
+                                <h3 class="mainImage" style="display:none;margin:0 0 6px 0;padding:0;">#label('admin.main.image')</h3>
+                            #end
+                            <div style="line-height:30px;">Name: $!img</div>
+                            <button type="button" onclick="dialogConfirm('Product Images','Delete this image?', function(){deleteImage('$!img');});"><span class="del">#label('admin.delete')</span></button>
+                            #if($product.mainImage==$img)
+                                <button class="mainImage" type="button" style="display:none;" onclick="mainImage($velocityCount);"><span class="ok">#label('admin.main.image')</span></button>
+                            #else
+                                <button class="mainImage" type="button" onclick="mainImage($velocityCount);"><span class="ok">#label('admin.main.image')</span></button>
+                            #end
+                        </th>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.product.images')</h2>
+                <p>#label('admin.product.images.not.found')</p>
+            </div>
+        #end
+        </div>
+        <div style="float:left;">
+            <h2>#label('admin.upload.images')</h2>
+            <form action="$urlAddImgEx" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="idProduct" value="$!product.idProduct"/>
+                #set( $imageErrors = $action.getFlash('images_errors'))
+                #if($util.isNotEmpty($imageErrors))
+                    <div class="error">
+                        <h2>#label('admin.errors')</h2>
+                        <p>
+                            #foreach($err in $imageErrors)
+                                $!err<br/>
+                            #end
+                        </p>
+                    </div>
+                #end
+                <table>
+                    #foreach($i in [1..3])
+                    <tr>
+                        <td><input type="file" name="file" size="40" /></td>
+                    </tr>
+                    #end
+                </table>   
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.submit')</span></button>
+                </div>
+            </form>
+
+            <!--div id="my_uploader" style="width: 450px; height: 330px;">You browser doesn't support native upload. Try Firefox 3 or Safari 4.</div-->
+            <!--div class="button-bar">
+                <div  id="container" style="float:left;">
+                    <button type="button" id="pickImage"><span class="">#label('admin.select.files')</span></button>
+                </div>
+                <button type="button" id="uploadfiles"><span class="">#label('admin.upload.files')</span></button>
+                <div style="clear:both;"></div>
+            </div>
+            <table id="filelist" cellpadding="0" cellspacing="0"></table-->
+        </div>
+        <br style="clear:both;"/>
+    </div>
+<script type="text/javascript" src="/struts/js/ajaxupload.js"></script>
+<script type="text/javascript">
+    function mainImage(index) {
+        var imgSel = $('#image_'+index).val();
+        jQuery.getJSON("$urlMainImage",{idProduct:$!product.idProduct,mainImage:imgSel}, function(data){
+            if (data==imgSel) {
+                $('button.mainImage').show();
+                $('#cell_'+index).find('button.mainImage').hide();
+                $('h3.mainImage').hide();
+                $('#cell_'+index).find('h3.mainImage').show();
+            }
+        });
+    }
+    function deleteImage(imgName) {
+        $('#divImages').loading("$!action.getText('admin.updating.images')","$!action.getText('admin.please.wait')");
+        $('#divImages').load("$urlDelImg",{idProduct:$!product.idProduct,deleteImg:imgName});
+    }
+    $(function() {
+        /*
+        uploader = new plupload.Uploader({
+                runtimes : 'gears,html5,flash,silverlight,browserplus',
+                browse_button : 'pickImage',
+                container : 'container',
+                max_file_size : '2mb',
+                multipart: true,
+                url : "$urlAddImg",
+                flash_swf_url : '/js/plupload/plupload.flash.swf',
+                filters : [
+                    {title : "Image files", extensions : "jpg,gif,png"}
+                ]
+            });
+
+            uploader.bind('Init', function(up, params) {
+                $('#filelist').html("<tr><th class='filename'>$!action.getText('admin.file')</th><th class='filesize'>$!action.getText('admin.size')</th><th class='filepercent'>%</th><th class='filedelete'>&nbsp;</th></tr>");
+            });
+
+            uploader.bind('FilesAdded', function(up, files) {
+                jQuery.each(files, function(i, file) {
+                    $('#filelist').append(
+                        '<tr id="' + file.id + '"><td class="filename">' + file.name + '</td><td class="filesize">' + plupload.formatSize(file.size) + '</td><td class="filepercent"></td><td class="filedelete"><a href="#" class="delFileList delete-row" rel="' + file.id + '"></a></td></tr>');
+                });
+            });
+
+            uploader.bind('UploadProgress', function(up, file) {
+                $('#' + file.id + " b").html(file.percent + "%");
+            });
+
+            uploader.bind('FileUploaded', function(up, file) {
+                $('#' + file.id).hide();
+            });
+
+            uploader.bind('StateChanged', function(up) {
+                if (up.state==plupload.STOPPED) {
+                    $('#divImages').loading("$!action.getText('admin.updating.images')","$!action.getText('admin.please.wait')");
+                    $('#divImages').load("$urlDelImg",{idProduct:$!product.idProduct});
+                }
+            });
+
+            $('#uploadfiles').click(function(e) {
+                uploader.start();
+                e.preventDefault();
+            });
+
+            $('.delFileList').live('click',function(e){
+                var f = uploader.getFile($(this).attr('rel'));
+                if (f) {
+                    uploader.removeFile(f);
+                    $('#' + f.id).hide();
+                }
+                e.preventDefault();
+            });
+
+            uploader.init();
+           */
+        $("#my_uploader").pluploadQueue({
+            // General settings
+            runtimes : 'flash',
+            url : "$urlAddImg",
+            max_file_size : '10mb',
+            chunk_size : '1mb',
+            unique_names : true,
+            filters : [
+                {title : "Image files", extensions : "jpg,gif,png"},
+                {title : "Flash files", extensions : "swf"}
+            ],
+
+            // Resize images on clientside if we can
+            resize : {width : 320, height : 240, quality : 90},
+
+            // Flash settings
+            flash_swf_url : '/struts/js/plupload/plupload.flash.swf',
+            silverlight_xap_url : '/struts/js/plupload/plupload.silverlight.xap',
+            onFinished: function() {
+                $('#divImages').loading("$!action.getText('admin.updating.images')","$!action.getText('admin.please.wait')");
+                $('#divImages').load("$urlDelImg",{idProduct:$!product.idProduct});
+            }
+        });
+    });
+</script>

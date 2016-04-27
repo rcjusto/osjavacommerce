@@ -1,0 +1,35 @@
+<div class="menu-classic">
+    <ul class="clearfix">
+        #foreach($mIt in $treemenu.children() )
+            #set( $m = $mIt.userObject )
+            <li class="$!m.cssClass">
+                <a href="$!m.url">$!m.getLabel($locale.language)</a>
+                #if($m.menuContent)
+                    <ul class="clearfix">
+                        <li>$!m.menuContent.getLanguage($locale.language,$defaultLanguage).value</li>
+                    </ul>
+                #else
+                    #if($m.showSubcategories)
+                        #set($subcats = $action.getSubCategories($m.linkCategory, true))
+                        #if($subcats && $subcats.size()>0)
+                            <ul class="clearfix">
+                                #foreach($subcat in $subcats)
+                                    <li><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                                #end
+                            </ul>
+                        #end
+                    #else
+                        #if($mIt.children().hasMoreElements())
+                            <ul class="clearfix">
+                                #foreach($sIt in $mIt.children())
+                                    #set( $s = $sIt.userObject )
+                                    <li><a href="$!s.url">$!s.getLabel($locale.language)</a></li>
+                                #end
+                            </ul>
+                        #end
+                    #end
+                #end
+            </li>
+        #end
+    </ul>
+</div>

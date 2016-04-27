@@ -1,0 +1,6 @@
+<div id="blockContent" class="clearfix">
+    <div class="closed-store ">
+        <p class="closed-title">#label('store.closed')</p>
+        <p>#label('store.closed.details')</p>
+    </div>
+</div>

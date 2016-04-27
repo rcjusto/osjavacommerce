@@ -1,0 +1,28 @@
+#if($serviceList && $serviceList.size()>0)
+<table id="shippingMethodList" class="listado" cellpadding="0" cellspacing="0">
+    <tr>
+        <th>&nbsp;</th>
+        <th class="name">#label('admin.method')</th>
+        <th class="price">#label('admin.cost')</th>
+        <th class="days">#label('admin.days.to.delivery')</th>
+    </tr>
+    #foreach($rateS in $serviceList)
+        <tr>
+            <td>
+                #if($!rateS.method.carrierName!='CUSTOM')
+                <input id="selectedShippingMethod$velocityCount" name="selectedShippingMethod" type="radio" value="$!rateS.method.id" />
+                #end
+            </td>
+            <td class="name"><label for="selectedShippingMethod$velocityCount">$!rateS.method.carrierName - $!rateS.method.getMethodName($defaultLanguage)</label></td>
+            <td class="price">$!util.formatNumber($rateS.value,'money')</td>
+            <td class="days">
+                #if($rateS.daysToDelivery && $util.isNotEmpty($rateS.daysToDelivery))
+                    #if($rateS.daysToDelivery=='1') 1 #label('day') #else $!rateS.daysToDelivery #label('days') #end
+                #end
+            </td>
+        </tr>
+    #end
+</table>
+#end
+#actionErrors("$action.getText('admin.error.getting.rates')")
+

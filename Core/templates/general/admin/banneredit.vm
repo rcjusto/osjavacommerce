@@ -1,0 +1,108 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($banner.id)
+        #label('admin.banner.modify') ID: $!banner.id
+    #else
+        #label('admin.banner.new')
+    #end
+</h1>
+#foreach($bz in $currentBannersZones)
+    #if($banner.bannerZone==$bz.code) #set($zone = $bz) #end
+#end
+#surl('id=urlForm' "action=savebanner")
+<form action="$urlForm" method="post" enctype="multipart/form-data" class="validable">
+#shidden('name=idBanner' "value=$!banner.id")
+#shidden('name=banner.id')
+<div class="formulario">
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.active')</th>
+            <td>#scheckbox('name=banner.active')</td>
+            <th rowspan="5">#label('admin.banner.zone'):</th>
+            <td rowspan="5" style="padding-left:8px;">
+                <div>$!zone.getName($defaultLanguage)</div>
+                <input type="hidden" name="banner.bannerZone" value="$!banner.bannerZone" />
+                <img src="/struts/templates/${template}/banners/${banner.bannerZone}.gif" alt="" style="border:1px solid #d0d0d0;"/>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.url')</th>
+            <td>#stextfield('name=banner.bannerUrl' 'cssClass=field required string-medium')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.target')</th>
+            <td>
+                #set($bannerTargets=['_blank','_self'])
+                <select name="banner.bannerTarget" class="field string-medium">
+                    #foreach($bt in $bannerTargets)
+                        <option value="$bt" #if($bt==$banner.bannerTarget) selected="selected" #end>#label("admin.target${bt}")</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.size')</th>
+            <td>
+                #stextfield('name=banner.bannerWidth' 'cssClass=field integer')
+                <span style="float:left;margin:3px;">x</span>
+                #stextfield('name=banner.bannerHeight' 'cssClass=field integer')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.for.category')</th>
+            <td>
+                #set($catTree = $dao.getCategoryTree(false))
+                <select id="treecat" name="forCategory" class="field myselect string-medium">
+                    <option value=""></option>
+                    #categoryOption($catTree 0 $!banner.forCategory.idCategory)
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.text')</th>
+            <td colspan="3">#stextfield('name=banner.bannerText' 'cssClass=field string-large')</td>
+        </tr>
+        #foreach($lang in $languages)
+            <tr>
+                <th>#label('admin.image') $lang:</th>
+                <td colspan="3">
+                    #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{banner.id}_${lang}")))
+                    #if($util.isNotEmpty($imgUrl))
+                        #if($imgUrl.endsWith('.swf'))
+                            <div id="flash_${banner.id}_${lang}"></div>
+                            <script type="text/javascript">
+                                $("#flash_${banner.id}_${lang}").flash({swf:"$imgUrl",height:$!banner.bannerHeight,width:$!banner.bannerWidth});
+                            </script>
+                        #else
+                            <div><img src="${imgUrl}?rnd=$!{math.random}" alt=""/></div>
+                        #end
+
+                    #end
+                    <input type="hidden" id="oldimg_$lang" value="$!imgUrl">
+                    #sfile("id=newimg_${lang}" 'name=bannerImage' 'size=80' 'cssClass=customval'  )
+                </td>
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listbanner" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+<script type="text/javascript">
+    function customVal(el) {
+        var lang = $(el).attr('id').substring(7);
+        var oldEmpty = $('#oldimg_' + lang).val() == null || $('#oldimg_' + lang).val() == '' || $('#oldimg_' + lang).val() == 'undefined';
+        var newEmpty = $(el).val() == null || $(el).val() == '' || $(el).val() == 'undefined';
+        return !oldEmpty || !newEmpty;
+    }
+    $(function() {
+
+        $('#treecat').treeSelect();
+    })
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

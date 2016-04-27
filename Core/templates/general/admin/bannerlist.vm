@@ -1,0 +1,83 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.banner.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=listbanner")
+    <form action="$urlForm" method="post">
+    <table cellspacing="0" cellpadding="0" style="border-top:4px solid #d0d0d0;">
+        #foreach($bz in $currentBannersZones)
+            #set($bannerList = $action.getBanners($bz.code))
+            <tr>
+                <td colspan="2" style="background-color:#f6f6f6;text-align:left;padding:4px 0 2px 6px;">
+                    <span style="font-size:12pt;font-weight:bold;margin-right:10px;">$!bz.getName($defaultLanguage)</span>
+                    (<a href="$!action.url('editbanner','admin',$util.map.add('bannerZone',$!bz.code))">#label('admin.banner.new')</a>)
+                    #if($util.isNotEmpty($bannerList) && $bz.bannersNumber==1)
+                        <span style="float: right;margin-right: 12px;"><a href="$!action.url('editSlider','admin',$util.map.add('bannerZone',$!bz.code))">#label('admin.configure.slider')</a></span>
+                    #end
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <th style="width:1%;padding:4px 6px;border-bottom:4px solid #d0d0d0;background-color:#f6f6f6;">
+                    <img src="/struts/templates/${template}/banners/${bz.code}.gif" alt=""/>
+                </th>
+                <td style="background-color:white;padding:4px 6px;border-bottom:4px solid #d0d0d0;">
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        #foreach($b in $bannerList)
+                            #surl('id=urlEdit' "action=editbanner" "idBanner=$!b.id")
+                            #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{b.id}_${locale.language}")))
+                            #if($b.active) #set($bColor = '#406db8') #else #set($bColor = '#d0d0d0') #end
+                            <li style="float:left;margin: 0 10px 10px 0;padding:6px;border:1px solid $!bColor;">
+                                <div style="float:left;margin-right:10px;">
+                                    #if($imgUrl.endsWith('.swf'))
+                                        <div id="flash_$b.id"></div>
+                                        <script type="text/javascript">
+                                            $("#flash_$b.id").flash({swf:"$imgUrl",height:83,width:100});
+                                        </script>
+                                    #else
+                                        <div><img src="$imgUrl" alt="$!ban.bannerText" style="width:100px;height:83px;"/></div>
+                                    #end
+                                    <div style="margin-top:4px;">
+                                        <label>
+                                            <input type="checkbox" name="selecteds" value="$!b.id">
+                                            <span>#label('admin.remove')</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div style="float:left;">
+                                    <table>
+                                        <tr>
+                                            <th style="text-align:left;">#label('admin.id')</th>
+                                            <td>$!b.id</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:left;">#label('admin.text')</th>
+                                            <td>$!b.bannerText</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:left;">#label('admin.active')</th>
+                                            <td>$!b.active</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:left;">#label('admin.hits')</th>
+                                            <td>$!b.bannerHits</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="link-bar" colspan="2" style="text-align:right;"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div style="clear:both;"></div>
+                            </li>
+                        #end
+                        <li style="clear:both;"></li>
+                    </ul>
+                </td>
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+    </div>
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

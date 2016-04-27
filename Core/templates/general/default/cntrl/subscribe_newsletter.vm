@@ -1,0 +1,10 @@
+<div class="subscribe_newsletter">
+    <form id="emailSubscribe">
+        <label for="subscribeEmailAddress">#label('deal.alert.by.email')</label>
+        <div class="wrapper clearfix">
+            <input type="text" id="subscribeEmailAddress" class="required email" value=""/>
+            <a href="#" onclick="$('#emailSubscribe').submit(); return false;"></a>
+        </div>
+        <span class="field_error" style="display:none;"></span>
+    </form>
+</div>

@@ -1,0 +1,148 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label($jobName)</h1>
+<div class="formulario">
+    #if($util.isNotEmpty($jobName))
+        #surl('id=formProperties' "action=jobpropertiessave")
+        <form action="$formProperties" method="post" class="validable">
+            #shidden('name=job.id')
+            #shidden('name=job.name' "value=$!jobName")
+            #formErrors()
+            <table cellspacing="0" cellpadding="0" class="formulario">
+                <tr>
+                    <th>#label('admin.active')</th>
+                    <td>#scheckbox('name=job.active')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.job.start.at')</th>
+                    <td><input type="text" name="jobStartAt" value="$!job.strBeginHour" class="field required string-short"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.job.run.every')</th>
+                    <td>
+                        <input type="text" name="job.intervalNumber" value="$!job.intervalNumber" class="field integer required"/>
+                        <select name="job.intervalUnit" class="field string-short required">
+                            #foreach($opt in ['HOUR','DAY','WEEK','MONTH','YEAR'])
+                                <option value="$opt" #if($opt==$job.intervalUnit) selected="selected" #end >$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                #if($job.active)
+                    <tr>
+                        <th>#label('admin.previous.execution')</th>
+                        <td>$!util.formatDate($!job.lastExecution) $!date.format('HH:mm',$!job.lastExecution)</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.next.execution')</th>
+                        <td>$!util.formatDate($!trigger.nextFireTime) $!date.format('HH:mm',$!trigger.nextFireTime)</td>
+                    </tr>
+                #end
+
+                #if($util.isNotEmpty($job.executionStatus))
+                    <tr>
+                        <th>#label('admin.last.execution.status')</th>
+                        <td>#label("admin.execution.$!{job.executionStatus}")</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.last.execution.message')</th>
+                        <td>$!job.executionMsg</td>
+                    </tr>
+                #end
+
+                #foreach($propGroup in $propertyGroups)
+                    <tr class="block-title">
+                        <th colspan="2">#label($!propGroup.groupName)</th>
+                    </tr>
+                    #foreach($propName in $propGroup.propertyNames)
+                    <tr>
+                        <th><input type="hidden" name="jobPropertyKey" value="$!propName.name"/>#label("admin.$!propName.name")</th>
+                        <td>
+                            #if($propName.options && !$list.isEmpty($propName.options))
+                                <select name="jobPropertyValue" class="field string-medium">
+                                    #foreach($opt in $propName.options)
+                                    <option value="$opt" #if($job.getJobProperty($propName.name, $!propName.defaultValue)==$opt) selected="selected" #end >#label($opt)</option>
+                                    #end
+                                </select>
+                            #else
+                                <input type="text" name="jobPropertyValue" value="$!job.getJobProperty($propName.name, $!propName.defaultValue)" class="field string-medium"/>
+                            #end
+                        </td>
+                    </tr>
+                    #end
+                #end
+
+                #if($configLink)
+                    <tr>
+                        <th>#label('admin.task.configuration.page')</th>
+                        <td><a href="$configLink">#label('admin.configure')</a></td>
+                    </tr>
+                #end
+
+            </table>
+            <div id="jobState" class="box" style="display:none;">
+                <div class="clearfix" style="margin:4px;">
+                    <div id="taskMsg" style="float: left;"></div>
+                    <div id="taskETA" style="float: right;"></div>
+                </div>
+                <div id="taskPercent"></div>
+            </div>
+            <div class="button-bar">
+                <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                #if($job.active)
+                    <button type="button" onclick="executeNow();"><span>#label('admin.execute.now')</span></button>
+                #end
+                <button type="button" href="$!action.url('jobpropertieslist')"><span class="back">#label('admin.background.job.list')</span></button>
+            </div>
+        </form>
+    #end
+</div>
+<script type="text/javascript">
+    var timeStart = null;
+    function executeState() {
+        jQuery.getJSON("$action.url('jobexecutestate','admin')", {jobName:"$!jobName"}, function(data) {
+            if (data.result == 'error') {
+                $('#jobState').hide();
+            } else {
+                $('#jobState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#taskMsg').html("<p>Task Complete.</p>");
+                    $("#taskETA").hide();
+                    $("#taskPercent").hide();
+                    refreshPage();
+                } else {
+                    if (data.percent != null) {
+                        var d = new Date();
+                        var eta = (d-timeStart)*(100-data.percent)/data.percent;
+                        $('#taskMsg').html(Math.round(data.percent) + '%: ' + data.msg);
+                        $('#taskETA').html('ETA: '+formatTimestamp(eta)).show();
+                        $("#taskPercent").progressbar('option', 'value', Math.round(data.percent)).show();
+                    }
+                    setTimeout(executeState, 1000);
+                }
+            }
+        });
+    }
+    function executeNow() {
+        jQuery.getJSON("$action.url('jobexecute','admin')", {jobName:"$!jobName"}, function(data) {
+            if (data.result == 'ok') {
+                timeStart = new Date();
+                executeState();
+            } else {
+                alert(data.msg);
+            }
+        });
+    }
+    function refreshPage() {
+        $('#formListJobs').submit();
+    }
+    function formatTimestamp(t) {
+        var s = Math.round(t / 1000);
+        return s + ' seg';
+    }
+    $(function() {
+        $("#taskPercent").progressbar({ value: 0 });
+        executeState();
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

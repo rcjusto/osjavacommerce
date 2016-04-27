@@ -1,0 +1,30 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.merchant.list')</h1>
+<div class="listado">
+    #if($util.isNotEmpty($listado))
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th>#label('admin.name')</th>
+            <th style="text-align:center;">#label('admin.active')</th>
+            <th>#label('admin.type')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($m in $listado)
+            #surl('id=urlEdit' "action=editmerchant" "serviceName=$!m.get('name')")
+            <tr>
+                <td>$!m.get('name')</td>
+                <td class="#if($m.get('active')) chk_true #else chk_false #end ">&nbsp;</td>
+                <td>#label("payment.type.${m.get('type')}")</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.payment.services.not.found')</h2>
+            <p>#label('admin.payment.services.not.found.text')</p>
+        </div>
+    #end
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

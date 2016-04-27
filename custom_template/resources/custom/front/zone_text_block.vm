@@ -1,0 +1,23 @@
+#set($block = $action.getStaticText($params, 'block'))
+
+#if($action.hasRole('superadmin'))
+    #set($_id = $blockId.replace('.','_') )
+<div class="editable-block block free-text template-block">
+    <div class="editable-block-link"><a href="#" onclick="return editBlock('$blockId')">EDIT BLOCK</a></div>
+    #if($block && $!util.isNotEmpty($block.getLanguage($locale.language, $defaultLanguage).value))
+        <div id="block_$_id">
+            #evaluate($!block.getLanguage($locale.language, $defaultLanguage).value)
+        </div>
+    #else
+        <div id="block_$_id" class="editable-block-empty">#label('empty.block')</div>
+    #end
+</div>
+#else
+    #if($block)
+    <div class="block free-text">
+        #evaluate($!block.getLanguage($locale.language, $defaultLanguage).value)
+    </div>
+    #end
+#end
+
+#set($block = $util.null)

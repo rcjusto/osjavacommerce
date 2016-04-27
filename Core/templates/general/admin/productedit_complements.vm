@@ -1,0 +1,119 @@
+<div class="listado">
+    <div style="float:left;width:400px;margin-right:50px;">
+        #if($util.isNotEmpty($complementGroups))
+            #if($util.isNotEmpty($productComplementParent))
+                <h2 class="block-title">#label('admin.complement.groups.inherited')</h2>
+                <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th style="text-align:left;">#label('admin.group.name')</th>
+                        <th style="text-align:left;">&nbsp;</th>
+                    </tr>
+                    #foreach($p in $productComplementParent)
+                        <tr>
+                            <td width="95%" style="padding-right:20px;">$!p.getGroupName($defaultLanguage)</td>
+                            <td width="5%"><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+                        </tr>
+                    #end
+                </table>
+            #end
+            #if($util.isNotEmpty($product.relatedGroups))
+                <h2 class="block-title">#label('admin.complement.groups.configured')</h2>
+                <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th style="text-align:left;">Group Name</th>
+                        <th style="text-align:left;">&nbsp;</th>
+                    </tr>
+                    #foreach($p in $product.relatedGroups)
+                        <tr>
+                            <td width="95%">$!p.getGroupName($defaultLanguage)</td>
+                            <td width="5%"><a class="delete-row" href="#" onclick="return dialogConfirm('Product Complement Groups','Are you sure you want to remove this group?',function(){delComplement($p.idGroup);});" title="Delete Complement Group"></a></td>
+                        </tr>
+                    #end
+                </table>
+            #end
+            <div class="formulario">
+                <form id="formAddComplement">
+                    <input type="hidden" name="idProduct" value="$!product.idProduct">
+
+                    <h3>#label('admin.complement.group.add')</h3>
+                    <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <th>#label('admin.select.group')</th>
+                            <td width="5%">
+                                <select name="groupId" class="field string-medium">
+                                    #foreach($g in $complementGroups)
+                                        <option value="$!g.idGroup">$!g.getGroupName($defaultLanguage)</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="button-bar">
+                        <button type="button" onclick="addComplement();"><span class="add">#label('admin.add.complement')</span></button>
+                    </div>
+                </form>
+            </div>
+        #else
+            <div class="info">
+                <h2>#label('admin.complement.groups')</h2>
+
+                <p>#label('admin.complement.groups.not.found')</p>
+            </div>
+        #end
+    </div>
+    <div style="float:left;width:400px;">
+    #if($util.isNotEmpty($action.getUserLevelListAll()))
+        #if($util.isNotEmpty($product.forUsers))
+            <h2 class="block-title">#label('admin.product.customers.access.limited')</h2>
+            <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <th style="text-align:left;">#label('admin.customer.level')</th>
+                    <th style="text-align:left;width:5%">&nbsp;</th>
+                </tr>
+                #foreach($lid in $product.forUsers)
+                    #set($l = $action.findBeanInList($action.getUserLevelListAll(),"id",$lid.toString()))
+                    #if($l)
+                    <tr>
+                        <td>$!l.getName($defaultLanguage)</td>
+                        <td><a class="delete-row" href="#" onclick="return dialogConfirm('Product Customer Access','Are you sure you want to remove access to this level?',function(){delUserLevel($l.id);});" title="Remove access to customers"></a></td>
+                    </tr>
+                    #end
+                    #set($l = $util.null)
+                #end
+            </table>
+        #else
+            <h2 class="block-title">#label('admin.product.customers.access')</h2>
+            <p>#label('admin.product.public.access')</p>
+        #end
+        <div class="formulario">
+            <form id="formAddUserLevel">
+                <input type="hidden" name="idProduct" value="$!product.idProduct">
+
+                <h3>#label('admin.product.customers.access.add')</h3>
+                <table class="formulario" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.customer.level')</th>
+                        <td>
+                            <select name="levelId" class="field string-medium">
+                                #foreach($l in $action.getUserLevelListAll())
+                                    <option value="$!l.id">$!l.getName($defaultLanguage)</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <div class="button-bar">
+                    <button type="button" onclick="addUserLevel();"><span class="add">#label('admin.add.access')</span></button>
+                </div>
+            </form>
+        </div>
+    #else
+        <div class="info">
+            <h2>#label('admin.customer.levels.not.found')</h2>
+            <p>#label('admin.customer.levels.not.found.text')</p>
+        </div>
+
+    #end
+    </div>
+    <br style="clear:both;"/>
+</div>

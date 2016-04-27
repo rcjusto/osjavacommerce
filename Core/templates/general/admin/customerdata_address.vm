@@ -1,0 +1,57 @@
+#surl('id=urlformaddresses' "action=useraddresssave")
+<form id="formaddresses" action="urlformaddresses" class="validable">
+    #shidden('name=idUser' "value=$!user.idUser")
+    #formErrors()
+    #if($util.isNotEmpty($user.addressList))
+        <table class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.nickname')</th>
+                <th>#label('admin.contact')</th>
+                <th>#label('admin.address')</th>
+                <th>#label('admin.city')</th>
+                <th>#label('admin.postal.code')</th>
+                <th>#label('admin.state')</th>
+                <th>#label('admin.country')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($a in $user.addressList)
+                <tr>
+                    <td>$!a.code</td>
+                    <td>$!a.fullName</td>
+                    <td>$!a.address</td>
+                    <td>$!a.city</td>
+                    <td>$!a.zipCode</td>
+                    <td>$!a.state.stateName</td>
+                    <td>$!a.idCountry</td>
+                    <td><a href="#" onclick="editAddress($!a.idAddress)">#label('admin.edit.address')</a></td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.user.address')</h2>
+
+            <p>#label('admin.user.address.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="button" onclick="editAddress(0);"><span class="add">#label('admin.user.address.new')</span></button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    var dateFormat = #if($!defaultLanguage=='es') 'dd/mm/yy' #else 'mm/dd/yy' #end;
+    $(function() {
+        $('form.validable').find("input:text,select,textarea").each(function() {
+            $(this).attr('oldvalue', $(this).val()).change(function() {
+                if ($(this).attr('oldvalue') != $(this).val()) $(this).addClass('modified'); else $(this).removeClass('modified');
+            });
+        });
+        $('form.validable').find("input.date").each(function() {
+            if (!$(this).hasClass('readonly'))
+                $(this).datepicker({dateFormat:dateFormat}).attr('oldvalue', $(this).val()).change(function(e, nv) {
+                    if ($(this).attr('oldvalue') != nv) $(this).addClass('modified'); else $(this).removeClass('modified');
+                });
+        });
+    });
+</script>

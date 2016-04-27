@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>Order Invoice $!order.idOrder</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="$!action.skinFile('css/print.css')"/>
+</head>
+<body>
+<div id="printContent">
+    <div id="topBar" class="clearfix">
+        <img id="logo" alt="Logo" src="$!action.storeFile('images/custom/print_logo.gif')"/>
+        <span id="pageTitle">#label('admin.order.invoice')</span>
+    </div>
+
+    #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+
+</div>
+
+<hr/>
+
+
+
+</body>
+</html>

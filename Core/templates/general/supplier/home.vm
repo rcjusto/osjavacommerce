@@ -1,0 +1,16 @@
+#set($menuSelected='home')
+#parse('/WEB-INF/views/supplier/page_top.vm')
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.jqplot.min.css" />
+<script type="text/javascript" src="/struts/js/jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="/struts/js/jqplot/jqplot.pieRenderer.min.js"></script>
+
+<div id="topSellers"></div>
+<div id="moreViewed"></div>
+
+<script type="text/javascript">
+    $(function(){
+        $('#topSellers').load("$action.url('topSellers','supplier')",{year:2008});
+        $('#moreViewed').load("$action.url('moreViewed','supplier')",{year:2008});
+    })
+</script>
+#parse('/WEB-INF/views/supplier/page_bot.vm')

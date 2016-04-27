@@ -1,0 +1,59 @@
+<div id="blockContent" class="order-page clearfix">
+    <div id="blockOrderDetail">
+        <div class="block">
+            #if($order)
+                <h1>#label('order.data')</h1>
+                #set($orderShowTrackingPackages = 'Y')
+                #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+            #else
+                <div class="error">
+                    <h2>#label('order.not.found')</h2>
+                    <p>#label('order.not.found.text')</p>
+                </div>
+            #end
+            <div class="button-bar">
+                #if($order)
+
+                    #if($util.fileExist($!action.storeFile("invoices/${order.idOrder}.pdf")))
+                        <button type="button" href="$!action.storeFile('invoices')/${order.idOrder}.pdf"><span>#label('invoice')</span></button>
+                    #end
+
+                    <button type="button" onclick="printOrder();"><span>#label('printable.version')</span></button>
+
+                    #if($action.getStoreProperty('can.re.order','Y')=='Y')
+                    #surl('id=urlAddToCart' "action=addordertocart" "idOrder=$!order.idOrder")
+                    <button type="button" href="$urlAddToCart"><span>#label('add.products.to.cart')</span></button>
+                    #end
+
+                    #if($action.getStoreProperty('can.do.rma','Y')=='Y')
+                    #surl('id=urlRma' "action=rmaorder" "idOrder=$!order.idOrder")
+                    <button type="button" href="$urlRma"><span>#label('order.rma')</span></button>
+                    #end
+                #end
+                #surl('id=urlOrders' "action=orders")
+                <button type="button" href="$urlOrders"><span>#label('my.orders')</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+#surl('id=urlPrintOrder' "action=order" "idOrder=$!order.idOrder" )
+<script type="text/javascript">
+    var wndPrint = null;
+    function printOrder() {
+        if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+        var url = "$!urlPrintOrder" + '&output=print';
+        wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+        wndPrint.focus();
+    }
+
+    $(function(){
+        $('a.shipping-packages-tracking').click(function(){
+            var idPackage = $(this).attr('rel');
+            var url = "$!action.url('tracking')";
+            $('#dialogContent').append($('<div>').loading('Loading tracking data', 'Please wait...'));
+            $('#dialogContent').load(url, {idPackageProduct:idPackage,rnd:Math.random()});
+            $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+           return false;
+        });
+    });
+</script>

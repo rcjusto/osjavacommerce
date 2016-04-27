@@ -1,0 +1,39 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.help.list')</h1>
+<div class="listado">
+    #if($util.isNotEmpty($helplist))
+        <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                <th>#label('admin.code')</th>
+                <th>#label('admin.text')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #set($oldPage = '')
+            #foreach($h in $helplist)
+                #if($oldPage!=$h.page)
+                    <tr class="block-title">
+                        <th colspan="3">$!h.page</th>
+                    </tr>
+                #end
+
+                #surl('id=urlEdit' "action=edithelp" "idHelp=$!h.id")
+
+                <tr>
+                    <td>$!h.code</td>
+                    <td>$!util.abbreviate($h.getHelpContent($defaultLanguage),50)</td>
+                    <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <p>#label('admin.helps.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        #surl('id=urlButton' "action=edithelp")
+        <button type="button" href="$urlButton"><span class="add">#label('admin.help.new')</span></button>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

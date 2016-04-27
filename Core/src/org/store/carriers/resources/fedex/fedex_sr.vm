@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FDXShipRequest xmlns:api="http://www.fedex.com/fsmapi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="FDXShipRequest.xsd">
+    <RequestHeader>
+        <AccountNumber>$!bean.user.accountNumber</AccountNumber>
+        <MeterNumber>$!bean.user.meterNumber</MeterNumber>
+        <CarrierCode>$!bean.carrierCode</CarrierCode>
+    </RequestHeader>
+    <ShipDate>$!bean.shipDate</ShipDate>
+    <DropoffType>$!bean.dropoffType</DropoffType>
+    <Service>$!bean.service</Service>
+    <Packaging>$!bean.packaging</Packaging>
+    <WeightUnits>$!bean.weightUnits</WeightUnits>
+    <Weight>$!tool.format($bean.pack.packageWeight, '0.0')</Weight>
+    <CurrencyCode>USD</CurrencyCode>
+    <Origin>
+        <Contact>
+            <PersonName>$!bean.originAddress.attentionName</PersonName>
+            #if($!bean.originAddress.name && $!bean.originAddress.name!='')<CompanyName>$!bean.originAddress.name</CompanyName>#end
+            <PhoneNumber>$!bean.originAddress.phoneNumber</PhoneNumber>
+            #if($!bean.originAddress.email && $!bean.originAddress.email!='')<E-MailAddress>$!bean.originAddress.email</E-MailAddress>#end
+        </Contact>
+        <Address>
+            <Line1>$!bean.originAddress.address.addressLine1</Line1>
+            #if($!bean.originAddress.address.addressLine2 && $!bean.originAddress.address.addressLine2!='')<Line2>$!bean.originAddress.address.addressLine2</Line2>#end
+            <City>$!bean.originAddress.address.city</City>
+            <StateOrProvinceCode>$!bean.originAddress.address.stateProvinceCode</StateOrProvinceCode>
+            <PostalCode>$!bean.originAddress.address.postalCode</PostalCode>
+            <CountryCode>$!bean.originAddress.address.countryCode</CountryCode>
+        </Address>
+    </Origin>
+    <Destination>
+        <Contact>
+            <PersonName>$!bean.destinationAddress.attentionName</PersonName>
+            #if($!bean.destinationAddress.companyName && $!bean.destinationAddress.companyName!='')<CompanyName>$!bean.destinationAddress.companyName</CompanyName>#end
+            #set( $dpn = $!bean.destinationAddress.phoneNumber.toString("") )
+            #if( $dpn && $dpn!='' )<PhoneNumber>$dpn</PhoneNumber>#end
+        </Contact>
+        <Address>
+            <Line1>$!bean.destinationAddress.address.addressLine1</Line1>
+            #if($!bean.destinationAddress.address.addressLine2 && $!bean.destinationAddress.address.addressLine2!='')<Line2>$!bean.destinationAddress.address.addressLine2</Line2>#end
+            <City>$!bean.destinationAddress.address.city</City>
+            <StateOrProvinceCode>$!bean.destinationAddress.address.stateProvinceCode</StateOrProvinceCode>
+            <PostalCode>$!bean.destinationAddress.address.postalCode</PostalCode>
+            <CountryCode>$!bean.destinationAddress.address.countryCode</CountryCode>
+        </Address>
+    </Destination>
+    <Payment>
+        <PayorType>$!bean.payorType</PayorType>
+    </Payment>
+    <Dimensions>
+        <Length>$!tool.roundToInt($bean.pack.dimensionsLength)</Length>
+        <Width>$!tool.roundToInt($bean.pack.dimensionsWidth)</Width>
+        <Height>$!tool.roundToInt($bean.pack.dimensionsHeight)</Height>
+        <Units>$!bean.dimentionsUnits</Units>
+    </Dimensions>
+    <DeclaredValue>$!tool.format($bean.pack.insuredValueMonetaryValue, '0.00')</DeclaredValue>
+    <SpecialServices>
+        <FutureDayShipment>$!bean.futureDayShipment</FutureDayShipment>
+        <ResidentialDelivery>$!bean.residentialDelivery</ResidentialDelivery>
+        <InsidePickup>$!bean.insidePickup</InsidePickup>
+        <InsideDelivery>$!bean.insideDelivery</InsideDelivery>
+        <SaturdayPickup>$!bean.saturdayPickup</SaturdayPickup>
+        <SaturdayDelivery>$!bean.saturdayDelivery</SaturdayDelivery>
+    </SpecialServices>
+    <Label>
+        <Type>$!bean.labelType</Type>
+        <ImageType>$!bean.labelImageType</ImageType>
+    </Label>
+</FDXShipRequest>

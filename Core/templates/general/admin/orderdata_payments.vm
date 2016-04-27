@@ -1,0 +1,26 @@
+<div class="listado">
+    <h2 class="block-title">#label('admin.order.payments')</h2>
+
+    <div class="block-content">
+        <table class="listado" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.status')</th>
+                <th>#label('admin.amount')</th>
+                <th>#label('admin.expected.date')</th>
+                <th>#label('admin.payment.date')</th>
+                <th>#label('admin.reference')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($pp in $payments)
+                <tr>
+                    <td>$!pp.status</td>
+                    <td>$!util.formatNumber($pp.amount,'0.00')</td>
+                    <td #if($date.date.after($pp.expectedDate) && $pp.status=='Pending') style="background-color:#ffb6c1;" #end >$!util.formatDate($pp.expectedDate)</td>
+                    <td>$!util.formatDate($pp.paymentDate)</td>
+                    <td>$!pp.reference</td>
+                    <td class="link-bar" nowrap="nowrap"><a href="#" class="editPayment" rel="$!pp.id"><span class="edit">#label('admin.modify')</span></a></td>
+                </tr>
+            #end
+        </table>
+    </div>
+</div>

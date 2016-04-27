@@ -1,0 +1,1 @@
+#parse("/WEB-INF/views/${template}/mails/invoice_items.vm")

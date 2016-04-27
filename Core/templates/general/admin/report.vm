@@ -1,0 +1,38 @@
+#set($menuSelected='reports')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    <!--
+    #reportPreview table {border-collapse:collapse;border-spacing:0}
+    #reportPreview table td {padding:4px;}
+    -->
+</style>
+#set($info = $report.getName($code,$action))
+<h1>#label('admin.report') $!info.name</h1>
+<p>$!info.description</p>
+<div class="formulario">
+    <form id="formExecute" action="$action.url('reportExport','admin')" method="post">
+        <input type="hidden" name="format" id="format" value="" />
+        <input type="hidden" name="code" value="$!code" />
+        <input type="hidden" name="className" value="$!className" />
+        <div class="report clearfix">$!config</div>
+        <div class="button-bar">
+            <button type="button" id="btnExecute"><span class="ok">#label('admin.execute')</span></button>
+            <button type="submit" onclick="$('#format').val('excel')"><span class="ext_xls">Excel</span></button>
+            <button type="submit" onclick="$('#format').val('pdf')"><span class="ext_pdf">PDF</span></button>
+        </div>
+    </form>
+</div>
+<div id="reportPreview"></div>
+
+<script type="text/javascript">
+$(function(){
+    $('#btnExecute').click(function(){
+        var data = $('#formExecute').serialize();
+        $('#reportPreview').loading('Generando Reporte','Por favor espere...');
+        $('#reportPreview').load("$action.url('reportPreview','admin')",data);
+        return false;
+    });
+    $('select.tree').treeSelect();
+});
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,37 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.preparing.order.list')</h1>
+<div class="listado" style="width:960px;">
+    #if($carts && $carts.size()>0)
+    <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <th>#label('admin.temporal.id')</th>
+            <th>#label('admin.date')</th>
+            <th>#label('admin.customer')</th>
+            <th>#label('admin.total')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($c in $carts)
+            <tr>
+                <td>$!c.id</td>
+                <td>$!util.formatDate($c.createdDate)</td>
+                <td>$!c.user.fullName</td>
+                <td>$!util.formatNumber($c.total,'0.00')</td>
+                <td class="link-bar" nowrap="nowrap">
+                    <a href="$!action.url('salescartedit','admin',$util.toMap(['idCart',$c.id.toString()]))" ><span class="edit">#label('admin.edit')</span></a>
+                    <a href="$!action.url('salescartdel','admin',$util.toMap(['idCart',$c.id.toString()]))" onclick="return confirm('Delete this preorder?')"><span class="del">#label('admin.delete')</span></a>
+                </td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.sales.carts.empty')</h2>
+            <p>#label('admin.sales.carts.empty.text')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="button" href="$!action.url('salescartedit','admin')"><span class="new">#label('admin.create.order')</span></button>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

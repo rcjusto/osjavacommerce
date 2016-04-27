@@ -1,0 +1,36 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($group.idGroup)
+        #label('admin.complement.group.modify') ID: $!group.idGroup
+    #else
+        #label('admin.complement.group.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=complementgroupsave")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=idGroup' "value=$!group.idGroup")
+#shidden('name=group.idGroup')
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.group.name')</th>
+        <td>
+            <input name="vis_groupName" class="multilang field string-large" value=""/>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="groupName" value="$!group.getGroupName($l)"/>
+            #end
+        </td>
+    </tr>
+</table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=complementgrouplist" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

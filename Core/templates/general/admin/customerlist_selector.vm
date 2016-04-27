@@ -1,0 +1,96 @@
+#surl('id=urlUserList' "action=customerlist")
+<script type="text/javascript">
+    function selectedlist() {
+        return jQuery.data($('#debug')[0], 'selected');
+    }
+    function debug() {
+        var todas = '';
+        jQuery.each(selectedlist(), function() {
+            todas += ',' + this
+        });
+        $('#debug').text(todas);
+    }
+    function updSelected(chk) {
+        if (chk != null && selectedlist() != null) {
+            var index = jQuery.inArray(chk.val(), selectedlist());
+            if (chk.is(':checked')) {
+                if (index < 0) selectedlist().push(chk.val());
+            } else {
+                if (index >= 0) selectedlist().splice(index, 1);
+            }
+        }
+    }
+    function initTable() {
+        $('#tab_listado').find('input').click(function() {
+            updSelected($(this))
+        });
+        $('#tab_listado').find('input').each(function() {
+            if (selectedlist() != null) {
+                var index = jQuery.inArray($(this).val(), selectedlist());
+                $(this).attr('checked', index >= 0);
+            }
+        });
+        $('#tab_listado').sortedTable('userSortField', 'userSortDirection', function() {
+            $('#form_filter').submit();
+        });
+    }
+    $(function() {
+        jQuery.data($('#debug')[0], 'selected', []);
+        $('#treecat').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        $('#form_filter').submit(function() {
+            if ($('#form_filter').validForm()) {
+                var data = $('#form_filter').serialize();
+                $('#listadoUser').loading("$!action.getText('admin.loading.customers')", "$!action.getText('admin.please.wait')");
+                $('#listadoUser').load("$urlUserList", data);
+            }
+            return false;
+        });
+        initTable();
+    });
+</script>
+<div class="dialog-header">
+    <h2>#label('admin.select.customers')</h2>
+    <h4>#label('admin.select.customers.instructions')</h4>
+</div>
+<div class="dialog-data" style="overflow:hidden;">
+    <div class="listado">
+        <form id="form_filter" action="#" class="validable">
+            #shidden('name=output' 'value=modal')
+            #shidden('name=multiple')
+            #shidden('name=userFilter.sortedField' 'id=userSortField')
+            #shidden('name=userFilter.sortedDirection' 'id=userSortDirection')
+            <div id="filterContainer" class="filters formulario">
+                #formErrors()
+                <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="100%">
+                    <tr>
+                        <th>#label('admin.name')</th>
+                        <td>#stextfield('name=userFilter.filterName' 'cssClass=field string-medium')</td>
+                        <th>#label('admin.level')</th>
+                        <td>
+                            <select name="userFilter.filterLevel" class="field string-short">
+                                <option value="">#label('admin.not.filter')</option>
+                                #foreach($l in $userLevelList)
+                                    <option #if($userFilter.filterLevel==$l.id) selected="selected" #end  value="$l.id">$!{l.getName($defaultLanguage)}</option> #end
+                            </select>
+                        </td>
+                        <td style="vertical-align:bottom;text-align:right;margin-left:20px;">
+                            <button type="submit"><span class="search">#label('admin.update')</span></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="listadoUser">
+                #parse('/WEB-INF/views/admin/customerlist_modal.vm')
+            </div>
+        </form>
+
+    </div>
+</div>
+<div class="button-bar">
+    <button class="buttonOk" type="button"><span class="ok">#label('admin.ok')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+    <span id="debug"></span>
+</div>

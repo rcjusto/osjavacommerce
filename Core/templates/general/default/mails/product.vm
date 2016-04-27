@@ -1,0 +1,46 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<p style="margin-bottom:8px;">$!{mailFromName} $!{action.getText('mail.user.ask.to.sent.email')}</p>
+<p>$!{mailComment}</p>
+<p><br/></p>
+<div style="padding: 6px 20px;background-color: #f8f8f8"><strong>URL: </strong> <a href="$!{product.url}">$!{product.url}</a></div>
+<p><br/></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" >
+    <tr>
+        <td style="vertical-align: top;width: 30%;">
+            <img src="$!{product.image}" alt=""/>
+        </td>
+        <td style="vertical-align: top;padding-left: 20px;width: 70%;">
+            <h2>$!{product.name}</h2>
+            <p>$!{action.getText('part.number')}: $!{product.partNumber}</p>
+            <p style="font-weight: bold;margin-top: 10px;">$!{product.stock}</p>
+            <div style="font-size: 10pt;margin-top: 9px;text-align: justify">$!{product.description}</div>
+            <div style="margin-top: 10px;font-size: 14pt;">$!{product.finalPrice}</div>
+            <div style="margin-top: 10px;">$!{product.volumePrices}</div>
+            <div style="margin-top: 10px;">$!{product.labels}</div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            #if($product.hasInformation())
+                <h2>$!{action.getText('information')}</h2>
+                <div>$!{product.information}</div>
+            #end
+            #if($product.hasFeatures())
+                <h2>$!{action.getText('features')}</h2>
+                <div>$!{product.features}</div>
+            #end
+            #if($product.data.rebate)
+                <h2>$!{action.getText('product.rebate')}</h2>
+                <div>$!{product.rebate}</div>
+            #end
+
+            $!{product.staticTexts}
+            $!{product.reviews}
+        </td>
+    </tr>
+
+</table>

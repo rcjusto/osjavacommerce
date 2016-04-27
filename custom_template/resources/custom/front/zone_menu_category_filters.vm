@@ -1,0 +1,71 @@
+<div class="template-block">
+#if($util.isNotEmpty($productFilter.filterLabel))
+#else
+    #set($labels = $action.sortMapByValues($extras.get('LABELS')))
+    #if($util.isNotEmpty($labels.keySet()))
+    <div class="menu-labels block tree-menu">
+        <h2>#label('filter.by.options')</h2>
+        <ul class="filterLabels">
+            #foreach($labEntry in $labels.entrySet())
+                <li class="clearfix level0">
+                    <a href="#" data="$labEntry.key.code" class="filter-label level0">
+                        $labEntry.key.getName($locale.language)
+                        <span class="num-products">($!labEntry.value)</span>
+                    </a>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+#end
+
+#set($prices = $extras.get('PRICES'))
+#if($action.canShowPrices && $util.isNotEmpty($prices))
+<div class="menu-prices block tree-menu">
+    <h2>#label('filter.by.price')</h2>
+    <ul class="filterPrices">
+        #foreach($pMap in $prices)
+            #if ($pMap.count && $pMap.count>0)
+                <li class="clearfix level0">
+                    <a href="#" data-min="$!pMap.min" data-max="$!pMap.max" class="filter-price level0">
+                        #if($pMap.min)
+                            #if($pMap.max)
+                                <span>$!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency()) - $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                            #else
+                                <span>#label('over') $!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency())</span>
+                            #end
+                        #else
+                            #if($pMap.max)
+                                <span>#label('under') $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                            #end
+                        #end
+                        <span class="num-products">($!util.formatNumber($pMap.count,'0'))</span>
+                    </a>
+                </li>
+            #end
+        #end
+    </ul>
+</div>
+#end
+
+#set($attributes = $extras.get('ATTRIBUTES'))
+#if ($util.isNotEmpty($attributes.keySet()))
+    #foreach($cp in $attributes.keySet())
+        #if (!$list.contains($productFilter.propertyAttribute,$!cp.attribute.id))
+        <div class="menu-attributes block tree-menu">
+            <h2>$!cp.attribute.getAttributeName($locale.language)</h2>
+            <ul class="filterAttributes">
+                #foreach($attValue in $attributes.get($cp).keySet())
+                    #if($util.isNotEmpty($attValue))
+                        <li class="level0">
+                            <a href="#" class="filter-attribute level0" data="$!attValue" attr="$!cp.attribute.id">$!attValue
+                                ($!attributes.get($cp).get($attValue))</a>
+                        </li>
+                    #end
+                #end
+            </ul>
+        </div>
+        #end
+    #end
+#end
+</div>

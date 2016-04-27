@@ -1,0 +1,48 @@
+<h2>#label('shopcart')</h2>
+    <div class="top-cart-header clearfix">
+            <span class="top-cart-label">#linklabel('top.cart' "$!action.url('shopcart')")</span>
+            #if($!userSession.items.isEmpty())
+                <span class="top-cart-empty">#label('top.cart.empty')</span>
+            #else
+                <span class="top-cart-items"><a href="$!action.url('shopcart')">$!userSession.items.size() #label('top.cart.items')</a></span>
+                <span class="top-cart-total"> <a href="$!action.url('shopcart')">#label('top.cart.total') $!action.formatActualCurrency($userSession.total)</a></span>
+            #end
+    </div>
+    <div class="top-cart-detail">
+        <div class="top-cart-message #if($util.isNotEmpty($errors)) cart-error #end">
+            #foreach($m in $messages) <div>$!m</div> #end
+            #foreach($e in $errors) <div>$!e</div> #end
+        </div>
+        #if(!$!userSession.items.isEmpty())
+            <ul>
+                #foreach($item in $util.reverse($userSession.items))
+                    #set($_image = "$imageResolver.getImageForProduct($item.beanProd1,'list/')")
+                    <li class="clearfix">
+                        #if($util.isNotEmpty($_image))
+                            <a href="$!action.urlProduct($item.beanProd1)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($_image)" alt="$!pName"/></a>
+                        #else
+                            <a href="$!action.urlProduct($item.beanProd1)"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a>
+                        #end
+                        <div class="product_name"><a href="$!action.urlProduct($item.beanProd1)">$!item.quantity $!util.abbreviate($item.fullName,35)</a></div>
+                        <div class="product_price">$!action.formatActualCurrency($item.subtotal)</div>
+                    </li>
+                #end
+            </ul>
+            <div class="total clearfix">
+                <span class="label">#label('top.cart.total')</span>
+                <span class="value">$!action.formatActualCurrency($userSession.total)</span>
+            </div>
+            <div class="buttons clearfix">
+                #linklabel('go.shopcart' $!action.url('shopcart','') 'shopcart')
+                #if(!$userSession.shoppingCart.needQuote() && $action.canCheckout)
+                    #if($action.getStoreProperty('onepage.checkout','Y')=='Y')
+                        #linklabel('go.checkout' $!action.url('checkout','') 'checkout')
+                    #else
+                        #linklabel('go.checkout' $!action.url('paystepAddress','') 'checkout')
+                    #end
+                #end
+            </div>
+        #else
+            <div class="empty-cart">#label('top.cart.empty')</div>
+        #end
+    </div>

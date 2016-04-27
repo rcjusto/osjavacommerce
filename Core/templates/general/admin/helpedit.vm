@@ -1,0 +1,47 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($prolabel.code)
+        #label('admin.help.modify')
+    #else
+        #label('admin.help.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savehelp")
+<form action="$urlForm" method="post" class="validable">
+<input type="hidden" name="idHelp" value="$!help.id" />
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.page')</th>
+            <td>
+                #stextfield('name=help.page' 'cssClass=field string-medium required')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.code')</th>
+            <td>
+                #stextfield('name=help.code' 'cssClass=field string-medium required')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.text')</th>
+            <td>
+                <textarea name="vis_helpContent" class="multilang field string-large" rows="10"></textarea>
+                #foreach($l in $languages )
+                    <input type="hidden" class="$l" name="helpContent" value="$!esc.html($help.getHelpContent($l))"/>
+                #end
+                <a href="#" class="textarea-ckeditor"></a>
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listhelp" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

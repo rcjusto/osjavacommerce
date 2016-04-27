@@ -1,0 +1,18 @@
+#set($priceMap = $userSession.getPriceMap() )
+#set($promotions = $priceMap.get('promotions'))
+<div class="shopcart-detail template-block">
+    #control('shopcart_alerts')
+    #actionMessages()
+    #if($util.isNotEmpty($userSession.items))
+        #control('shopcart_request_cancel')
+        #control('shopcart_items')
+        #control('shopcart_coupons')
+        #control('shopcart_actions')
+    #else
+        #actionErrors()
+        <div class="info">
+            <h2>#label('shopping.cart.empty')</h2>
+            <p>#label('shopping.cart.empty.text')</p>
+        </div>
+    #end
+</div>

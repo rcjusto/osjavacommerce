@@ -1,0 +1,4 @@
+<div class="register-page template-block">
+    #parse("/WEB-INF/views/custom/front/login_detail.vm")
+    #parse("/WEB-INF/views/custom/front/register_detail.vm")
+</div>

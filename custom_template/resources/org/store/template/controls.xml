@@ -1,0 +1,33 @@
+<controls>
+    <control name="logo" description="Logo of Store"/>
+    <control name="menu_currencies" description="Menu with available currencies"/>
+    <control name="menu_languages" description="Menu with available languages"/>
+    <control name="menu_social" description="Menu with available social links"/>
+    <control name="menu_user" description="Menu with customer options"/>
+    <control name="search" description="Search block"/>
+    <control name="menu_top" description="Top menu"/>
+    <control name="menu_bottom" description="Bottom menu"/>
+    <control name="menu_categories" description="Categories menu"/>
+    <control name="menu_manufacturers" description="Manufacturers menu"/>
+    <control name="menu_category_filters" description="Category filters menu"/>
+    <control name="shopcart" description="Lateral shopcart"/>
+    <control name="banners" description="Banners" parameters="bannerZone|noOfBanners"/>
+    <control name="text_block" description="Free Text" parameters="blockName"/>
+    <control name="hot_products" description="Hot products"/>
+    <control name="breadcrumbs" description="Breadcrumbs" />
+    <control name="listing" description="Listing" pages="listing" fixed="true"/>
+    <control name="product_detail" description="Product Detail" pages="detail" fixed="true"/>
+    <control name="shopcart_detail" description="Shopcart Detail" pages="shopcart" fixed="true"/>
+    <control name="register_detail" description="Register/Login Form" pages="register" fixed="true"/>
+    <control name="profile_detail" description="Profile/Addresses" pages="profile" fixed="true"/>
+    <control name="wishlist_detail" description="Wishlist" pages="wishlist" fixed="true"/>
+    <control name="checkout_detail" description="One-Page Checkout" pages="checkout" fixed="true"/>
+    <control name="orders" description="My Orders" pages="orders" fixed="true"/>
+    <control name="order" description="Order Details" pages="order" fixed="true"/>
+    <control name="rmaorder" description="RMAs for Order" pages="rmaorder" fixed="true"/>
+    <control name="rmadetail" description="RMA Details" pages="rmadetail" fixed="true"/>
+    <control name="payresult" description="Payment Result" pages="payresult" fixed="true"/>
+    <control name="anonymouslogin" description="Anonymous Login" pages="anonymous_login" fixed="true"/>
+    <control name="login" description="Login Page" pages="login" fixed="true"/>
+    <control name="compare" description="Compare Products" pages="compare" fixed="true"/>
+</controls>

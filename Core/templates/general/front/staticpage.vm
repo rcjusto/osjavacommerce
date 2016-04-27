@@ -1,0 +1,3 @@
+#set( $contentPage = "/WEB-INF/views/${template}/front/staticpage.vm" )
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")
+

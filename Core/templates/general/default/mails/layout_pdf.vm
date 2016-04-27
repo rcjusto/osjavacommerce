@@ -1,0 +1,16 @@
+#if($util.isNotEmpty($contentPage))
+<html>
+<head>
+    #parse("/WEB-INF/views/${template}/mails/${contentPage}_css.vm")
+</head>
+<body>
+<div id="mailBody">
+    #parse("/WEB-INF/views/${template}/mails/global_top.vm")
+    #parse("/WEB-INF/views/${template}/mails/${contentPage}_top.vm")
+    #parse("/WEB-INF/views/${template}/mails/${contentPage}.vm")
+    #parse("/WEB-INF/views/${template}/mails/${contentPage}_bot.vm")
+    #parse("/WEB-INF/views/${template}/mails/global_bot.vm")
+</div>
+</body>
+</html>
+#end

@@ -1,0 +1,233 @@
+#set($menuSelected='purchases')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<div style="width: 990px;">
+
+    <form id="formPurchase" action="$action.url('savepurchase','admin')" method="post">
+        <input type="hidden" name="idPurchase" value="$!purchase.id"/>
+        <input type="hidden" name="doAction" id="doAction" value=""/>
+        <input type="hidden" name="aProduct" id="aProduct" value=""/>
+        <input type="hidden" name="aQuantity" id="aQuantity" value="1"/>
+        <input type="hidden" name="aQuantity" id="aQuantity" value="1"/>
+
+        <div class="clearfix">
+            <h1 style="float: left;">#if($purchase.id) #label('admin.purchase.order.data') # $!purchase.id #else #label('admin.purchase.order.create') #end </h1>
+            #if($purchase.id)<h3 style="float: right;margin: 10px 0 0 0;">#label("purchase.status.$!{purchase.status}")</h3>#end
+        </div>
+
+        <h2 class="block-title" style="margin-top: 0 !important;">#label('purchase.supplier.info')</h2>
+        <div class="block-data">
+            <input type="hidden" name="idProvider" value="$!purchase.provider.idProvider" />
+            <h3>$!purchase.provider.providerName</h3>
+            <p>#label('admin.email'): $!purchase.provider.email</p>
+            <p>#label('admin.address'): $!purchase.provider.getFullAddress($defaultLanguage) </p>
+            <p>#label('admin.phone'): $!purchase.provider.phone</p>
+            <p>#label('admin.accountNo'): $!purchase.provider.accountNo</p>
+        </div>
+
+        <h2 class="block-title">#label('purchase.products')</h2>
+        <div id="purchaseProducts" class="listado">
+            #parse('/WEB-INF/views/admin/purchaseedit_products.vm')
+        </div>
+
+        <div class="formulario">
+            <h2 class="block-title">#label('purchase.order.terms')</h2>
+            <div class="block-data">
+                <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th>#label('admin.ship.via')</th>
+                        <td>
+                            <select name="purchase.shipVia" class="field string-short">
+                                #foreach($opt in ['UPS','FEDEX','WILL CALL','FREE SHIPPING'])
+                                    <option value="$opt" #if($opt==$!purchase.shipVia) selected="selected" #end >$!opt</option>
+                                #end
+                            </select>
+                        </td>
+                        <th>#label('admin.fob')</th>
+                        <td>
+                            <select name="purchase.fob" class="field string-short">
+                                #foreach($opt in ['Origin','Destination'])
+                                    <option value="$opt" #if($opt==$!purchase.fob) selected="selected" #end >$!opt</option>
+                                #end
+                            </select>
+                        </td>
+                        <th>#label('admin.freight')</th>
+                        <td>#stextfield('name=purchase.freight' 'cssClass=field decimal')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.discount.percent')</th>
+                        <td>#stextfield('name=purchase.discount' 'cssClass=field decimal')</td>
+                        <th>#label('admin.required.date')</th>
+                        <td>#stextfield('name=requiredDate' "value=$!util.formatDate($purchase.requiredDate, $defaultLanguage)" 'cssClass=field date')</td>
+                        #if(!$action.getPaytermList().isEmpty())
+                            <th>#label('admin.payterms')</th>
+                            <td>
+                                <select name="idPayterms" class="field string-short">
+                                    #foreach($opt in $action.getPaytermList())
+                                        <option value="$opt.idPayterms" #if($opt.idPayterms==$!purchase.payterms.idPayterms) selected="selected" #end >$!opt.description</option>
+                                    #end
+                                </select>
+                            </td>
+                        #end
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        #if($util.isNotEmpty($locations))
+            #if($purchase.locationStore) #set($location = $purchase.locationStore) #else #set($location = $locations.get(0)) #end
+            <h2 class="block-title">#label('purchase.send.to')</h2>
+            <div class="block-data">
+                #if($locations.size()>1 && ($purchase.status=='New' || !$purchase.status))
+                    <div class="clearfix">
+                        <select id="locationId" name="idLocation" class="field string-medium" style="font-weight: bold;font-size: 12pt;">
+                            #foreach($l in $locations)
+                                <option value="$!l.id" #if($l.id==$location.id) selected="selected" #end >$!l.storeName</option>
+                            #end
+                        </select>
+                    </div>
+                    #foreach($l in $locations)
+                        <div style="display: none;" class="locations-data" id="location$!{l.id}">
+                            <p>#label('admin.email'): $!l.email</p>
+
+                            <p>#label('admin.address'): $!l.getFullAddress(false) </p>
+
+                            <p>#label('admin.phone'): $!l.phone</p>
+                        </div>
+                    #end
+                #else
+                    <input type="hidden" name="idLocation" value="$!location.id"/>
+                    <h3>$!location.storeName</h3>
+                    <p>#label('admin.email'): $!location.email</p>
+                    <p>#label('admin.address'): $!location.getFullAddress(false) </p>
+                    <p>#label('admin.phone'): $!location.phone</p>
+                #end
+            </div>
+        #end
+
+        <div class="formulario">
+            <h2 class="block-title">#label('purchase.accounting')</h2>
+            <div class="block-data">
+                <table class="formulario" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.paymentType')</th>
+                        <td>
+                            <select name="purchase.paymentType" class="field string-short">
+                                <option value=""></option>
+                                #foreach($opt in ['CHECK','CREDIT CARD'])
+                                    <option value="$opt" #if($opt==$!purchase.paymentType) selected="selected" #end >$!opt</option>
+                                #end
+                            </select>
+                        </td>
+                        <th>#label('admin.paymentAmount')</th>
+                        <td>#stextfield('name=purchase.paymentAmount' 'cssClass=field decimal')</td>
+                        <th>#label('admin.checkNumber')</th>
+                        <td>#stextfield('name=purchase.checkNumber' 'cssClass=field string-short')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.datePaid')</th>
+                        <td>#stextfield('name=datePaid' "value=$!util.formatDate($purchase.datePaid, $defaultLanguage)" 'cssClass=field date')</td>
+                        <th>#label('admin.comments')</th>
+                        <td colspan="3">
+                            #stextarea('name=purchase.comments' 'cssClass=field' 'cssStyle=width:400px;')
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="button-bar">
+            <div class="clearfix" style="margin-bottom: 10px;">
+                <label>
+                    <span>#label('purchase.add.comments')</span>
+                    <textarea rows="4" cols="60" class="field" name="comments" style="float: none;width: 900px"></textarea>
+                </label>
+            </div>
+            <div>
+            #if($purchase.status!='Cancelled' && $purchase.status!='Closed')
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #end
+            #if($purchase.status=='New')
+            <button type="button" id="btnSend"><span>#label('admin.send.to.supplier')</span></button>
+            #end
+            #if($purchase.status=='Sent' || $purchase.status=='Received')
+            <button type="button" id="btnReceive"><span>#label('admin.receive')</span></button>
+            #end
+            #if($purchase.status=='Received')
+            <button type="button" id="btnClose"><span>#label('admin.close')</span></button>
+            #end
+            #if($purchase.status=='Closed')
+            <button type="button" id="btnPaid"><span>#label('admin.paid')</span></button>
+            #end
+            #if($purchase.status!='Cancelled' && $purchase.status!='Closed')
+            <button type="button" id="btnCancel"><span>#label('admin.cancel.purchase')</span></button>
+            #end
+            #if( $purchase.id ) <button type="button"><span class="print">#label('admin.print')</span></button> #end
+            </div>
+        </div>
+    </form>
+
+    <h2 class="block-title" style="margin-top: 0 !important;">#label('purchase.history')</h2>
+    <div class="block-data">
+        #set($oldHStatus = '')
+        #foreach($ph in $purchase.history)
+            #if ($oldHStatus!=$ph.historyStatus || $util.isNotEmpty($ph.historyComment))
+            <div style="padding: 8px;border-bottom: 1px dotted #aaa;">
+                <div class="clearfix">
+                    <span>$!util.formatDate($!ph.historyDate, $defaultLanguage)</span>
+                    #if ($oldHStatus!=$ph.historyStatus)
+                    <strong>$!ph.historyStatus</strong>
+                    #end
+                    <span style="float: right;">$!action.getUserById($ph.historyUser).fullName</span>
+                </div>
+                #if($util.isNotEmpty($ph.historyComment))
+                    <div style="font-size: 9pt;">$!ph.historyComment</div>
+                #end
+            </div>
+            #end
+            #set($oldHStatus = $ph.historyStatus)
+        #end
+    </div>
+
+</div>
+<script type="text/javascript">
+    function selectProduct() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.products')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$action.url('productlist','admin')", {output:'selector',multiple:'false',updateFilters:'Y',filterSupplier:$!purchase.provider.idProvider, rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selectedEl = $('#tab_listado').find("input[name='selectedProduct']:checked");
+                if (selectedEl) {
+                    #if($purchase.id)
+                        $('#purchaseProducts').load("$!action.url('productpurchaseadd','admin')",{idPurchase:$purchase.id,aProduct:selectedEl.val()});
+                    #else
+                    $('#aProduct').val(selectedEl.val());
+                    $('#doAction').val('add_product');
+                    $('#formPurchase').submit();
+                    #end
+                }
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function removeProduct(id) {
+        $('#purchaseProducts').load("$!action.url('productpurchasedel','admin')",{idPurchase:$purchase.id,aProduct:id});
+    }
+    function updProduct() {
+        var data = $('#formPurchase').serialize();
+        $('#purchaseProducts').load("$!action.url('productpurchaseupd','admin')",data);
+    }
+    $(function() {
+        $('#locationId').change(
+                function() {
+                    $('.locations-data').hide();
+                    $('#location' + $(this).val()).show();
+                }).trigger('change');
+        $('#btnSend').click(function(){$('#formPurchase').attr('action',"$action.url('sendpurchase','admin')").submit();});
+        $('#btnReceive').click(function(){$('#formPurchase').attr('action',"$action.url('receivepurchase','admin')").submit();});
+        $('#btnClose').click(function(){$('#formPurchase').attr('action',"$action.url('closepurchase','admin')").submit();});
+        $('#btnPaid').click(function(){$('#formPurchase').attr('action',"$action.url('paidpurchase','admin')").submit();});
+        $('#btnCancel').click(function(){$('#formPurchase').attr("action", "$action.url('cancelpurchase','admin')").submit();});
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

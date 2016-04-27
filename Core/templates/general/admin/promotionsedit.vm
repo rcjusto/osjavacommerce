@@ -1,0 +1,298 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($promotionalCode.idPromotion)
+        #label('admin.promotional.code.modify') ID: $!promotionalCode.idPromotion
+    #else
+        #label('admin.promotional.code.new')
+    #end
+</h1>
+#surl('id=urlFormSave' "action=savepromotions")
+<form action="$urlFormSave" method="post" class="validable">
+#shidden('name=idPromotionalCode' "value=$!promotionalCode.idPromotion")
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.code')</th>
+            <td>
+                #stextfield('name=promotionalCode.code' 'cssClass=field required string-medium')
+            </td>
+            <th>#label('admin.type')</th>
+            <td>
+                <select id="promotionType" name="promotionalCode.promotionType" class="field string-medium">
+                    <option value="P" #if($promotionalCode.promotionType=='P') selected="selected" #end >General Promotion</option>
+                    <option value="C" #if($promotionalCode.promotionType=='C') selected="selected" #end >Customer Coupon</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td colspan="3">
+                <input name="vis_promotionName" class="multilang field string-large" value=""/>
+                #foreach($l in $languages )
+                    <input type="hidden" class="$l" name="promotionName" value="$!promotionalCode.getName($l)"/>
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.valid')</th>
+            <td>
+                <span style="float:left;margin-right:6px;">From</span>
+                <input type="text" name="validFrom" value="$!util.formatDate($promotionalCode.validFrom)" class="field date"/>
+                <span style="float:left;margin-left:20px;margin-right:6px;">To</span>
+                <input type="text" name="validTo" value="$!util.formatDate($promotionalCode.validTo)" class="field date"/>
+            </td>
+            <th>#label('admin.active')</th>
+            <td>#scheckbox('name=promotionalCode.active')</td>
+        </tr>
+        <tr class="block-title">
+            <th colspan="4">#label('admin.conditions')</th>
+        </tr>
+        <tr>
+            <th>#label('admin.minimum.shopcart.total')</th>
+            <td>#stextfield('name=promotionalCode.minTotalShopcart' "value=$!util.formatNumber($promotionalCode.minTotalShopcart,'money')" 'cssClass=field decimal')</td>
+            <th>#label('admin.maximum.shopcart.total')</th>
+            <td>#stextfield('name=promotionalCode.maxTotalShopcart' "value=$!util.formatNumber($promotionalCode.maxTotalShopcart,'money')" 'cssClass=field decimal')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.product.in.cart')</th>
+            <td colspan="3">
+                <input type="hidden" id="productInCart" name="productInCart" value="$!promotionalCode.productInCart.idProduct"/>
+                <input type="text" id="productInCartName" readonly="readonly" value="$!promotionalCode.productInCart.getProductName($defaultLanguage)" class="field readonly string-large"/>
+                <a href="#" class="ellipsis" onclick="return selectProduct('productInCart');"></a>
+                <a href="#" class="clear" onclick="$('#productInCart').val('');$('#productInCartName').val(''); return false;"></a>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.category.in.cart')</th>
+            <td>
+                #set($catTree = $dao.getCategoryTree(false))
+                <select name="categoryInCart" class="field tree-select string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #categoryOption($catTree 0 $!promotionalCode.categoryInCart.idCategory)
+                </select>
+            </td>
+            <th>#label('admin.manufacturer.in.cart')</th>
+            <td>
+                #if($manufacturerFilter)
+                <select name="manufacturerInCart" class="field string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #foreach($m in $manufacturerList)
+                        <option value="$!m.idManufacturer" #if($promotionalCode.manufacturerInCart.idManufacturer==$m.idManufacturer)selected="selected"#end>$!m.manufacturerName</option>
+                    #end
+                </select>
+                #else
+                    <input type="hidden" id="idManufacturer" name="manufacturerInCart" value="$!promotionalCode.manufacturerInCart.idManufacturer">
+                    <input type="text" id="nameManufacturer" readonly="readonly" value="$!promotionalCode.manufacturerInCart.manufacturerName" class="field readonly string-medium" />
+                    <a href="#" class="ellipsis" onclick="return selectManufacturer('#idManufacturer','#nameManufacturer');"></a>
+                    <a href="#" class="clear" onclick="$('#idManufacturer').val('');$('#nameManufacturer').val(''); return false;"></a>
+                    #parse('/WEB-INF/views/admin/selectmanufacturer.vm')
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.label.in.cart')</th>
+            <td>
+                <select name="labelInCart" class="field string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #foreach($l in $labelList)
+                        <option value="$!l.id" #if($promotionalCode.labelInCart.id==$l.id)selected="selected"#end>$!l.getName($defaultLanguage)</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        #if ($promotionalCode.idPromotion)
+        <tr class="only-coupon">
+            <th>#label('admin.only.for.customer')</th>
+            <td>
+                <input type="hidden" id="promUser" name="idUser" value="$!promotionalCode.user.idUser"/>
+                <input type="text" id="promUserName" value="$!promotionalCode.user.fullName" readonly="readonly" class="field readonly string-medium"/>
+                <a href="#" class="ellipsis" onclick="return selectUser('promUser');"></a>
+                <a href="#" class="clear" onclick="$('#promUser').val('');$('#promUserName').val(''); return false;"></a>
+            </td>
+            <th>#label('admin.only.for.customer.level')</th>
+            <td>
+                <select name="idLevel" class="field string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #foreach($lev in $userLevelList)
+                    <option value="$!lev.id" #if($lev==$promotionalCode.userLevel) selected="selected" #end>$!lev.getName($defaultLanguage)</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr class="only-coupon">
+            <th>#label('admin.only.for.categories')</th>
+            <td>
+                <div class="listado">
+                #if($promotionalCode.applyToCategories && !$promotionalCode.applyToCategories.isEmpty())
+                <table class="listado" width="100%" cellpadding="0" cellspacing="0">
+                    #foreach($c in $promotionalCode.applyToCategories)
+                    <tr>
+                        <td>$c.getCategoryName($defaultLanguage)</td>
+                        <td>
+                            <a class="delete-row" href="#" onclick="return dialogConfirm('Only For Categories','Are you sure you want to remove this category?',function(){removeCategory($c.idCategory,'yes');});" title="Remove category"></a>
+                        </td>
+                    </tr>
+                    #end
+                </table>
+                #else
+                    <div>#label('admin.all')</div>
+                #end
+                <div class="button-bar">
+                    <button type="button" onclick="selectCategory('yes');"><span class="add">#label('admin.add')</span></button>
+                </div>
+                </div>
+            </td>
+            <th>#label('admin.exclude.categories')</th>
+            <td>
+                <div class="listado">
+                #if($promotionalCode.notApplyToCategories && !$promotionalCode.notApplyToCategories.isEmpty())
+                <table class="listado" width="100%" cellpadding="0" cellspacing="0">
+                    #foreach($c in $promotionalCode.notApplyToCategories)
+                    <tr>
+                        <td>$c.getCategoryName($defaultLanguage)</td>
+                        <td>
+                            <a class="delete-row" href="#" onclick="return dialogConfirm('Exclude Categories','Are you sure you want to remove this category?',function(){removeCategory($c.idCategory,'no');});" title="Remove category"></a>
+                        </td>
+                    </tr>
+                    #end
+                </table>
+                #else
+                    <div>#label('admin.none')</div>
+                #end
+                <div class="button-bar">
+                    <button type="button" onclick="selectCategory('no');"><span class="add">#label('admin.add')</span></button>
+                </div>
+                </div>
+            </td>
+        </tr>
+        #end
+        <tr class="block-title">
+            <th colspan="4">#label('admin.actions')</th>
+        </tr>
+        <tr class="only-promotion">
+            <th>#label('admin.free.shipping')</th>
+            <td colspan="3">#scheckbox('name=promotionalCode.freeShipping')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.fixed.discount')</th>
+            <td colspan="3"><input type="text" name="promotionalCode.discount" value="$!util.formatNumber($promotionalCode.discount,'money')" class="field decimal" /></td>
+        </tr>
+        <tr class="only-promotion">
+            <th>#label('admin.discount.percent')</th>
+            <td colspan="3"><input type="text" name="promotionalCode.discountPercent" value="$!util.formatNumber($promotionalCode.discountPercent,'money')" class="field decimal" /></td>
+        </tr>
+        <tr class="only-promotion">
+            <th>#label('admin.free.product')</th>
+            <td colspan="3">
+            <input type="hidden" id="freeProduct" name="freeProduct" value="$!promotionalCode.freeProduct.idProduct"/>
+            <input type="text" id="freeProductName" readonly="readonly" value="$!promotionalCode.freeProduct.getProductName($defaultLanguage)" class="field readonly string-large"/>
+            <a href="#" class="ellipsis" onclick="return selectProduct('freeProduct');"></a>
+            <a href="#" class="clear" onclick="$('#freeProduct').val('');$('#freeProductName').val(''); return false;"></a>
+            </td>
+        </tr>
+    </table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listpromotions" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#surl('id=urlAddCondition' "action=promotionssetcondition")
+<form id="formAddCondition" action="$urlAddCondition" method="post" >
+    #shidden('name=idPromotionalCode' "value=$!promotionalCode.idPromotion")
+    <input type="hidden" id="conditionAction" name="conditionName" value="" />
+    <input type="hidden" id="conditionValue" name="conditionValue" value="" />
+</form>
+#surl('id=urluserlist' "action=customerlist")
+#surl('id=urlprodlist' "action=productlist")
+#surl('id=urlcatsel' "action=categoryselector")
+<script type="text/javascript">
+    function selectProduct(fldId) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.products')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlprodlist", {output:'selector',multiple:'false', rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selectedEl = $('#tab_listado').find("input[name='selectedProduct']:checked");
+                if (selectedEl) {
+                    $('#'+fldId).val(selectedEl.val());
+                    // Buscar nombre del producto
+                    $('#'+fldId+'Name').val(selectedEl.parent().parent().find("td:eq(2)").attr('title'));
+                }
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function selectUser(fldId) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.users')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urluserlist", {output:'selector',multiple:'false', rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selectedEl = $('#tab_listado').find("input[name='selectedUser']:checked");
+                if (selectedEl) {
+                    $('#'+fldId).val(selectedEl.val());
+                    // Buscar nombre del producto
+                    $('#'+fldId+'Name').val(selectedEl.parent().parent().find("td:eq(1)").attr('title'));
+                }
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function selectCategory(type) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.categories')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlcatsel", {rnd:Math.random()}, function() {
+            $('#dialogContent').find('h2').html('Add Category');
+            $('#dialogo').find('input.buttonOk:first').click(function() {
+                var selNode = $('#treecat1').dynatree("getActiveNode");
+                if (selNode) {
+                    var cId = selNode.data.key.substr(4);
+                    $('#dialogo').dialog('close');
+                    if (type == 'yes') {
+                        $('#conditionAction').val('categoryAddYes');
+                        $('#conditionValue').val(cId);
+                        $('#formAddCondition').submit();
+                    } else {
+                        $('#conditionAction').val('categoryAddNo');
+                        $('#conditionValue').val(cId);
+                        $('#formAddCondition').submit();
+                    }
+                }
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function removeCategory(cId, type) {
+        if (type == 'yes') {
+            $('#conditionAction').val('categoryDelYes');
+            $('#conditionValue').val(cId);
+            $('#formAddCondition').submit();
+        } else {
+            $('#conditionAction').val('categoryDelNo');
+            $('#conditionValue').val(cId);
+            $('#formAddCondition').submit();
+        }
+    }
+    $(function(){
+        $('.tree-select').find('option').each(function(){
+            var l = eval($(this).attr('level'))*20+4;
+            if (!isNaN(l)) $(this).css('padding-left',l+'px')
+        });
+        $('#promotionType').change(function(){
+            if ($(this).val()=='C') {
+                $('.only-coupon').show();
+                $('.only-promotion').hide();
+            } else {
+                $('.only-coupon').hide();
+                $('.only-promotion').show();
+            }
+        }).trigger('change');
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

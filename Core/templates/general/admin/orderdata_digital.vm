@@ -1,0 +1,63 @@
+#set($needLinks = false)
+<div class="block-content listado">
+    <table id="digitalItems" width="100%" cellpadding="0" cellspacing="0" class="listado">
+        <tr>
+            <th class="name">#label('admin.part.number')</th>
+            <th class="name">#label('admin.product.name')</th>
+            <th>#label('admin.supplier')</th>
+            <th>#label('admin.link')</th>
+        </tr>
+        #foreach($odp in $digitalProducts)
+            <tr>
+                <td>$!odp.product.partNumber</td>
+                <td>$!odp.product.getProductName($defaultLanguage)</td>
+                <td>
+                    #foreach($pp in $odp.product.productProviders)
+                        <div>$!pp.provider.providerName</div>
+                    #end
+                </td>
+                <td>
+                    #if($util.isNotEmpty($!odp.downloadLink))
+                        <a href="#" onclick="alert('$!odp.downloadLink'); return false;">#label('see.link')</a>
+                    #else
+                        #set($needLinks = true)
+                        <a href="#" onclick="$('#manual_$!{odp.id}').show();return false;">#label('put.manual')</a>
+                    #end
+                </td>
+            </tr>
+            <tr class="nohover">
+                <td colspan="4" style="border-bottom: 2px solid #666666">
+                    <div id="manual_$!{odp.id}" style="display: none;" class="formulario">
+                        <form action="$!action.url('orderManualLink','admin')" method="post">
+                            <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+                            <input type="hidden" name="idODP" value="$!odp.id"/>
+                            <table class="formulario" cellpadding="0" cellspacing="0">
+                                <tr class="nohover">
+                                    <th style="border: 0;background-color: transparent;">#label('admin.new.link')</th>
+                                    <td style="border: 0;"><input type="text" id="nl_${odp.id}" name="barCode" value="" class="field string-large"></td>
+                                    <td style="border: 0;">
+                                        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                                        <button type="button" onclick="$('#manual_$!{odp.id}').hide();"><span class="cancel">#label('admin.cancel')</span></button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+
+                    #if($odp.trackingStatus && $odp.trackingStatus.startsWith('Error:'))
+                        <div style="color: red;">$!odp.trackingStatus</div>
+                    #end
+                </td>
+            </tr>
+        #end
+    </table>
+    #if($needLinks)
+        <form action="$!action.url('requestLinks','admin')" method="post">
+            <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+
+            <div class="button-bar">
+                <button type="submit"><span>#label('request.links.to.supplier')</span></button>
+            </div>
+        </form>
+    #end
+</div>

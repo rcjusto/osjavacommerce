@@ -1,0 +1,49 @@
+<style type="text/css">
+    #manufacturerSearchResult li{border-bottom: 1px solid #eee;display: block; }
+    #manufacturerSearchResult li a {display: block; padding: 6px; text-decoration: none}
+    #manufacturerSearchResult li a:hover { background-color: #666; color: white; }
+</style>
+<div id="selectManufacturer" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.manufacturers')</h2>
+            <h4>#label('admin.select.manufacturer')</h4>
+        </div>
+        <div class="dialog-data">
+            <div class="clearfix" style="padding: 5px; border-bottom: 1px solid #cccccc; ">
+                <input type="text" id="selectManufacturerFilter" class="field " style="width: 430px;"/>
+            </div>
+            <ul id="manufacturerSearchResult" style="height: 240px;overflow-y: auto;list-style: none;margin: 0; padding: 0">
+
+            </ul>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#selectManufacturer').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var fieldId, fieldName;
+    $(function(){
+        $('#selectManufacturerFilter').keyup(function(){
+            $('#manufacturerSearchResult').find('li').remove();
+            jQuery.getJSON("$!action.url('autocompleteManufacturers','admin')",{term:$('#selectManufacturerFilter').val()}, function(data){
+                $('#manufacturerSearchResult').find('li').remove();
+                jQuery.each(data, function(){
+                    $('<a>').addClass('select-manufacturer').attr('href','#').attr('rel',this.value).html(this.label).appendTo($('<li>').appendTo('#manufacturerSearchResult'));
+                })
+            });
+        });
+        $('a.select-manufacturer').live('click', function(){
+            $(fieldId).val($(this).attr('rel'));
+            $(fieldName).val($(this).html());
+            $('#selectManufacturer').dialog('close');
+            return false;
+        });
+    });
+    function selectManufacturer(id, name) {
+        fieldId = id;
+        fieldName = name;
+        $('#selectManufacturer').dialog({width:500,modal:true,resizable:false,position:['center',50]});
+    }
+</script>

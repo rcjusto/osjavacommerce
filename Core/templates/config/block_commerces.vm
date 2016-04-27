@@ -1,0 +1,137 @@
+#surl('id=urlEditCommerce' 'action=editCommerce' 'namespace=/config')
+#surl('id=urlDelCommerce' 'action=delCommerce' 'namespace=/config')
+#surl('id=urlSaveCommerceUrl' 'action=saveCommerceUrl' 'namespace=/config')
+#surl('id=urlDelCommerceUrl' 'action=delCommerceUrl' 'namespace=/config')
+
+#if($action.hasActionErrors())
+<div class="errors">
+    #foreach($err in $action.getActionErrors())
+        <p>$!err</p>
+    #end
+</div>
+#end
+<table class="listado" width="100%">
+    <tr>
+        <th>Id / Database</th>
+        <th>Urls</th>
+        <th>Products</th>
+        <th>Categories</th>
+        <th>Users</th>
+        <th>&nbsp;</th>
+    </tr>
+    #foreach($comm in $commerces.values())
+        #set($stats = $action.getStoreStatistics($comm.id))
+        <tr class="can_hover">
+            <td>
+                <div style="font-size:12pt;font-weight:bold;">$comm.id</div>
+                <div class="database">$comm.database</div>
+            </td>
+            #if($stats)
+            <td>
+                <table class="blank" width="100%">
+                #foreach($url in $comm.urls)
+                    <tr class="can_hover">
+                        <td class="url"><a href="http://$!{url.normalizeUrl()}index.jsp" target="_blank" style="color:#333;text-decoration:none">http://$!url.normalizeUrl()</a></td>
+                        <td class="url" nowrap="nowrap" style="text-align:right;">
+                            <a href="http://$!{url.normalizeUrl()}admin/home.jsp" target="_blank" style="color:#333;text-decoration:none" class="admin"></a>
+                            <span>&nbsp;</span>
+                            <a href="#" class="edit edit-commerce-url" data-index="$velocityCount" data-domain="$!url.domain" data-path="$!url.path" rel="$!comm.id"></a>
+                            <span>&nbsp;</span>
+                            <a href="#" class="delete del-commerce-url" data-index="$velocityCount" rel="$!comm.id"></a>
+                        </td>
+                    </tr>
+                #end
+                    <tr>
+                        <td colspan="4"><a href="#" class="new new-commerce-url" rel="$!comm.id">Configure New Url</a></td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                #if($!stats.get('prod_total'))<div>Total: $!stats.get('prod_total')</div>#end
+                #if($!stats.get('prod_active'))<div>Actives: $!stats.get('prod_active')</div>#end
+            </td>
+            <td>
+                #if($!stats.get('cat_total'))<div>Total: $!stats.get('cat_total')</div>#end
+                #if($!stats.get('cat_active'))<div>Actives: $!stats.get('cat_active')</div>#end
+            </td>
+            <td>
+                #if($!stats.get('user_total'))<div>Total: $!stats.get('user_total')</div>#end
+                #if($!stats.get('users'))<div>Clients: $!stats.get('users')</div>#end
+            </td>
+            #else
+                <td colspan="4" style="text-align: center;vertical-align: middle;">ERROR: Can't connect database</td>
+            #end
+            <td style="text-align:right;">
+                <div><a href="#" rel="$!comm.id" class="edit-commerce edit">Modify</a></div>
+                <div><a href="#" rel="$!comm.id" class="del-commerce delete">Delete</a></div>
+            </td>
+        </tr>
+    #end
+</table>
+<div style="margin:8px;">
+    <button type="button" class="new-commerce"><span class="new">Configure New Commerce</span></button>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('.edit-commerce').live('click', function() {
+            $('#commerces').loading('Loading. Please wait ...');
+            $('#commerces').load("$!urlEditCommerce", {store:$(this).attr('rel')});
+            return false;
+        });
+        $('.new-commerce').live('click', function() {
+            $('#commerces').loading('Loading. Please wait ...');
+            $('#commerces').load("$!urlEditCommerce");
+            return false;
+        });
+        $('.del-commerce').live('click', function() {
+            if (confirm('Remove commerce with id: ' + $(this).attr('rel') + '?')) {
+                $('#commerces').loading('Deleting. Please wait ...');
+                $('#commerces').load("$urlDelCommerce", {store:$(this).attr('rel')});
+            }
+            return false;
+        });
+        $('.edit-commerce-url').live('click', function(){
+            $('#commerceIndex').val($(this).attr('data-index'));
+            $('#commerceId').val($(this).attr('rel'));
+            $('#commerceDomain').val($(this).attr('data-domain'));
+            $('#commercePath').val($(this).attr('data-path'));
+            $('#dialogUrl').dialog('option','title','Modify Url').dialog('open');
+            return false;
+        });
+        $('.del-commerce-url').live('click', function(){
+            if (confirm('Delete this url configuration?')) {
+                $('#commerces').loading('Deleting. Please wait ...');
+                $('#commerces').load("$!urlDelCommerceUrl", {id:$(this).attr('rel'),index:$(this).attr('data-index')});
+            }
+            return false;
+        });
+        $('.new-commerce-url').live('click', function(){
+            $('#commerceId').val($(this).attr('rel'));
+            $('#commerceIndex').val('');
+            $('#commerceDomain').val('');
+            $('#commercePath').val('');
+            $('#dialogUrl').dialog('option','title','Configure Url').dialog('open');
+            return false;
+        });
+        $('#btnSaveCommerceUrl').live('click', function(){
+            var valid = true;
+            $('#formCommerceUrl').find('.errors').hide();
+            $('#formCommerceUrl').find('input.required').each(function(){
+                $(this).removeClass('error');
+                if ($(this).val()=='') {
+                    $(this).addClass('error');
+                    $('#formCommerceUrl').find('.errors').show();
+                    valid = false;
+                }
+            });
+            if (valid) {
+                var data = $('#formCommerceUrl').serialize();
+                $('#dialogUrl').dialog('close');
+                $('#commerces').loading('Saving. Please wait ...');
+                $('#commerces').load("$!urlSaveCommerceUrl", data);
+            }
+            return false;
+        });
+    });
+</script>

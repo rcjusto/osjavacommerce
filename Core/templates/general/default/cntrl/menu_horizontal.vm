@@ -1,0 +1,56 @@
+<div class="menu-horizontal">
+    <ul class="clearfix menu-left">
+        #foreach($mIt in $treemenu.children() )
+            #set( $m = $mIt.userObject )
+            <li class="$!m.cssClass hoverable"><a href="$!m.url" rel="#hormenu${m.id}">$!m.getLabel($locale.language)</a></li>
+        #end
+    </ul>
+</div>
+
+#foreach($mIt in $treemenu.children() )
+    #set( $m = $mIt.userObject )
+    #if($mIt.children().hasMoreElements())
+    <div id="hormenu${m.id}" class="submenu-horizontal" style="display: none;">
+        <ul class="unique">
+            #foreach($sIt in $mIt.children())
+                #set( $s = $sIt.userObject )
+                <li class="hoverable">
+                    <a href="$!s.url">$!s.getLabel($locale.language)</a>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+    #if($m.menuContent)
+    <div id="hormenu${m.id}" class="submenu-horizontal clearfix" style="display: none;">
+        $!m.menuContent.getLanguage($locale.language,$defaultLanguage).value
+    </div>
+    #end
+    #if($m.showSubcategories)
+        #set($subcats = $action.getSubCategories($m.linkCategory, true))
+        #if($subcats && $subcats.size()>0)
+        <div id="hormenu${m.id}" class="submenu-horizontal clearfix" style="display: none;">
+            #if ($subcats && $subcats.size()>12)
+                <div class="multicolumn">
+                #set( $rowsCat = $util.getRows($subcats, $math.ceil($math.div($subcats.size(),2))))
+                #foreach($row in $rowsCat)
+                    <ul class="#if($velocityCount<1) first #end ">
+                        #foreach($subcat in $row)
+                            #if($subcat!='')
+                            <li class="hoverable"><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                            #end
+                        #end
+                    </ul>
+                #end
+                </div>
+            #else
+                <ul class="unique">
+                    #foreach($subcat in $subcats)
+                        <li class="hoverable"><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                    #end
+                </ul>
+            #end
+        </div>
+        #end
+    #end
+#end

@@ -1,0 +1,106 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($prolabel.code)
+        #label('admin.product.label.modify')
+    #else
+        #label('admin.product.label.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveprolabel")
+<form action="$urlForm" method="post" enctype="multipart/form-data" class="validable">
+    <input type="hidden" name="idLabel" value="$!prolabel.id">
+
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.code')</th>
+                <td>
+                    #if ($prolabel.code)
+                        #shidden('name=prolabel.code')<input type="text" readonly="readonly" value="$!prolabel.code" class="field readonly string-medium"/>
+                    #else
+                        #stextfield('name=prolabel.code' 'cssClass=field string-medium required')
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.name')</th>
+                <td>
+                    <input name="vis_labelName" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="labelName" value="$!prolabel.getName($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.list.content')</th>
+                <td>
+                    <textarea name="vis_contentList" class="multilang field string-large" rows="3"></textarea>
+                    <a href="#" class="textarea-ckeditor"></a>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="contentList" value="$!esc.html($prolabel.getContentList($l))"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.detail.content')</th>
+                <td>
+                    <textarea name="vis_contentDetail" class="multilang field string-large" rows="3"></textarea>
+                    <a href="#" class="textarea-ckeditor"></a>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="contentDetail" value="$!esc.html($prolabel.getContentDetail($l))"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.filter.in.listing')</th>
+                <td>#scheckbox('name=prolabel.filterInListing')</td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listprolabel" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+
+#if($prolabel.code)
+    #surl('id=urlformApply' "action=applyprolabel")
+<form id="formApplyLabel" action="$urlformApply" method="post">
+    <input type="hidden" name="idLabel" value="$!prolabel.id">
+
+    <div class="formulario">
+        <h2>Apply to products from:</h2>
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>Manufacturer</th>
+                <td>
+                    <input type="hidden" id="idManufacturer" name="idManufacturer" value="$!product.manufacturer.idManufacturer">
+                    <input type="text" id="nameManufacturer" readonly="readonly" value="$!product.manufacturer.manufacturerName" class="field string-medium readonly" />
+                    <a href="#" class="ellipsis" onclick="return selectManufacturer('#idManufacturer','#nameManufacturer');"></a>
+                    <a href="#" class="clear" onclick="$('#idManufacturer').val('');$('#nameManufacturer').val(''); return false;"></a>
+                    #parse('/WEB-INF/views/admin/selectmanufacturer.vm')
+                </td>
+            </tr>
+            <tr>
+                <th>Supplier</th>
+                <td>
+                    <select name="idProvider" class="field string-medium">
+                        <option value=""></option>
+                        #foreach($provider in  $action.getProviderList())
+                            <option value="$!provider.idProvider">$!provider.providerName</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span>#label('admin.apply')</span></button>
+        </div>
+    </div>
+</form>
+#end
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,15 @@
+#if($cartAlerts)
+<div class="cart-alerts clearfix">
+    <span class="title">#label('you.have')</span>
+    #if($cartAlerts.approved && $cartAlerts.approved>0) <span class="alert">$!cartAlerts.approved #label('approved.quote.request')</span> #end
+    #if($cartAlerts.pending && $cartAlerts.pending>0) <span class="alert">$!cartAlerts.pending #label('pending.quote.request')</span> #end
+    #if($cartAlerts.saved && $cartAlerts.saved>0) <span class="alert">$!cartAlerts.saved #label('saved.carts')</span> #end
+    <span class="link">
+        <a href="$!action.url('shopcartlist')">#label('see.details')</a>
+        #if($lastCart && !$lastCart.equals($userSession.shoppingCart))
+            <span class="sep">|</span>
+            <a href="$!action.url('shopcartload','',$util.toMap(['idCart',$lastCart.id.toString()]))">#label('reload.last.cart')</a>
+        #end
+    </span>
+</div>
+#end

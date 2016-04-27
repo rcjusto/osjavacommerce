@@ -1,0 +1,119 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text() == 'hide filters') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+            jQuery.cookie('filters.visible', 'false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text('hide filters');
+            jQuery.cookie('filters.visible', 'true');
+        }
+    }
+    $(function() {
+        if (jQuery.cookie('filters.visible') == 'false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+        }
+    });
+</script>
+<h1 style="float:left;">#label('admin.order.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">hide filters</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    #surl('id=urlformfilter' "action=orderlist")
+    <form id="form_filter" action="$urlformfilter" method="post" class="validable">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.order.id')</th>
+                    <td>#stextfield('name=filterCode' 'cssClass=field string-short')</td>
+                    <th rowspan="5">#label('admin.status')</th>
+                    <td rowspan="5">
+                        #foreach($st in $action.getOrderStatusList())
+                            <div><label>
+                                <input type="checkbox" name="filterStatus" value="$!st.id" #if($list.contains($filterStatus,$st.id)) checked="checked" #end  />
+                                $!st.getStatusName($defaultLanguage)
+                            </label></div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.from')</th>
+                    <td><input type="text" name="filterDateFrom" value="$!util.formatDate($filterDateFrom)" class="field date"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.to')</th>
+                    <td><input type="text" name="filterDateTo" value="$!util.formatDate($filterDateTo)" class="field date"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.user')</th>
+                    <td>#stextfield('name=filterUser' 'cssClass=field string-medium')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{orders.name}_pagerows').val($(this).val());" class="field">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$orders.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th colspan="2">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        #set($nav=$orders)
+        #parse('/WEB-INF/views/admin/navigator.vm')
+        #if($util.isNotEmpty($orders.listado))
+            <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th>#label('admin.id')</th>
+                    <th>#label('admin.created')</th>
+                    <th>#label('admin.status')</th>
+                    <th>#label('admin.payment')</th>
+                    <th>#label('admin.shipping')</th>
+                    <th>#label('admin.customer')</th>
+                    <th style="text-align:right">#label('admin.total')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($o in $orders.listado)
+                    #surl('id=urlEdit' "action=orderdata" "idOrder=$!o.idOrder")
+                    <tr>
+                        <td>$!o.idOrder</td>
+                        <td>$!util.formatDate($o.createdDate)</td>
+                        <td nowrap="nowrap"><span class='$!action.getText("order.color.$!{o.status.statusCode}")'></span> $!o.status.getStatusName($defaultLanguage)</td>
+                        <td>$!o.paymentMethod</td>
+                        <td>
+                            #if($o.pickInStore)
+                                #label('admin.pick.in.store') $!o.pickInStore.name
+                            #else
+                                $!o.shippingMethod.getMethodName($defaultLanguage)
+                            #end
+                        </td>
+                        <td>$!o.user.fullName</td>
+                        <td style="text-align:right">$!util.formatNumber($o.total,'money')</td>
+                        <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.orders.not.found')</h2>
+
+                <p>#label('admin.orders.not.found.text')</p>
+            </div>
+        #end
+    </form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

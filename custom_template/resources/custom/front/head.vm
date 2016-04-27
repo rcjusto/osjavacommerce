@@ -1,0 +1,59 @@
+<title>$!pageTitle</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-Language" CONTENT="$!locale.language">
+<meta name="title" CONTENT="$!pageTitle">
+<meta name="abstract" CONTENT="$!metaAbstract">
+<META NAME="description" CONTENT="$!metaDescription">
+<META NAME="keywords" CONTENT="$!metaKeywords">
+<META NAME="distribution" CONTENT="Global">
+<META NAME="revisit-after" CONTENT="1 days">
+<META NAME="robots" CONTENT="FOLLOW,INDEX">
+<link rel="icon" type="image/ico" rel="SHORTCUT ICON" href="$!action.skinFile('images/favicon.ico')"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/front.css?v=1"/>
+<link rel="stylesheet" type="text/css" href="$!action.skinFile('css/site.css?version=$!{css_version}')" id="linkCssSite"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/clear.css"/>
+<script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ui.autocomplete.html.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ui.stars.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.lightbox.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.mymenu.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.rcslider.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.scrollTo-min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript">
+var params = {
+    urlBase: "$!util.siteUrl",
+    language: "$!locale.language",
+    urls: {
+        reg_newsletter: "$!action.url('registernewsletter')",
+        add_cart: "$!action.url('addtocart')",
+        label_edit: "$!action.url('staticlabeledit','admin')",
+        block_edit: "$!action.url('blockedit')",
+        country_states: "$!action.url('countrystates')",
+        menu_subcategories: "$!action.url('menuSubcategories')",
+        compare_product:"$!action.url('compareAdd')",
+        compare_remove:"$!action.url('compareDel')"
+    },
+    errors: {
+        required:"$!action.getText('error.empty.field')",
+        integer:"$!action.getText('error.invalid.integer')",
+        email:"$!action.getText('error.invalid.email')",
+        decimal:"$!action.getText('error.invalid.decimal')",
+        gt:"$!action.getText('error.invalid.gt')",
+        lt:"$!action.getText('error.invalid.lt')"
+    },
+    texts: {
+        loading:"$!action.getText('loading','Loading')",
+        please_wait:"$!action.getText('please.wait','Please wait...')"
+    }
+};
+</script>
+<script type="text/javascript" src="/struts/js/site.js" charset="UTF-8"></script>
+#if($action.adminUser)
+<script type="text/javascript" src="/struts/js/ckeditor/ckeditor.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/struts/js/ckeditor/adapters/jquery.js" charset="UTF-8"></script>
+#end
+#parse("/WEB-INF/views/front/head_custom.vm")
+#parse("/WEB-INF/views/front/head_google_analytics.vm")

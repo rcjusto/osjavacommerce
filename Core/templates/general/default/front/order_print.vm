@@ -1,0 +1,4 @@
+#if($order)
+    <h1>#label('order') # $!{order.idOrder} </h1>
+    #parse("/WEB-INF/views/${template}/front/orderinfo_print.vm")
+#end

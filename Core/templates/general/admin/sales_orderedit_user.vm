@@ -1,0 +1,37 @@
+<table>
+    <tr>
+        <th>Customer</th>
+        <td>
+            <a href="#" class="clear" onclick="$('#user').val('');$('#userName').val(''); return false;"></a>
+        </td>
+        <td><button type="button" class="newUser"><span>#label('admin.new.customer')</span></button></td>
+    </tr>
+    #if($order.user)
+        <tr>
+            <th>Billing Info.</th>
+            <td>
+                #if($util.isNotEmpty($order.user.addressList))
+                    <select name="billingAddress" class="field string-medium">
+                        #foreach($add in $order.user.addressList)
+                            <option value="$!add.idAddress" #if($!add==$order.billingAddress) selected="selected" #end>$!{add.fullName}, $!{add.state.stateName}, $!{add.city}, $!{add.address} $!{add.address2}</option>
+                        #end
+                    </select>
+                #end
+            </td>
+            <td><button type="button" class="newAddress" name="newBillingAddress"><span>#label('admin.new.address')</span></button></td>
+        </tr>
+        <tr>
+            <th>Shipping Info.</th>
+            <td>
+                #if($util.isNotEmpty($order.user.addressList))
+                    <select name="shippingAddress" class="field string-medium">
+                        #foreach($add in $order.user.addressList)
+                            <option value="$!add.idAddress" #if($!add==$order.deliveryAddress) selected="selected" #end>$!{add.fullName}, $!{add.state.stateName}, $!{add.city}, $!{add.address} $!{add.address2}</option>
+                        #end
+                    </select>
+                #end
+            </td>
+            <td><button type="button" class="newAddress" name="newShippingAddress"><span>#label('admin.new.address')</span></button></td>
+        </tr>
+    #end
+</table>

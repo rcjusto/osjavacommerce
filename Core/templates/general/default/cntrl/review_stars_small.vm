@@ -1,0 +1,7 @@
+#set($_value = 0)
+#set($_delta = 14)
+#if($_parameters) #set($_value = $math.round($_parameters) ) #end
+#if($math.mod($_value,2)==0) #set($dy = -37) #else #set($dy = $math.sub(-37, $_delta)) #end
+#set($dx = $math.mul($math.sub($math.ceil($math.div($_value,2)), 5),$_delta))
+<div class="review-stars-small" title="$action.getText('rating','Rating') $_value/10" style="background-position:$!{dx}px $!{dy}px;"></div>
+#set($_value = $util.null)

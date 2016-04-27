@@ -1,0 +1,8 @@
+<div id="blockContent" class="clearfix">
+    <div class="statictext-centercol">
+        #actionMessages('register.page.subtitle.subscription')
+    </div>
+    <div class="product-rightcol">
+        #parse("/WEB-INF/views/${template}/front/rightcol.vm")
+    </div>
+</div>

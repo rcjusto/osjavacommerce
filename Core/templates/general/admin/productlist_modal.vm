@@ -1,0 +1,41 @@
+#if($util.isNotEmpty($productlist.listado))
+    #set($nav=$productlist)
+    #parse('/WEB-INF/views/admin/navigator.vm')
+#end
+#if($multiple=='false')
+    #set($selControl = 'radio')
+#else
+    #set($selControl = 'checkbox')
+#end
+
+    #if($util.isNotEmpty($productlist.listado))
+    <div style="">
+    <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="width:1%;">&nbsp;</th>
+            <th class="sort" sortby="partNumber">#label('admin.part.number')</th>
+            <th class="sort" sortby="productName">#label('admin.name')</th>
+            <th style="text-align:center">#label('admin.active')</th>
+            <th class="sort" sortby="stock" style="text-align:right">#label('admin.stock')</th>
+            <th class="sort" sortby="costPrice" style="text-align:right">#label('admin.price')</th>
+        </tr>
+        #foreach($p in $productlist.listado)
+            <tr>
+                <td><input type="$selControl" value="$!p.idProduct" id="selectedProduct$!p.idProduct" name="selectedProduct" /></td>
+                <td><label for="selectedProduct$!p.idProduct">$!p.partNumber</label></td>
+                <td title="$!p.getLanguage($defaultLanguage).productName"><label for="selectedProduct$!p.idProduct">$!util.abbreviate($p.getLanguage($defaultLanguage).productName,60)</label></td>
+                <td style="text-align:center !important;" class="#if($p.active) chk_true #else chk_false #end"> &nbsp; </td>
+                <td style="text-align:right">$!p.stock</td>
+                <td style="text-align:right">$!util.formatNumber($p.basePrice,'money')</td>
+            </tr>
+        #end
+    </table>
+    </div>    
+    #else
+        <div class="info">
+            <p>#label('admin.products.not.found')</p>
+        </div>
+    #end
+<script type="text/javascript">
+    $(function(){initTable();});
+</script>

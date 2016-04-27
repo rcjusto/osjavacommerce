@@ -1,0 +1,12 @@
+<h3>#label('admin.select.template')</h3>
+<ul style="list-style:none;margin:0;padding:0;">
+    #foreach($tm in $mailtemplates.keySet())
+        #set($tName = $tm.replace('.','_'))
+        <li class="#if($tName==$campaign.templateName) selected #end">
+            <input type="hidden" id="template_$tName" value="$!esc.html($mailtemplates.get($tm))"/>
+            <a href="#" rel="$tName" class="templateLink">
+            <img src="$!{util.siteUrl}/$!{action.storeFile('campaigns')}/${tm}.gif" alt="$tm">
+            </a>
+        </li>
+    #end
+</ul>

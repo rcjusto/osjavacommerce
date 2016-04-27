@@ -1,0 +1,95 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.state.list')</h1>
+<div class="listado">
+    <div>
+        <div style="float:left;width:200px;margin-right:20px;">
+            <h2 class="block-title">#label('configured.countries')</h2>
+            <table style="width: 100%">
+                #foreach($c in $action.getCountries(true))
+                    <tr>
+                        <td><a href="#" onclick="$('#countryCode').val('${c.code}');$('#formList1').submit();return false;" rel="${c.code}">${c.name}</a></td>
+                        <td style="width: 30px;"><a class="remove" href="#" onclick="$('#deleteCountry').val('${c.code}');$('#formList1').submit();return false;"></a></td>
+                    </tr>
+                #end
+            </table>
+            <div>
+                <form action="$!action.url('addallcountries')" method="post">
+                    <div class="button-bar">
+                        <button type="submit"><span>#label('configure.all.countries')</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div style="float:left;width:700px;">
+            <h2 class="block-title">#label('select.country.to configure')</h2>
+            <div style="margin:8px 0;">
+                <div style="float:left;margin-right:40px;">
+                    #surl('id=urlformList' "action=liststate")
+                    <form id="formList1" action="$urlformList" method="post">
+                        <input type="hidden" id="deleteCountry" name="deleteCountry" value="" />
+                        <select id="countryCode" name="countryCode" class="field string-medium" onchange="$('#formList1').submit()">
+                            <option value="">#label('admin.select.a.country')</option>
+                            #foreach($opt in $action.getCountries(false))
+                                <option value="$!opt.code" #if($countryCode==$opt.code) selected="selected" #end >$!opt.name</option>
+                            #end
+                        </select>
+                    </form>
+                </div>
+                #if($countryCode && $countryCode!='')
+                    <div style="float:left;">
+                        #surl('id=urlformGenerate' "action=stategenerator")
+                        <form id="formGenerate" action="$urlformGenerate" method="post">
+                            #shidden("name=countryCode")
+                            <div>
+                                <a href="#" onclick="$('#formGenerate').submit();return false;">#label('admin.configure states.automatically')</a>
+                            </div>
+                        </form>
+                    </div>
+                #end
+                <div style="clear:both;"></div>
+            </div>
+
+            #if($countryCode && $countryCode!='')
+                <form id="formList" action="$action.url('liststate','admin')" method="post">
+                    #actionErrors()
+                    #shidden("name=countryCode")
+                    <table class="grid" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <th colspan="2" style="text-align:left;">#label('admin.states.of') $!action.getCountryName($countryCode)</th>
+                        </tr>
+                        <tr>
+                            <th>#label('admin.code')</th>
+                            <th>#label('admin.name')</th>
+                        </tr>
+                        #foreach($s in $states)
+                            <tr style="background-color:#f6f6f6;">
+                                <td style="padding:1px;"><input type="hidden" name="stateId" value="$!s.idState"/><input type="text" name="stateCode" value="$!s.stateCode" class="field string-shortest"/></td>
+                                <td style="padding:1px;"><input type="text" name="stateName" value="$!s.stateName" class="field string-large"/></td>
+                            </tr>
+                        #end
+                        #foreach($s in [1..10])
+                            <tr>
+                                <td style="padding:1px;"><input type="hidden" name="stateId" value="$!s.idState"/><input type="text" name="stateCode" value="" class="field string-shortest"/></td>
+                                <td style="padding:1px;"><input type="text" name="stateName" value="" class="field string-large"/></td>
+                            </tr>
+                        #end
+                    </table>
+
+                    <div class="button-bar">
+                        <button type="submit"><span class="ok">#label('admin.update')</span></button>
+                    </div>
+                </form>
+            #end
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+#surl('id=urlDel' "action=delstate" )
+<script type="text/javascript">
+    function deleteState(idS) {
+        location.href.url = "$urlDel" + '?idState=' + idS;
+    }
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,211 @@
+#* @vtlvariable name="productsToShipping" type="java.util.List<java.util.Map>" *#
+ #if($productsToShipping && $productsToShipping.size()>0)
+        <div class="listado">
+            <h2 class="block-title">#label('admin.items.to.shipping')</h2>
+
+            <div class="block-content">
+                #surl('id=urlAddPackage' "action=orderaddpackage")
+                <form id="formAddPackage" action="$urlAddPackage" method="post" class="validable">
+                    <input type="hidden" name="openTab" value="2"/>
+                    <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+                    #formErrors()
+                    <table class="listado" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <th>#label('admin.part.number')</th>
+                            <th>#label('admin.product.name')</th>
+                            <th style="text-align:center;">#label('admin.delivered')</th>
+                            <th style="text-align:center;">#label('admin.add.to.package')</th>
+                            <th style="text-align:center;">#label('admin.total')</th>
+                        </tr>
+                        #foreach($map in $productsToShipping)
+                            <tr>
+                                <td>$!map.get('code')</td>
+                                <td>$!map.get('name')
+                                #if($map.containsKey('caract1'))<span>, $!map.get('caract1')</span>#end
+                                #if($map.containsKey('caract2'))<span>, $!map.get('caract2')</span>#end
+                                #if($map.containsKey('caract3'))<span>, $!map.get('caract3')</span>#end
+                                </td>
+                                <td style="text-align:center;">$!map.get('delivered')</td>
+                                <td style="text-align:center;">
+                                    <input type="hidden" name="packageProductDetail" value="$!map.get('id')"/>
+                                    #if($map.get('pending')>0)
+                                        <input type="text" weight="$!util.formatNumber($map.get('weight'),'decimal4')" name="packageProductQuantity" value="$!map.get('pending')" class="field integer" onchange="recalculateWeight()" style="float:none;" maxvalue="$!map.get('pending')"/>
+                                    #else
+                                        <input type="text" weight="$!util.formatNumber($map.get('weight'),'decimal4')" name="packageProductQuantity" readonly="readonly" value="0" style="float:none;" class="field readonly integer"/>
+                                    #end
+                                </td>
+                                <td style="text-align:center;">$!map.get('total')</td>
+                            </tr>
+                        #end
+                    </table>
+                    <div class="formulario">
+                        <h3 style="margin:6px 0;">#label('admin.create.new.package')</h3>
+                        <table class="formulario" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:8px;">
+                            <tr>
+                                <th>#label('admin.width') <span style="font-weight:lighter;">($dimensionUnit)</span>:</th>
+                                <td><input type="text" name="packageWidth" value="" class="field decimal required string-char"/></td>
+                                <th>#label('admin.height') <span style="font-weight:lighter;">($dimensionUnit)</span>:</th>
+                                <td><input type="text" name="packageHeight" value="" class="field decimal required string-char"/></td>
+                                <th>#label('admin.length') <span style="font-weight:lighter;">($dimensionUnit)</span>:</th>
+                                <td><input type="text" name="packageLength" value="" class="field decimal required string-char"/></td>
+                                <th>#label('admin.weight') <span style="font-weight:lighter;">($weightUnit)</span>:</th>
+                                <td><input type="text" id="packageWeight" name="packageWeight" value="" class="field decimal required string-char"/></td>
+                                <th>
+                                    <button type="submit"><span>#label('order.add.package')</span></button>
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    #end
+
+    #if($packages && $packages.size()>0)
+        #surl('id=urlSavePackage' "action=ordersavepackage")
+        <div>
+            <h2 class="block-title">#label('admin.packages')</h2>
+
+            <div class="block-content">
+                #foreach($package in $packages)
+                    #surl('id=urlDelPackage' "action=orderdelpackage" "idOrder=$!order.idOrder" "idPacking=$!package.id" "openTab=1")
+                    <div style="margin-bottom:10px;border-top:1px solid silver;">
+                        <div style="padding:4px;margin-bottom:4px;background-color:#f4f4f4;">
+                            <span style="float:left;font-weight:bold;font-size:12pt;">#label('admin.package') $!math.add($velocityCount,1)</span>
+                            <span style="float:left;margin-left:30px;">#label('admin.dimension'): $!util.formatNumber($package.dimentionWidth, '0.00')  x $!util.formatNumber($!package.dimentionHeight, '0.00') x $!util.formatNumber($!package.dimentionLength, '0.00') $!action.dimensionUnit</span>
+                            <span style="float:left;margin-left:30px;">#label('admin.weight'): $!util.formatNumber($!package.weight, '0.00') $!action.weightUnit</span>
+                    <span style="float:right;margin-right:12px;font-weight:bold;">
+                        #if($package.pending) #label('admin.package.pending') | <a href="$urlDelPackage">#label('admin.remove.package')</a> #else #label('admin.package.sent') #end
+                    </span>
+
+                            <div style="clear:both;"></div>
+                        </div>
+                        <div>
+                            <div style="float:left;width:340px;" class="formulario">
+                                <div id="packageEdit$velocityCount" #if($package.pending) #else style="display:none;" #end>
+                                    <form action="$urlSavePackage" method="post" class="validable">
+                                        <input type="hidden" name="openTab" value="2"/>
+                                        <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+                                        <input type="hidden" name="idPacking" value="$!package.id"/>
+                                        #formErrors()
+                                        <table width="100%" class="formulario" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <th>#label('admin.method')</th>
+                                                <td colspan="3">
+                                                    <select name="packageShippingMethod" class="field required string-medium">
+                                                        <option value=""></option>
+                                                        #foreach($opt in $action.getShippingMethodList())
+                                                            <option value="$!opt.id" #if($opt==$package.shippingMethod) selected="selected" #end >$!opt.carrierName - $!opt.getMethodName($defaultLanguage)</option>
+                                                        #end
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>#label('admin.date')</th>
+                                                <td><input type="text" name="packageDate" value="$!util.formatDate($package.deliveryDate)" class="field required date"/></td>
+                                                <th>#label('admin.cost')</th>
+                                                <td><input type="text" name="packageCost" value="$!util.formatNumber($package.deliveryCost,'money')" class="field required decimal"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th>#label('admin.tracking')</th>
+                                                <td colspan="3"><input type="text" name="packageTracking" value="$!package.trackingNumber" class="field string-medium"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th>#label('admin.custom.tracking')</th>
+                                                <td colspan="3"><textarea rows="5" name="packageTrackingText" class="field string-medium"/>$!esc.html($package.customTracking)</textarea></td>
+                                            </tr>
+                                            <tr>
+                                                <th>&nbsp;</th>
+                                                <td colspan="3">
+                                                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                                                    #if($package.pending) #else
+                                                        <button type="button" onclick="$('#packageEdit$velocityCount').hide();$('#packageInfo$velocityCount').show();"><span class="cancel">#label('admin.cancel')</span></button>
+                                                    #end
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </div>
+                                <div id="packageInfo$velocityCount" #if($package.pending) style="display:none;" #end>
+                                    <table width="100%" class="formulario" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <th>#label('admin.method')</th>
+                                            <td colspan="3">$!package.shippingMethod.carrierName - $!package.shippingMethod.getMethodName($defaultLanguage)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>#label('admin.date')</th>
+                                            <td>$!util.formatDate($package.deliveryDate)</td>
+                                            <th>#label('admin.cost')</th>
+                                            <td>$!action.formatActualCurrency($package.deliveryCost,$order.currency)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>#label('admin.tracking')</th>
+                                            <td colspan="3">$!package.trackingNumber</td>
+                                        </tr>
+                                        <tr>
+                                            <th>&nbsp;</th>
+                                            <td colspan="3">
+                                                <button type="button" onclick="$('#packageInfo$velocityCount').hide();$('#packageEdit$velocityCount').show();"><span class="edit">#label('admin.edit')</span></button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div style="float:right;width:600px;" class="listado">
+                                <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <th>#label('admin.part.number')</th>
+                                        <th>#label('admin.product.name')</th>
+                                        <th style="text-align:center;">#label('admin.qty')</th>
+                                    </tr>
+                                    #foreach($packItemEntry in $package.packingProductList)
+                                        #set($odp = $!packItemEntry.orderDetailProduct)
+                                        <tr>
+                                            <td>$!odp.product.partNumber</td>
+                                            <td>$!odp.product.getProductName($defaultLanguage)
+                                                #if($util.isNotEmpty($!odp.caractValue1)) <span>, $!odp.caractValue1</span> #end
+                                                #if($util.isNotEmpty($!odp.caractValue2)) <span>, $!odp.caractValue2</span> #end
+                                                #if($util.isNotEmpty($!odp.caractValue3)) <span>, $!odp.caractValue3</span> #end
+                                            </td>
+                                            <td style="text-align:center;">$!odp.orderDetail.quantity</td>
+                                        </tr>
+                                    #end
+                                </table>
+                            </div>
+                            <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                #end
+                <div class="formulario">
+                    <h3>#label('admin.delivery.pending.packages')</h3>
+                    #surl('id=urlDeliveryPackage' "action=orderdeliverypackages")
+                    <form action="$urlDeliveryPackage" method="post" class="validable">
+                        <input type="hidden" name="openTab" value="2"/>
+                        <input type="hidden" name="idOrder" value="$!order.idOrder">
+                        #formErrors()
+                        <table class="formulario" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>#label('admin.use.this.method')</th>
+                                <td>
+                                    <select id="deliveryShippingMethod" name="deliveryShippingMethod" class="field required string-medium">
+                                        <option value=""></option>
+                                        #foreach($opt in $action.getShippingMethodList())
+                                            #if($opt.carrierName!='CUSTOM')
+                                                <option value="$!opt.id" #if($opt==$package.shippingMethod) selected="selected" #end >$!opt.carrierName - $!opt.getMethodName($defaultLanguage)</option>
+                                            #end
+                                        #end
+                                    </select>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <button type="button" onclick="showPendingRates()"><span>#label('admin.get.rates')</span></button>
+                                    <button type="submit"><span>#label('admin.delivery.pending')</span></button>
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="pendingRates" class="listado"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    #end

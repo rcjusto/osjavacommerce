@@ -1,0 +1,83 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=loadStates' "action=countrystates")
+<script type="text/javascript">
+    $(function() {
+        $('#countryCode').change(function() {
+            if ($(this).val() != '0') {
+                $('#statesContainer').load("$loadStates", {countryCode:$(this).val(),idState:"$!{locationStore.state.idState}"});
+            } else {
+                $('#statesContainer').html("$!action.getText('admin.select.a.country')")
+            }
+        }).trigger('change');
+    });
+</script>
+<h1>
+    #if ($locationStore.id)
+        #label('admin.location.modify') - ID: $!locationStore.id
+    #else
+        #label('admin.location.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savelocation")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=locationStore.id')
+#shidden('name=idStore' "value=$!locationStore.id")
+<div class="formulario">
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td>
+                #stextfield('name=locationStore.storeName' 'cssClass=field string-medium required')
+            </td>
+            <th class="required" style="width:120px;">#label('admin.email')</th>
+            <td style="width:280px;">
+                #stextfield('name=locationStore.email' 'size=40' 'cssClass=field string-medium email')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.country')</th>
+            <td>
+                #sselect('id=countryCode' 'name=locationStore.idCountry' "list=countries" 'listKey=code' 'listValue=name' "headerKey=0" 'headerValue=(Select a country...)'  'cssClass=myselect field required string-medium')
+            </td>
+            <th class="required">#label('admin.state')</th>
+            <td id="statesContainer">
+                #label('admin.select.a.country')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.city')</th>
+            <td>
+                #stextfield('name=locationStore.city' 'cssClass=field required string-medium')
+            </td>
+            <th class="required">#label('admin.postal.code')</th>
+            <td>
+                #stextfield('name=locationStore.zipCode' 'cssClass=field required string-short')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.address')</th>
+            <td>
+                #stextfield('name=locationStore.address' 'cssClass=field required string-medium')
+            </td>
+            <th>#label('admin.phone'):</th>
+            <td>
+                #stextfield('name=locationStore.phone' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.active')</th>
+            <td>#scheckbox('name=locationStore.active')</td>
+            <th>#label('admin.main.address')</th>
+            <td>#scheckbox('name=locationStore.main')</td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listlocation" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

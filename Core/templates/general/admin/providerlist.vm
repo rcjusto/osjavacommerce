@@ -1,0 +1,43 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.provider.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=listprovider")
+    <form action="$urlForm" method="post">
+    #if($util.isNotEmpty($providers.listado))
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.id')</th>
+            <th>#label('admin.name')</th>
+            <th>#label('admin.address')</th>
+            <th>#label('admin.contact')</th>
+            <th>#label('admin.payment.terms')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($p in $providers.listado)
+            #surl('id=urlEdit' "action=editprovider" "idProvider=$!p.idProvider")
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!p.idProvider"/></td>
+                <td>$!p.idProvider</td>
+                <td>$!p.providerName</td>
+                <td>$!p.fullAddress</td>
+                <td>$!p.contact #if($util.isNotEmpty($p.email))($p.email)#end</td>
+                <td>#if($p.payterms) $!p.payterms.description #end </td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <p>#label('admin.suppliers.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #surl('id=urlNew' "action=editprovider")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.provider.new')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

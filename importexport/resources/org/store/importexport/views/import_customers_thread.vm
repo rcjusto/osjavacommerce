@@ -1,0 +1,40 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.customer.import.step2')</h1>
+
+#if($thread)
+    <div id="jobState" class="box">
+        <div id="taskMsg" style="margin:4px;"></div>
+        <div id="taskPercent"></div>
+    </div>
+    <div id="output" style="display: none;margin-top: 10px;background-color: #666666;color: #ffffff;padding: 10px;">
+
+    </div>
+#else
+
+#end
+
+<script type="text/javascript">
+    function updateStatus() {
+        jQuery.getJSON("$action.url('import_customers_info','admin')", function(data) {
+            if (data.status == 'running') {
+                if (data.percent != null) {
+                    $('#taskMsg').html(data.percent + '%: ' + data.message);
+                    $("#taskPercent").progressbar('option', 'value', data.percent);
+                }
+                setTimeout(updateStatus, 1000);
+            } else if (data.status=='finished') {
+                $('#taskMsg').html('100%: Finished');
+                $("#taskPercent").progressbar('option', 'value', 100);
+                if (data.output!=null) $('#output').html(data.output).show();
+            }
+        });
+    }
+
+    $(function() {
+        $("#taskPercent").progressbar();
+        updateStatus();
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

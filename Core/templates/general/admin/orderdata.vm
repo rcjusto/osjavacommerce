@@ -1,0 +1,527 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.order.data') # $!order.idOrder</h1>
+#if($order)
+<div style="width:990px;" id="orderTabs">
+
+#actionMessages()
+
+<ul class="tabs">
+    <li><a href="#tabGeneral">#label('admin.general.information')</a></li>
+    #if($payments && $payments.size()>0)
+    <li><a href="#tabPayment">#label('admin.payment.information')</a></li>
+    #end
+    <li><a href="#tabShipping">#label('admin.shipping.information')</a></li>
+    <li><a href="#tabCosts">#label('admin.cost.information')</a></li>
+    #if($digitalProducts && !$digitalProducts.isEmpty())
+    <li><a href="#tabDigital">#label('admin.download.information')</a></li>
+    #end
+    #if($purchases && !$purchases.isEmpty())
+    <li><a href="#tabPurchases">#label('admin.purchase.information')</a></li>
+    #end
+    <li style="float:right;font-size:16pt;">#label('admin.status'): $!order.status.getStatusName($defaultLanguage)</li>
+</ul>
+<div id="tabGeneral">
+
+<div class="listado">
+    <div class="block-content">
+        <table width="100%" class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.order.id')</th>
+                #if($util.isNotEmpty($order.customReference))
+                    <th>#label('admin.order.reference')</th>#end
+                <th>#label('admin.created')</th>
+                <th>#label('admin.status')</th>
+                <th>#label('admin.payment')</th>
+                <th>#label('admin.shipping')</th>
+                <th>#label('admin.customer')</th>
+                <th>#label('admin.from.ip')</th>
+            </tr>
+            <tr>
+                <td>$!order.idOrder</td>
+                #if($util.isNotEmpty($order.customReference))
+                    <td>$!order.customReference</td>#end
+                <td>$!util.formatDate($order.createdDate,$defaultLanguage)</td>
+                <td>$!order.status.getStatusName($defaultLanguage)</td>
+                <td>$!action.getPaymentMethodName($order.paymentMethod) $!order.codeMerchant</td>
+                <td>
+                    #if($order.shippingMethod)
+                        $!order.shippingMethod.carrierName - $!order.shippingMethod.getMethodName($defaultLanguage)
+                    #else
+                        #if($order.pickInStore) #label('admin.pick.in.store') $!order.pickInStore.name  #end
+                    #end
+                </td>
+                <td>
+                    #surl('id=urlUser' "action=customeredit" "idUser=$!order.user.idUser")
+                    <a href="$urlUser" target="_blank" style="color:#406db8;">$!order.user.fullName</a>
+                </td>
+                <td>$!order.remoteIp</td>
+            </tr>
+            #if($util.isNotEmpty($order.customMessage))
+                <tr><td colspan="8"><strong>#label('admin.customer.message'): </strong>$!order.customMessage</td></tr>
+            #end
+        </table>
+        #if($order.status.statusCode=='payment_validation')
+            <div class="button-bar">
+                <form action="$!action.url('orderrequeststate','admin')" method="post">
+                    <input type="hidden" name="idOrder" value="$!order.idOrder" />
+                    <button type="submit"><span>#label('order.request.status')</span></button>
+                </form>
+            </div>
+        #end
+    </div>
+</div>
+
+<div class="listado">
+    <h2 class="block-title">#label('admin.billing.and.shipping.information') <a href="#" rel="#tableAddress"></a></h2>
+
+    <div class="block-content">
+        <table id="tableAddress" class="listado" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.company')</th>
+                <th>#label('admin.contact')</th>
+                <th>#label('admin.address')</th>
+                <th>#label('admin.city')</th>
+                <th>#label('admin.state')</th>
+                <th>#label('admin.postal.code')</th>
+                <th>#label('admin.country')</th>
+                <th>#label('admin.phone')</th>
+            </tr>
+            <tr class="subtotal">
+                <td colspan="8">#label('admin.billing.address')</td>
+            </tr>
+            <tr class="data">
+                <td>$!order.billingAddress.company</td>
+                <td>$!order.billingAddress.fullName</td>
+                <td>$!order.billingAddress.address $!order.billingAddress.address2</td>
+                <td>$!order.billingAddress.city</td>
+                <td>$!order.billingAddress.state.stateName</td>
+                <td>$!order.billingAddress.zipCode</td>
+                <td>$!order.billingAddress.idCountry</td>
+                <td>$!order.billingAddress.phone</td>
+            </tr>
+            #if($order.shippingMethod)
+                <tr class="subtotal">
+                    <td colspan="8">#label('admin.shipping.address')</td>
+                </tr>
+                <tr class="data">
+                    <td>$!order.deliveryAddress.company</td>
+                    <td>$!order.deliveryAddress.fullName</td>
+                    <td>$!order.deliveryAddress.address $!order.deliveryAddress.address2</td>
+                    <td>$!order.deliveryAddress.city</td>
+                    <td>$!order.deliveryAddress.state.stateName</td>
+                    <td>$!order.deliveryAddress.zipCode</td>
+                    <td>$!order.deliveryAddress.idCountry</td>
+                    <td>$!order.deliveryAddress.phone</td>
+                </tr>
+            #end
+        </table>
+    </div>
+</div>
+
+<div class="listado">
+    <h2 class="block-title">#label('admin.items')<a href="#" rel="#tableItems"></a></h2>
+
+    <div class="block-content">
+        <table id="tableItems" width="100%" cellpadding="0" cellspacing="0" class="listado">
+            <tr>
+                <th class="name">#label('admin.part.number')</th>
+                <th class="name">#label('admin.product.name')</th>
+                <th class="quantity">#label('admin.quantity')</th>
+                <th class="price">#label('admin.unitary.price')</th>
+                <th class="price">#label('admin.line.price')</th>
+            </tr>
+            #foreach($detail in $order.orderDetails)
+                <tr class="product">
+                    <td class="name">
+                        #foreach($odp in $detail.orderDetailProducts)
+                            #surl('id=urlProd' "action=productedit" "idProduct=$!odp.product.idProduct")
+                            <div><a href="$urlProd" target="_blank" style="color:#406db8;">$!odp.product.partNumber</a></div>
+                        #end
+                    </td>
+                    <td class="name">
+                        #foreach($odp in $detail.orderDetailProducts)
+                            <div>
+                                $!odp.product.getProductName($locale.language)
+                                <a href="#$!odp.barCode" title="BarCode" id="barCode$!odp.id" onclick="addBarCode($!odp.id, '$!odp.product.getProductName($locale.language)'); return false;" style="font-size:8pt;">#if($util.isNotEmpty($odp.barCode)) [$!odp.barCode] #else [#label('admin.set.barcode')] #end</a>
+                                #if($detail.promotionCode && $util.isNotEmpty($detail.promotionCode))
+                                    <div class="promo">#label('promo') $!detail.promotionCode - $!detail.promotionName</div>
+                                #end
+                            </div>
+                        #end
+                    </td>
+                    <td class="quantity">$!detail.quantity</td>
+                    <td class="price">$!action.formatActualCurrency($detail.price,$order.currency)</td>
+                    <td class="price">$!action.formatActualCurrency($detail.subTotal,$order.currency)</td>
+                </tr>
+                #foreach($odp in $detail.orderDetailProducts)
+                    #if($odp.feeValue)
+                        <tr class="fee">
+                            <td>&nbsp;</td>
+                            <td class="name">#label('admin.fee') $!odp.feeName</td>
+                            <td class="quantity">$!detail.quantity</td>
+                            <td class="price">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
+                            <td class="price">$!action.formatActualCurrency($math.mul($odp.feeValue,$detail.quantity),$order.currency)</td>
+                        </tr>
+                    #end
+                    #if($odp.trackingStatus && $odp.trackingStatus.startsWith("Error:"))
+                        <tr class="error">
+                            <td colspan="5">$!odp.trackingStatus</td>
+                        </tr>
+                    #end
+                #end
+                #if($util.isNotEmpty($detail.complementName))
+                    <tr class="complement">
+                        <td>&nbsp;</td>
+                        <td class="name">#label('complement') $!detail.complementName</td>
+                        <td class="quantity">$!detail.quantity</td>
+                        <td class="price">$!action.formatActualCurrency($detail.complementValue,$order.currency)</td>
+                        <td class="price">$!action.formatActualCurrency($math.mul($detail.complementValue,$detail.quantity),$order.currency)</td>
+                    </tr>
+                #end
+            #end
+        </table>
+    </div>
+    <h2 class="block-title">#label('admin.sumary')</h2>
+
+    <div class="block-content">
+        <table width="100%" cellpadding="0" cellspacing="0" class="listado">
+            <tr class="subtotal">
+                <td colspan="4">#label('admin.merchandise.subtotal')</td>
+                <td class="price">$!action.formatActualCurrency($order.totalProducts,$order.currency)</td>
+            </tr>
+            #if($order.interestPercent && $order.interestPercent>0)
+                <tr class="subtotal">
+                    <td colspan="4">#label('interest.percent') $!number.format('0.##',$order.interestPercent)</td>
+                    <td class="price">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
+                </tr>
+            #end
+            #if($order.totalFees && $order.totalFees>0)
+                <tr class="subtotal">
+                    <td colspan="4">#label('subtotal.fees')</td>
+                    <td class="price">$!action.formatActualCurrency($order.totalFees,$order.currency)</td>
+                </tr>
+            #end
+
+            #foreach($prom in $order.getPromotions('discount-percent'))
+                <tr class="promotion">
+                    <td colspan="4" class="promo">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+                    <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+                </tr>
+            #end
+            #foreach($prom in $order.getPromotions('discount'))
+                <tr class="promotion" class="promo">
+                    <td colspan="4">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+                    <td class="price">$!action.formatActualCurrency($prom.get('value'), $order.currency)</td>
+                </tr>
+            #end
+            <tr class="subtotal">
+                #set($freeShipPromList = $order.getPromotions('free-shipping') )
+                #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                    #set( $freeShipProm = $list.get($freeShipPromList,0))
+                    <td colspan="4">#label('admin.promo'): $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
+                #else
+                    <td colspan="4">#label('admin.subtotal.shipping')</td>
+                #end
+                <td class="price">$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
+            </tr>
+            #if($order.totalInsurance && $order.totalInsurance>0)
+                <tr class="subtotal">
+                    <td colspan="4">#label('admin.subtotal.shipping.insurance')</td>
+                    <td class="price">$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
+                </tr>
+            #end
+
+            #set($taxesl = $order.getTaxes())
+            #if($taxesl && !$taxesl.isEmpty())
+                #foreach($tax in $taxesl)
+                    <tr class="subtotal">
+                        <td colspan="4">
+                            #label('admin.subtotal.tax') $!tax.name
+                            #if($tax.totax)<span class="tax-detail">( $!number.format('0.##',$math.mul($tax.percent,100))% #label('admin.of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
+                        </td>
+                        <td class="price">$!action.formatActualCurrency($tax.value,$order.currency)</td>
+                    </tr>
+                #end
+            #end
+
+            #if($order.totalRewards && $order.totalRewards>0)
+                <tr class="subtotal">
+                    <td colspan="4">#label('used.rewards')</td>
+                    <td class="price">- $!action.formatActualCurrency($order.totalRewards,$order.currency)</td>
+                </tr>
+            #end
+
+            <tr class="total">
+                <td colspan="4">#label('admin.total')</td>
+                <td class="price">$!action.formatActualCurrency($order.total,$order.currency)</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="formulario">
+    <h2 class="block-title">#label('admin.actions')</h2>
+
+    <div class="block-content">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="42%">
+                    #surl('id=formAction' "action=orderupdatestate")
+                    <form action="$formAction" method="post">
+                        <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+                        <table width="100%" class="formulario" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>#label('admin.new.status')</th>
+                                <td>
+                                    <select name="idStatus" class="field string-medium">
+                                        #foreach($st in $action.getOrderStatusList())
+                                            <option value="$!st.id" #if($st==$order.status) selected="selected" #end >$!st.getStatusName($defaultLanguage)</option>
+                                        #end
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>#label('admin.comment')</th>
+                                <td><textarea class="field string-medium" name="statusComment"></textarea></td>
+                            </tr>
+                        </table>
+                        <div class="button-bar">
+                            <button type="submit"><span>#label('change.status')</span></button>
+                        </div>
+                    </form>
+                </td>
+                <td width="4%">&nbsp;</td>
+                <td width="54%">
+                    #surl('id=formInvoice' "action=orderupdateinvoice")
+                    <form action="$formInvoice" method="post">
+                        <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+                        <table width="100%" class="formulario" cellpadding="0" cellspacing="0">
+                            #if('N' == $!action.getStoreProperty('invoice.number.automatic','N'))
+                            <tr>
+                                <th>#label('admin.invoice.no')</th>
+                                <td>
+                                    <input type="text" name="invoiceNo" value="$!order.invoiceNo" class="field string-medium"/>
+                                </td>
+                            </tr>
+                            #elseif($order.hasInvoiceNo())
+                                <tr>
+                                    <th>#label('admin.invoice.no')</th>
+                                    <td>
+                                        <input type="text" readonly="readonly" value="$!action.getOrderInvoice($order)" class="field string-medium readonly"/>
+                                    </td>
+                                </tr>
+                            #end
+                            <tr>
+                                <th>#label('admin.invoice.date')</th>
+                                <td>
+                                    <input type="text" name="invoiceDate" value="$!util.formatDate($order.invoiceDate)" class="field date"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>#label('admin.purchaseOrder.no')</th>
+                                <td>
+                                    <input type="text" name="purchaseOrder" value="$!order.purchaseOrder" class="field string-medium"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="divInvoice" style="display:none;"></div>
+                        <div class="button-bar">
+
+                            <button type="submit"><span>#if($order.hasInvoiceNo()) #label('admin.update.invoice') #else #label('admin.generate.invoice') #end</span></button>
+                            #if($order.hasInvoiceNo())
+                            <button type="button" onclick="generateInvoice();"><span>#label('admin.generate.pdf')</span></button>
+                            <button id="btnPrintInvoice" type="button" href="$!{action.storeFile('invoices')}/${order.idOrder}.pdf" #if($util.fileExist($!action.storeFile("invoices/${order.idOrder}.pdf"))) #else style="display:none" #end ><span>#label('admin.order.print')</span></button>
+                            #end
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <table width="100%" class="formulario" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>#label('packing.slip.email')</th>
+                                <td>
+                                    <input type="text" id="psEmail" value="" class="field string-medium"/>
+                                </td>
+                            </tr>
+                        </table>
+                    <div id="divPackingSlip" style="display:none;"></div>
+                    <div class="button-bar">
+                            <button id="btnPackingSlip" type="button" onclick="sendPackingSlip()"><span>#label('send.packing.slip')</span></button>
+                        </div>
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="listado">
+    <h2 class="block-title">#label('admin.order.history')</h2>
+
+    <div class="block-content">
+        <table width="100%" cellpadding="0" cellspacing="0" class="listado">
+            <tr>
+                <th>#label('admin.date')</th>
+                <th>#label('admin.user')</th>
+                <th>#label('admin.action')</th>
+                <th>#label('admin.comments')</th>
+            </tr>
+            #foreach($h in $order.orderHistory)
+                <tr style="vertical-align:top;">
+                    <td>$!util.formatDate($h.historyDate,$defaultLanguage)</td>
+                    <td>$!h.user.fullName</td>
+                    <td>$!h.historyStatus.getStatusName($defaultLanguage)</td>
+                    <td>$!h.historyComment</td>
+                </tr>
+            #end
+        </table>
+    </div>
+</div>
+</div>
+
+#if($payments && $payments.size()>0)
+<div id="tabPayment">
+    #parse('/WEB-INF/views/admin/orderdata_payments.vm')
+</div>
+#end
+
+<div id="tabShipping">
+   #parse('/WEB-INF/views/admin/orderdata_shipping.vm')
+</div>
+
+<div id="tabCosts">
+   #parse('/WEB-INF/views/admin/orderdata_costs.vm')
+</div>
+
+#if($digitalProducts && !$digitalProducts.isEmpty())
+<div id="tabDigital">
+    #parse('/WEB-INF/views/admin/orderdata_digital.vm')
+</div>
+#end
+
+#if($purchases && !$purchases.isEmpty())
+<div id="tabPurchases">
+    #parse('/WEB-INF/views/admin/orderdata_purchases.vm')
+</div>
+#end
+
+</div>
+
+#end
+#surl('id=urlPendingRates' "action=orderpendingrates")
+#surl('id=urlBarCode' "action=orderbarcode")
+#surl('id=urlPrintOrder' "action=orderdata" "idOrder=$!order.idOrder" 'output=print' )
+#surl('id=urlGenerateInvoice' "action=ordergenerateinvoice" "idOrder=$!order.idOrder"  )
+#surl('id=urlPackingSlip' "action=orderpackingslip" "idOrder=$!order.idOrder"  )
+#if($openTab) #set($showTab = $openTab) #else #set($showTab = 0) #end
+<script type="text/javascript">
+    function recalculateWeight() {
+        var weight = 0;
+        $('#formAddPackage').find("input[name='packageProductQuantity']").each(function() {
+            if ($(this).validField() && eval($(this).val()) > 0 && $(this).attr('weight') != '') {
+                weight += (eval($(this).val()) * eval($(this).attr('weight')));
+            }
+        });
+        $('#packageWeight').val(formatCurrency(weight, 2));
+    }
+    function showPendingRates() {
+        $('#pendingRates').loading("$!action.getText('admin.loading.rates')", "$!action.getText('admin.please.wait')");
+        $('#pendingRates').load("$urlPendingRates", {idOrder:$!order.idOrder}, function() {
+            $("input[name='selectedShippingMethod']").change(function() {
+                $('#deliveryShippingMethod').val($("input[name='selectedShippingMethod']:checked").val());
+            })
+        });
+    }
+    function addBarCode(id, pn) {
+        var bc = $('#barCode' + id).attr('href').substr(1);
+        $('#dialogContent').html('');
+
+        var div1 = $('<div>').addClass('dialog-header')
+                .append($('<h2>').html((bc != null && bc != '') ? "$!action.getText('admin.change.barcode')" : "$!action.getText('admin.set.barcode')"))
+                .append($('<h4>').html('Product: ' + pn));
+        var div2 = $('<div>').addClass('dialog-data').css('padding', '20px')
+                .append($('<input type="text">').attr('id', 'newBarCode').addClass('field').width(520).val(bc));
+        var div3 = $('<div>').addClass('button-bar')
+                .append($('<button type="button">').html('<span class="ok">Ok</span>').click(function() {
+            var newBc = $('#newBarCode').val();
+            $('#barCode' + id).text("$!action.getText('admin.seting.barcode')");
+            jQuery.getJSON("$urlBarCode", {idODP:id,barCode:newBc}, function(data) {
+                if (data == null || data == '') {
+                    $('#barCode' + id).text("[$!action.getText('admin.set.barcode')]");
+                    $('#barCode' + id).attr('href', '#');
+                }
+                else {
+                    $('#barCode' + id).text('[' + data + ']');
+                    $('#barCode' + id).attr('href', '#' + data);
+                }
+            });
+            $('#dialogo').dialog('close');
+        }))
+                .append($('<span>').html('&nbsp;'))
+                .append($('<button type="button">').html('<span class="cancel">$!action.getText('admin.cancel')</span>').click(function() {
+            $('#dialogo').dialog('close');
+        }));
+
+        $('#dialogContent').append(div1).append(div2).append(div3);
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+
+    }
+    function sendPackingSlip() {
+        $('#btnPackingSlip').hide();
+        $('#divPackingSlip').loading("$!action.getText('admin.packing.slip')", "$!action.getText('admin.packing.slip.text')").show();
+        jQuery.getJSON("$urlPackingSlip", {noMail:$('#psEmail').val()}, function(data) {
+            if (data.result == 'ok') {
+                $('#divPackingSlip').hide();
+                $('#btnPackingSlip').show();
+            } else {
+                if (data.error) msg = 'ERROR: ' + data.error;
+                $('#divPackingSlip').error("$!action.getText('admin.packing.slip')", msg);
+                $('#btnPackingSlip').show();
+            }
+        });
+    }
+    function generateInvoice() {
+        $('#btnPrintInvoice').hide();
+        $('#divInvoice').loading("$!action.getText('admin.invoice.generation')", "$!action.getText('admin.invoice.generation.text')").show();
+        jQuery.getJSON("$urlGenerateInvoice", {}, function(data) {
+            if (data.result == 'ok') {
+                $('#divInvoice').hide();
+                $('#btnPrintInvoice').show();
+            } else {
+                var msg = "$!action.getText('admin.error.generating.pdf')";
+                if (data.error) msg += ' ERROR: ' + data.error;
+                $('#divInvoice').error("$!action.getText('admin.invoice.generation')", msg);
+            }
+        });
+    }
+    var wndPrint = null;
+    function printOrder() {
+        if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+        var url = "$!urlPrintOrder" + '&output=print';
+        wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+        wndPrint.focus();
+    }
+    $(function() {
+        recalculateWeight();
+        $('#orderTabs').tabs({selected:$!showTab});
+        $('.editPayment').click(function(){
+            var url = "$!action.url('orderpaymentedit','admin')";
+            $('#dialogContent').loading(loadingText, '');
+            $('#dialogContent').load(url, {idOrder:"$!order.idOrder",idPayment:$(this).attr('rel'),rnd:Math.random()}, function(){
+                $('#dialogo').dialog({width:600,modal:true,resizable:false});
+            });
+            return false;
+        });
+        $('.sel-purchase').change(function(){
+            if ($(this).is(':checked')) {
+                $('#fld_'+$(this).attr('id')).show().attr('disabled', '');
+            } else {
+                $('#fld_'+$(this).attr('id')).attr('disabled', 'disabled').hide();
+            }
+        }).trigger('change');
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

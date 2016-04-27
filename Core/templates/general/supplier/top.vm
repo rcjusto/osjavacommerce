@@ -1,0 +1,19 @@
+#surl('id=urllogout' "action=logout")
+<div>
+    <a href="$!action.url('home','')" target="_blank"><img src="$!action.storeFile('images/admin/logo.gif')" alt="LOGO" style="float:left;"/></a>
+    <div style="float:right;margin-right:12px;">
+        <div style="text-align:right;font-size:16pt;font-weight:bold;margin-bottom:6px;">
+            #label('admin.store.management.system')
+        </div>
+        <div style="text-align:right;">
+            <span class="fecha">$!util.formatDate($date.date, $defaultLanguage)</span>
+            #if($action.adminUser)
+            <span> | </span>
+            #label('admin.user'): $!action.adminUser.fullName
+            <span> | </span>
+            <a href="$urllogout">#label('admin.logout')</a>
+            #end
+        </div>
+    </div>
+    <br style="clear:both;"/>
+</div>

@@ -1,0 +1,10 @@
+<ul class="clearfix">
+    <li class="dashboard link">#linklabel('admin.menu.dashboard', $!action.url('home','/admin'))</li>
+    #foreach($bc in $breadCrumbs)
+        #if($util.isNotEmpty($bc.link))
+            <li class="link"><a href="$!bc.link">$!bc.name</a></li>
+        #else
+            <li><span>$!bc.name</span></li>
+        #end
+    #end
+</ul>

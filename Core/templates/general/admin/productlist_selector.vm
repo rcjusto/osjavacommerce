@@ -1,0 +1,121 @@
+#surl('id=urlProductList' "action=productlist")
+<script type="text/javascript">
+    function selectedlist() {
+        return jQuery.data($('#debug')[0], 'selected');
+    }
+    function debug() {
+        var todas = '';
+        jQuery.each(selectedlist(), function(){ todas += ','+this  });
+        $('#debug').text(todas);
+    }
+    function updSelected(chk) {
+        if (chk!=null && selectedlist()!=null) {
+            var index= jQuery.inArray(chk.val(), selectedlist());
+            if (chk.is(':checked')){
+                if (index<0) selectedlist().push(chk.val());
+            } else {
+                if (index>=0) selectedlist().splice(index, 1);
+            }
+        }
+    }
+    function initTable() {
+       $('#tab_listado').find('input').click(function(){updSelected($(this))});
+       $('#tab_listado').find('input').each(function() {
+           if (selectedlist()!=null) {
+               var index= jQuery.inArray($(this).val(), selectedlist());
+               $(this).attr('checked',index>=0);
+           }
+       });
+       $('#tab_listado').sortedTable('prodSortField','prodSortDirection',function(){$('#form_filter').submit();});
+    }
+    $(function() {
+        jQuery.data($('#debug')[0],'selected',[]);
+        $('#treecat').find('option').each(function(){
+            var l = eval($(this).attr('level'))*20;
+            if (!isNaN(l)) $(this).css('padding-left',l+'px')
+        });
+        $('#form_filter').submit(function() {
+            if ($('#form_filter').validForm()) {
+                var data = $('#form_filter').serialize();
+                $('#listadoProd').loading('Loading Products', 'Please wait...');
+                $('#listadoProd').load("$urlProductList", data);
+            }
+            return false;
+        });
+        initTable();
+    });
+</script>
+<div class="dialog-header">
+    <h2>#label('admin.select.products')</h2>
+    <h4>#label('admin.select.products.instructions')</h4>
+</div>
+<div class="dialog-data" style="overflow:hidden;">
+    <div class="listado">
+        <form id="form_filter" action="#" class="validable">
+        #shidden('name=output' 'value=modal')
+        #shidden('name=updateFilters' 'value=Y')
+        #shidden('name=multiple')
+        #shidden('name=productFilter.sortedField' 'id=prodSortField')
+        #shidden('name=productFilter.sortedDirection' 'id=prodSortDirection')
+        #shidden('name=filterSupplier')
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="100%">
+                <tr>
+                    <th>#label('admin.category')</th>
+                    <td>
+                        #set($catTree = $dao.getCategoryTree(false))
+                        <select id="treecat" name="productFilter.filterCategories" class="field myselect string-short">
+                            <option value="" level="0">(no filter)</option>
+                            #categoryOption($catTree 0 $!productFilter.filterCategories)
+                        </select>
+                    </td>
+                    <th>#label('admin.name')</th>
+                    <td>#stextfield('name=productFilter.filterName' 'cssClass=field string-short')</td>
+                    <th>#label('admin.part.number')</th>
+                    <td>#stextfield('name=productFilter.filterCode' 'cssClass=field string-short')</td>
+                </tr>
+                <tr>
+                    #if($manufacturerFilter)
+                    <th>#label('admin.manufacturer')</th>
+                    <td>
+                        <select name="productFilter.filterManufacturer" class="field string-short">
+                            <option value="">#label('admin.not.filter')</option>
+                            #foreach($opt in $manufacturerList)
+                                <option value="$opt.idManufacturer" #if($productFilter.filterManufacturer==$opt.idManufacturer) selected="selected" #end >$!{opt.manufacturerName}</option>
+                            #end
+                        </select>
+                    </td>
+                    #end
+                    <th>#label('admin.label')</th>
+                    <td>
+                        <select name="productFilter.filterLabel" class="field string-short">
+                            <option value="">#label('admin.not.filter')</option>
+                            #foreach($opt in $labelList)
+                                <option value="$opt.code" #if($productFilter.filterLabel==$opt.code) selected="selected" #end >$!action.getText("label.$opt.code")</option>
+                            #end
+                        </select>
+                    </td>
+                    <td colspan="2" style="vertical-align:bottom;text-align:right;margin-left:20px;">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="listadoProd">
+            #parse('/WEB-INF/views/admin/productlist_modal.vm')
+        </div>
+    </form>
+
+    </div>
+</div>
+<div class="button-bar">
+    <button class="buttonOk" type="button"><span class="ok">#label('admin.ok')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+    <span id="debug"></span>
+</div>
+
+
+
+
+

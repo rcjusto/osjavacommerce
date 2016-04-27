@@ -1,0 +1,92 @@
+<script type="text/javascript">
+    $(function(){
+        $('#addField').click(function(){
+            var obj = $('div.friend-email:last');
+            var newObj = obj.clone();
+            newObj.find('input').val('');
+            obj.parent().append(newObj);
+        });
+        $('#formRefer').submit(function(){
+            $(this).find('.validation-error').hide();
+            var allEmpty = true;
+            $(this).find('input.newFriends').each(function(){
+                if ($(this).val()!='') allEmpty = false;
+            });
+            if (allEmpty) {
+                $('.validation-error').show();
+                return false;
+            }
+            return true;
+        });
+    });
+</script>
+<div id="blockContent" class="refer-friend-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+
+        <div class="block">
+            <h1>#label('refer.friends.page.title')</h1>
+
+            <div class="clearfix content">
+                <div class="block-add-friends">
+                    #if($mailSent=='Y')
+                        <div class="resultado">#label('invitations.sent.successfully')</div>
+                    #end
+                        #if($usersAlreadyReferred)
+                            <div class="warning referred">
+                                <div>#label('mails.already.referred')</div>
+                                <ul>
+                                    #foreach($m in $usersAlreadyReferred)
+                                        <li>$!m</li>
+                                    #end
+                                </ul>
+                            </div>
+                        #end
+                        #if($usersAlreadyRegistered)
+                            <div class="warning registered">
+                                <div>#label('mails.already.registered')</div>
+                                <ul>
+                                    #foreach($m in $usersAlreadyRegistered)
+                                        <li>$!m</li>
+                                    #end
+                                </ul>
+                            </div>
+                        #end
+                    <div class="warning validation-error" style="display: none;">
+                        #label('some.emails.are.required')
+                    </div>
+                    <form action="$!action.url('friendRefer')" id="formRefer" method="post">
+                        <div class="add-friend">
+                            <p class="label">#label('friends.email')</p>
+                            <div>
+                            #foreach($i in [1..5])
+                                <div class="friend-email"><input class="newFriends" name="newFriends" class="field string-200"/></div>
+                            #end
+                            </div>
+                            <div class="buttons">
+                                <button type="button" id="addField"><span class="add-fields">#label('add.fields')</span></button>
+                            </div>
+                        </div>
+                        <div class="add-message">
+                            <p class="label">#label('custom.message')</p>
+                            <textarea rows="6" cols="60" id="mailComment" name="mailComment" class="field string-200"></textarea>
+                            <div class="buttons">
+                                 <button type="submit"><span>#label('send')</span></button>
+                             </div>
+                         </div>
+                    </form>
+                </div>
+                #set($promoImg = $util.findImage($!action.storeFile("images/custom/referral_promo")))
+                #if($util.isNotEmpty($promoImg))
+                    <div class="block-promotion">
+                        <img src="$!promoImg" alt="promotion"/>
+                    </div>
+                #end
+            </div>
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,20 @@
+#set($_numRows = $_parameters.get('rows'))
+#if(!$_numRows) #set($_numRows = 10) #end
+#if($_numRows==0) #set($_numRows = $util.null) #end
+#set($_hotManufacturers = $dao.getHotManufacturers($_numRows))
+#if($_hotManufacturers && !$_hotManufacturers.isEmpty())
+    <div class="left-menu manufacturers">
+        <div class="title"><a href="#" id="linkMenuManufacturer">#label('filter.by.manufacturers')</a></div>
+        <ul>
+            #foreach($hotMan in $_hotManufacturers)
+                #set( $manufacturer = $list.get($hotMan,1))
+                <li>
+                    <div class="clearfix hoversable">
+                        <div><a href="$!action.urlManufacturer($manufacturer)">$!manufacturer.manufacturerName</a></div>
+                    </div>
+                </li>
+            #end
+        </ul>
+    </div>
+#end
+#set($_hotManufacturers = $util.null)

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="ONIXMessage" type="ONIXMessageType"/>
+  <xs:complexType name="ONIXMessageType">
+    <xs:sequence>
+      <xs:element type="HeaderType" name="Header"/>
+      <xs:element type="ProductType" name="Product" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ContributorType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="SequenceNumber"/>
+      <xs:element type="xs:string" name="ContributorRole"/>
+      <xs:element type="xs:string" name="PersonName"/>
+      <xs:element type="xs:string" name="PersonNameInverted"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImprintType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="NameCodeType"/>
+      <xs:element type="xs:string" name="NameCodeTypeName"/>
+      <xs:element type="xs:string" name="NameCodeValue"/>
+      <xs:element type="xs:string" name="ImprintName"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TitleType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="TextCaseFlag"/>
+      <xs:element type="xs:string" name="TitleType"/>
+      <xs:element type="xs:string" name="TitleText"/>
+      <xs:element type="xs:string" name="TitlePrefix"/>
+      <xs:element type="xs:string" name="TitleWithoutPrefix"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WebsiteType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="WebsiteRole"/>
+      <xs:element type="xs:string" name="WebsiteDescription"/>
+      <xs:element type="xs:string" name="WebsiteLink"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RelatedProductType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="RelationCode"/>
+      <xs:element type="ProductIdentifierType" name="ProductIdentifier"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProductIdentifierType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="ProductIDType"/>
+      <xs:element type="xs:string" name="IDTypeName" minOccurs="0"/>
+      <xs:element type="xs:string" name="IDValue"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MainSubjectType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="MainSubjectSchemeIdentifier"/>
+      <xs:element type="xs:string" name="SubjectSchemeVersion"/>
+      <xs:element type="xs:string" name="SubjectCode"/>
+      <xs:element type="xs:string" name="SubjectHeadingText"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SupplyDetailType">
+    <xs:sequence>
+      <xs:element type="SupplierIdentifierType" name="SupplierIdentifier"/>
+      <xs:element type="xs:string" name="SupplierName"/>
+      <xs:element type="xs:string" name="TelephoneNumber"/>
+      <xs:element type="xs:string" name="FaxNumber"/>
+      <xs:element type="xs:string" name="EmailAddress"/>
+      <xs:element type="WebsiteType" name="Website" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="xs:string" name="SupplierRole"/>
+      <xs:element type="xs:string" name="AvailabilityCode"/>
+      <xs:element type="xs:string" name="ProductAvailability"/>
+      <xs:element type="PriceType" name="Price"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HeaderType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="FromCompany"/>
+      <xs:element type="xs:string" name="SentDate"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PublisherType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="PublishingRole"/>
+      <xs:element type="xs:string" name="NameCodeType"/>
+      <xs:element type="xs:string" name="NameCodeTypeName"/>
+      <xs:element type="xs:string" name="NameCodeValue"/>
+      <xs:element type="xs:string" name="PublisherName"/>
+      <xs:element type="WebsiteType" name="Website" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="RecordReference"/>
+      <xs:element type="xs:string" name="NotificationType"/>
+      <xs:element type="xs:string" name="RecordSourceType"/>
+      <xs:element type="xs:string" name="RecordSourceIdentifierType"/>
+      <xs:element type="xs:string" name="RecordSourceIdentifier"/>
+      <xs:element type="ProductIdentifierType" name="ProductIdentifier"/>
+      <xs:element type="xs:string" name="Barcode"/>
+      <xs:element type="xs:string" name="ProductForm"/>
+      <xs:element type="xs:string" name="TradeCategory"/>
+      <xs:element type="TitleType" name="Title"/>
+      <xs:element type="ContributorType" name="Contributor" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="xs:string" name="NoContributor" minOccurs="0"/>
+      <xs:element type="LanguageType" name="Language"/>
+      <xs:element type="xs:string" name="NumberOfPages"/>
+      <xs:element type="xs:string" name="PagesArabic"/>
+      <xs:element type="xs:string" name="BASICMainSubject"/>
+      <xs:element type="xs:string" name="BICMainSubject"/>
+      <xs:element type="MainSubjectType" name="MainSubject"/>
+      <xs:element type="xs:string" name="AudienceCode"/>
+      <xs:element type="OtherTextType" name="OtherText" minOccurs="0"/>
+      <xs:element type="MediaFileType" name="MediaFile" minOccurs="0"/>
+      <xs:element type="ImprintType" name="Imprint"/>
+      <xs:element type="PublisherType" name="Publisher"/>
+      <xs:element type="xs:string" name="CityOfPublication"/>
+      <xs:element type="xs:string" name="CountryOfPublication"/>
+      <xs:element type="xs:string" name="PublishingStatus"/>
+      <xs:element type="xs:string" name="PublicationDate"/>
+      <xs:element type="xs:string" name="YearFirstPublished"/>
+      <xs:element type="RelatedProductType" name="RelatedProduct" minOccurs="0"/>
+      <xs:element type="SupplyDetailType" name="SupplyDetail"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PriceType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="PriceTypeCode"/>
+      <xs:element type="xs:string" name="PriceQualifier"/>
+      <xs:element type="xs:string" name="PriceTypeDescription"/>
+      <xs:element type="xs:string" name="PricePer"/>
+      <xs:element type="xs:string" name="MinimumOrderQuantity"/>
+      <xs:element type="DiscountCodedType" name="DiscountCoded"/>
+      <xs:element type="xs:string" name="DiscountPercent"/>
+      <xs:element type="xs:string" name="PriceStatus"/>
+      <xs:element type="xs:string" name="PriceAmount"/>
+      <xs:element type="xs:string" name="CurrencyCode"/>
+      <xs:element type="xs:string" name="CountryCode"/>
+      <xs:element type="xs:string" name="PriceEffectiveFrom"/>
+      <xs:element type="xs:string" name="PriceEffectiveUntil"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OtherTextType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="TextTypeCode"/>
+      <xs:element type="xs:string" name="TextFormat"/>
+      <xs:element type="xs:string" name="Text"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LanguageType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="LanguageRole"/>
+      <xs:element type="xs:string" name="LanguageCode"/>
+      <xs:element type="xs:string" name="CountryCode"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SupplierIdentifierType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="SupplierIDType"/>
+      <xs:element type="xs:string" name="IDTypeName"/>
+      <xs:element type="xs:string" name="IDValue"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MediaFileType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="MediaFileTypeCode"/>
+      <xs:element type="xs:string" name="MediaFileFormatCode"/>
+      <xs:element type="xs:string" name="MediaFileLinkTypeCode"/>
+      <xs:element type="xs:string" name="MediaFileLink"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DiscountCodedType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="DiscountCodeType"/>
+      <xs:element type="xs:string" name="DiscountCode"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,612 @@
+#macro(fieldSectionTitle $label)<tr class="title"><th colspan="2">$!label</th></tr>#end
+#macro(fieldLarge $id $label $class)
+<tr><th><label for="${id}">$!{label}</label></th><td><input type="text" id="${id}" value="" class="fld-css large $!class"/><a rel="${id}" href="#" class="clear-link clear-field"></td></tr>
+#end
+#macro(fieldSize $id $label $class)
+<tr><th><label for="${id}-value">$!{label}</label></th><td nowrap="nowrap"><input type="hidden" id="${id}" class="fld-css fld-size" /><input type="text" id="${id}-value" value="" class="small fld-value option-value$!class" /><input type="text" id="${id}-unit" value="" class="small fld-unit option-unit$!class"/><a rel="${id}" href="#" class="clear-link clear-field"></a></td></tr>
+#end
+#macro(fieldColor $id $label)
+<tr><th><label for="${id}">$!{label}</label></th><td nowrap="nowrap"><input type="hidden" id="${id}" value="" class="fld-css color" /><div class="color-wrapper"><div class="color" id="${id}-sample"></div></div><a rel="${id}" href="#" class="sel-color"></a><a rel="${id}" href="#" class="transparent"></a><a rel="${id}" href="#" class="clear-link clear-field"></a></td></tr>#end
+#set($borders = ['top', 'right', 'bottom','left'])
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+<style type="text/css"></style>
+<link rel="stylesheet" type="text/css" href="/struts/css/reset.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/admin.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/css_editor.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/colorpicker/css/colorpicker.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.ui.1.8.4.custom.css?v=1.1"/>
+<script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.simplelayout.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.options.js"></script>
+<script type="text/javascript" src="/struts/colorpicker/js/colorpicker.js"></script>
+<script type="text/javascript" src="/struts/js/css_editor.js"></script>
+<script type="text/javascript">
+var arrSize = ['1','2','3','4','5','6','7','8','9','10','12','14','16','18','24','36'];
+var arrUnit = ['em','ex','px','cm','mm','in','pc','pt','%'];
+var arrFontUnitEx = ['xx-small','x-small','small','medium','large','x-large','xx-large'];
+var arrPosUnitH = ['left','center','right'];
+var arrPosUnitV = ['top','middle','bottom'];
+var arrMarginUnit = ['auto'];
+var cssOriginal = null;
+var currentSelector = null;
+var cssData = $!skinCss;
+var templateCode = "$!templateCode";
+var skinName = "$!skinName";
+var alreadyParsed = false;
+var cssEditor;
+$(function() {
+    $(window).bind('resize',
+            function() {
+                $('body').simpleLayout({padding: 0, position: 'horizontal'});
+                $('#content').simpleLayout({padding: 0});
+                resizeLeftBar();
+            }).trigger('resize');
+
+
+    var canUpdateCss = false;
+    $('.css-selector-blink').bind('click',
+            function() {
+                frameBody.find($(this).attr('rel')).effect('highlight', {}, 2000);
+                return false;
+            }).dblclick(function() {
+                frameBody.find($(this).attr('rel')).effect('pulsate', {}, 2000);
+                return false;
+            });
+    $('.show-all-modifiers').click(function() {
+        cssEditor.cssEditor('showAllSelectors');
+        $('.css-editor-block').hide();
+        $('#cssmodifiers').show();
+        resizeLeftBar();
+        return false;
+    });
+    $('.change-skin').click(function() {
+        $('.css-editor-block').hide();
+        $('#csschangeskin').show();
+        resizeLeftBar();
+        return false;
+    });
+    $('.create-skin').click(function() {
+        $('.css-editor-block').hide();
+        $('#csscreateskin').show();
+        resizeLeftBar();
+        return false;
+    });
+    $('#activarEdicion').change(
+            function() {
+                if ($(this).is(':checked')) {
+                    $(this).parent().find('span.inactive').hide();
+                    $(this).parent().find('span.active').show();
+                } else {
+                    $(this).parent().find('span.active').hide();
+                    $(this).parent().find('span.inactive').show();
+                }
+            }).trigger('change');
+
+    // opciones generales
+    $('.edit-css-modifier').click(function() {
+        if (cssOriginal != null) {
+            var s = '';
+            jQuery.each(cssOriginal, function(n, v) {
+                s += n + ':' + v + ';\n'
+            });
+            alert(s);
+        } else {
+            alert('No hay datos cargados')
+        }
+    });
+
+    var localCssData = {};
+    updateCssInPage = function(s, p, v) {
+        if (canUpdateCss) {
+            // actualizar en la pagina
+            // $('#frame').contents().find(s).css(p, v);
+
+            // adicionar al local css data
+            localCssData[s] = getFormCss();
+
+            //actualizar en el json
+            if (cssData[s] == null) cssData[s] = {};
+            var pp = cssData[s];
+            if (v != '') pp[p] = v; else if (pp[p] != null) delete pp[p];
+
+            // enviar el selector para salvar el css
+            jQuery.getJSON("$action.url('custom_template_save_skin','admin')", {selector:s,property:p,value:v,templateCode:templateCode,skinName:skinName}, function(data) {
+                var date = new Date().valueOf();
+                if (data.result == 'OK') {
+                    //$('#frame').contents().find('#linkCssSite').attr('href', "$!{skinCssPath}?d=" + date);
+                    var myStyles = $('#frame').contents().find("#myStyles");
+                    if (myStyles.size() < 1) {
+                        myStyles = $('<style>').attr('id', 'myStyles').attr('type', 'text/css');
+                        $('#frame').contents().find('head').append(myStyles);
+                    }
+
+                    var contentStyles = '';
+                    jQuery.each(localCssData, function(s, v) {
+                        v = v.replace('img/', "${util.siteUrl}/${storeCode}/skins/${skinName}/css/img/");
+                        contentStyles += s + '{' + v + "}\n"
+                    });
+                    myStyles.html(contentStyles);
+                }
+            });
+        }
+    };
+
+    getFormCss = function() {
+        var res = '';
+        $('input.fld-css').each(function() {
+            if ($(this).val().trim() != '') res += $(this).attr('id') + ':' + $(this).val() + ';';
+        });
+        return res;
+    };
+
+    // actualizar el css en la pagina
+    $('input.fld-css').bind('change', function() {
+        if ($(this).val() != '') $(this).parent().parent().addClass('active');
+        else $(this).parent().parent().removeClass('active');
+        if (currentSelector != null) updateCssInPage(currentSelector, $(this).attr('id'), $(this).val());
+    });
+
+    // boton eliminar
+    $('.clear-field,.clear-image').click(function() {
+        $(this).parent().find('input').val('');
+        $(this).parent().find('div.color').css('background-color', '');
+        $(this).parent().find('input.fld-css').trigger('change');
+        return false;
+    });
+
+    // colores
+    $('div.color').ColorPicker({
+        onSubmit: function(hsb, hex, rgb, el) {
+            $(el).css('background-color', '#' + hex);
+            $(el).parent().parent().find('input').val('#' + hex);
+            $(el).parent().parent().find('input.fld-css').trigger('change');
+            $(el).ColorPickerHide();
+        },
+        onBeforeShow: function () {
+            $(this).ColorPickerSetColor(($(this).css('background-color') != null && $(this).css('background-color').indexOf('rgb') > -1) ? rgb2hex($(this).css('background-color')) : '#000000');
+        }
+    });
+    $('input.color').bind('change', function() {
+        $(this).parent().find('div.color').css('background-color', $(this).val());
+    });
+    $('a.sel-color').click(function() {
+        $(this).parent().find('div.color').trigger('click')
+    });
+    $('.transparent').click(function() {
+        $(this).parent().find('input').val('transparent');
+        $(this).parent().find('input').trigger('change');
+        $(this).parent().find('div.color').css('background-color', 'transparent');
+        return false;
+    });
+
+    //image
+    var wndPwd = null;
+    $('.browse-image').click(function(){
+        if (wndPwd != null)
+        if (!wndPwd.closed) wndPwd.close();
+
+        var url = "$action.url('imgexplorer','admin')";
+        wndPwd = window.open(url, 'wndPwd', 'toolbar=no,location=0,directories=no,status=no,menubar=0,scrollbars=no,resizable=yes,copyhistory=0,width=800,height=600');
+        wndPwd.focus();
+    });
+
+    // sizes
+    $('.option-unit').helpOptions(arrUnit, {readonly: true});
+    $('.option-value').helpOptions(arrSize);
+    $('input.fld-size').change(function() {
+        var arr = ($(this).val() != '') ? parseSize($(this).val()) : ['',''];
+        $(this).siblings('input.fld-value').val(arr[0]);
+        $(this).siblings('input.fld-unit').val(arr[1]);
+    });
+    $('input.fld-value').bind('change', function() {
+        var c = $(this).val() + $(this).siblings('input.fld-unit').val();
+        $(this).siblings('input.fld-size').val(c);
+        if (c != '') $(this).parent().parent().addClass('active'); else $(this).parent().parent().removeClass('active');
+        if (currentSelector != null) updateCssInPage(currentSelector, $(this).parent().find('input.fld-css').attr('id'), c);
+    });
+    $('input.fld-unit').bind('change', function() {
+        var c = $(this).siblings('input.fld-value').val() + $(this).val();
+        $(this).siblings('input.fld-size').val(c);
+        if (c != '') $(this).parent().parent().addClass('active'); else $(this).parent().parent().removeClass('active');
+        if (currentSelector != null) updateCssInPage(currentSelector, $(this).parent().find('input.fld-css').attr('id'), c);
+    });
+    $('.option-unit-size')
+            .helpOptions(jQuery.merge(['auto'], arrUnit), {readonly: true, onSelect:function(o, v) {
+                $(o).trigger('change');
+            }})
+            .bind('change', function() {
+                var sizeFld = $(this).parent().find('.option-value-size');
+                sizeFld.css('visibility', ($(this).val()=='auto') ? 'hidden' : 'visible');
+                if ($(this).val()=='auto') sizeFld.val('');
+            });
+    $('.option-value-size').helpOptions(arrSize);
+
+    // llenar opciones de los campos
+    $('#font-family').helpOptions(['Arial, Helvetica, sans-serif','Verdana, Geneva, Arial, Helvetica, sans-serif','"MS Sans Serif", Geneva, sans-serif','"Times New Roman", Times, serif','"MS Serif", "New York", serif','"Courier New", Courier, monospace', 'serif','sans-serif','cursive','fantasy','monospace'], {width:300});
+    $('#font-size-unit').helpOptions(jQuery.merge(jQuery.merge([], arrUnit), arrFontUnitEx), {readonly: true, onSelect: function(o, v) {
+        $('#font-size-value').css('visibility', (jQuery.inArray(v, arrFontUnitEx) < 0) ? 'visible' : 'hidden');
+        if (!jQuery.inArray(v, arrFontUnitEx) < 0) $('#font-size-value').val('');
+    }});
+    $('#font-size-value').css('visibility', (jQuery.inArray($('#font-size-unit').val(), arrFontUnitEx) < 0) ? 'visible' : 'hidden');
+    if (!jQuery.inArray($('#font-size-unit').val(), arrFontUnitEx) < 0) $('#font-size-value').val('');
+
+    $('#font-size-value').helpOptions(arrSize);
+    $('#font-weight').helpOptions(['bold','bolder','lighter','normal','100','200','300','400','500','600','700','800','900'], {readonly: true});
+    $('#font-style').helpOptions(['italic','normal','oblique'], {readonly: true});
+    $('#font-variant').helpOptions(['small-caps','normal'], {readonly: true});
+    $('#text-transform').helpOptions(['normal','capitalize','uppercase','lowercase'], {readonly: true});
+    $('#text-align').helpOptions(['left','center','right','justify'], {readonly: true});
+    $('#text-decoration').helpOptions(['none','blink','line-through','overline','underline'], {readonly: true});
+    $('#background-repeat').helpOptions(['no-repeat','repeat-x','repeat-y','repeat'], {readonly: true});
+
+    $('#background-position-h-value').helpOptions(arrSize);
+    $('#background-position-h-unit').helpOptions(jQuery.merge(jQuery.merge([], arrUnit), arrPosUnitH), {readonly:true, onSelect: function(o, v) {
+        $('#background-position-h-value').css('visibility', (jQuery.inArray(v, arrPosUnitH) < 0) ? 'visible' : 'hidden');
+        if (jQuery.inArray(v, arrPosUnitH) >= 0) $('#background-position-h-value').val('');
+        $('#background-position-h-unit').trigger('change');
+    }});
+    $('#background-position-h-value').css('visibility', (jQuery.inArray($('#background-position-h-unit').val(), arrPosUnitH) < 0) ? 'visible' : 'hidden');
+    if (!jQuery.inArray($('#background-position-h-unit').val(), arrPosUnitH) < 0) $('#background-position-h-value').val('');
+
+    $('#background-position-v-value').helpOptions(arrSize);
+    $('#background-position-v-unit').helpOptions(jQuery.merge(jQuery.merge([], arrUnit), arrPosUnitV), {readonly:true, onSelect: function(o, v) {
+        $('#background-position-v-value').css('visibility', (jQuery.inArray(v, arrPosUnitV) < 0) ? 'visible' : 'hidden');
+        if (jQuery.inArray(v, arrPosUnitV) >= 0) $('#background-position-v-value').val('');
+        $('#background-position-v-unit').trigger('change');
+    }});
+    $('#background-position-v-value').css('visibility', (jQuery.inArray($('#background-position-v-unit').val(), arrPosUnitV) < 0) ? 'visible' : 'hidden');
+    if (!jQuery.inArray($('#background-position-v-unit').val(), arrPosUnitV) < 0) $('#background-position-v-value').val('');
+
+    $('#background-position-h-value,#background-position-h-unit,#background-position-v-value,#background-position-v-unit').bind('change', function() {
+        var v = $('#background-position-h-value').val() + $('#background-position-h-unit').val() + ' ' + $('#background-position-v-value').val() + $('#background-position-v-unit').val();
+        updateLabelPosition();
+        $('#background-position').val(v).trigger('change');
+    });
+    $('#background-position').change(function() {
+        var arr1, arr2;
+        var arr = ($(this).val() != '') ? $(this).val().split(' ') : ['',''];
+        if (arr.length > 1) {
+            arr1 = (arr[0] != '') ? parseSize(arr[0]) : ['',''];
+            $('#background-position-h-value').val(arr1[0]);
+            $('#background-position-h-unit').val(arr1[1]);
+
+            arr2 = (arr[1] != '') ? parseSize(arr[1]) : ['',''];
+            $('#background-position-v-value').val(arr2[0]);
+            $('#background-position-v-unit').val(arr2[1]);
+        } else if (arr.length > 0) {
+            arr1 = (arr[0] != '') ? parseSize(arr[0]) : ['',''];
+            $('#background-position-h-value').val(arr1[0]);
+            $('#background-position-h-unit').val(arr1[1]);
+
+            $('#background-position-v-value').val('');
+            $('#background-position-v-unit').val('');
+        } else {
+            $('#background-position-h-value').val('');
+            $('#background-position-h-unit').val('');
+
+            $('#background-position-v-value').val('');
+            $('#background-position-v-unit').val('');
+        }
+        $('#background-position-h-value').css('visibility', (jQuery.inArray($('#background-position-h-unit').val(), arrPosUnitH) < 0) ? 'visible' : 'hidden');
+        if (!jQuery.inArray($('#background-position-h-unit').val(), arrPosUnitH) < 0) $('#background-position-h-value').val('');
+        $('#background-position-v-value').css('visibility', (jQuery.inArray($('#background-position-v-unit').val(), arrPosUnitV) < 0) ? 'visible' : 'hidden');
+        if (!jQuery.inArray($('#background-position-v-unit').val(), arrPosUnitV) < 0) $('#background-position-v-value').val('');
+        updateLabelPosition();
+    });
+    updateLabelPosition = function() {
+        var trH = $('#background-position-h-value').parent().parent();
+        if ($('#background-position-h-value').val() + $('#background-position-h-unit').val() + '' != '') trH.addClass('active'); else trH.removeClass('active');
+        var trV = $('#background-position-v-value').parent().parent();
+        if ($('#background-position-v-value').val() + $('#background-position-v-unit').val() + '' != '') trV.addClass('active'); else trV.removeClass('active');
+    };
+    $('.clear-field-pos').click(function() {
+        $(this).parent().find('input').val('');
+        $('#background-position-h-value').trigger('change');
+    });
+
+    $('#background-attachment').helpOptions(['fixed','scroll'], {readonly: true});
+    $('#display').helpOptions(['block','inline','inline-block','none'], {readonly: true});
+    $('#position').helpOptions(['block','inline','inline-block','none'], {readonly: true});
+    $('#float').helpOptions(['left','right','none'], {readonly: true});
+    $('#clear').helpOptions(['both','left','right','none'], {readonly: true});
+
+    #foreach($p in $borders)
+        $("#border-${p}-style").helpOptions(['none','hidden','solid','dotted','dashed','double','groove','ridge','inset','outset'], {readonly: true});
+    #end
+
+    $('#frame').load(function(e) { // Se cargo el framework
+        var frameBody = $(this).contents().find('body');
+        cssEditor = frameBody.cssEditor({
+            css: cssData,
+            editor: '#csseditor',
+            canNavigate : function() {
+                return !$('#activarEdicion').is(':checked');
+            },
+            // al dar click en un modificador css
+            onSelectModifier: function(m, d) {
+                currentSelector = m;
+                $('.css-editor-title').find('h2').html(m);
+                cssOriginal = cssData[m];
+                canUpdateCss = false;
+                // vaciar campos
+                $('input.fld-css').val('');
+                // asignar valores
+                if (cssOriginal != null) jQuery.each(cssOriginal, function(n, v) {
+                    $('#' + n).val(v);
+                });
+                // lanzar trigger
+                $('input.fld-css').trigger('change');
+
+                $('.css-editor-block').hide();
+                $('#cssform').show();
+                resizeLeftBar();
+                canUpdateCss = true;
+            },
+            // al dar click en un objeto de la pagina
+            onSelectObject: function(o) {
+                fillBreadCrumb(o);
+                $('.css-editor-block').hide();
+                $('#cssmodifiers').show();
+                resizeLeftBar();
+            }
+        });
+
+    });
+});
+
+
+var arrNumeric = ['+','-','.','0','1','2','3','4','5','6','7','8','9'];
+function parseSize(cad) {
+    if (cad != null && cad != '') {
+        var arr = cad.trim().split(' ');
+        if (arr.length > 0) {
+            // obtener important
+            var important = (arr[arr.length - 1] == '!important');
+            if (important) arr.pop();
+            // obtener unidad
+            var i, u = '', v = '';
+            if (arr.length > 0) {
+                var c = arr.join('');
+                for (i = 0; i < c.length; i++) {
+                    if (jQuery.inArray(c[i], arrNumeric) > -1) v += c[i];
+                    else u += c[i];
+                }
+            }
+            return [ v.trim(), u.trim(), (important) ? '!important' : '' ];
+        }
+    }
+    return [];
+}
+
+var hexDigits = new Array
+        ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f");
+
+//Function to convert hex format to a rgb color
+function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+
+function hex(x) {
+    return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+}
+
+function resizeLeftBar() {
+    $('#leftBar').simpleLayout({padding: 0});
+    $('#leftBarContent').simpleLayout({padding: 0});
+    $('#leftBarContent').simpleLayout({padding: 0});
+    $('#cssmodifiers').simpleLayout({padding: 0});
+    $('#cssform').simpleLayout({padding: 0});
+}
+
+function fillBreadCrumb(obj) {
+    var list = $(obj).parentsUntil('html');
+    $('#tagBreadCrumb').html('');
+    list.each(function() {
+        var _self = this;
+        $('<a>').attr('href', '#').html(_self.tagName)
+                .click(function() {
+                    selectObject(_self);
+                }).mouseover(function(e){
+                    cssEditor.cssEditor('showHover',_self);
+                }).mouseleave(function(e){
+                    cssEditor.cssEditor('hideHover');
+                })
+                .prependTo('#tagBreadCrumb');
+        if (this.tagName != 'BODY') $('<span>').html('>').prependTo('#tagBreadCrumb');
+    });
+}
+function selectObject(obj) {
+    cssEditor.cssEditor('selectElement',obj);
+}
+function onSelectImage(img) {
+    if (img!=null && img!='') {
+        $('#background-image').val("url('"+img+"')").trigger('change');
+    } else {
+        $('#background-image').val("none").trigger('change');
+    }
+}
+
+</script>
+</head>
+<body >
+<div id="leftBar" class="clearfix css-editor layout-fixed" style="width: 300px;">
+    <div class="css-editor-mode layout-fixed">
+        <div class="css-editor-skin-name">
+            SKIN: $!skin
+        </div>
+        <div class="css-editor-mode-switch">
+            <label>
+                <input type="checkbox" id="activarEdicion" checked="false">
+                <span class="active">Edicion Activada</span>
+                <span class="inactive">Edicion Desactivada</span>
+            </label>
+        </div>
+        <div class="css-editor-mode-links">
+            <a class="change-skin" href="#">change skin</a>
+            <span>|</span>
+            <a class="show-all-modifiers" href="#">show all modifiers</a>
+        </div>
+    </div>
+    <div id="leftBarContent" class="layout-resize" style="overflow: hidden;padding: 8px 0;">
+        <div id="csschangeskin" class="css-editor-block layout-resize">
+            #if($skins.size()>1)
+            <h2>Select Skin</h2>
+            <form id="formSelectSkin" action="$!action.url('custom_template_edit_skin','admin')" method="post">
+                <input type="hidden" name="templateCode" value="$!templateCode"/>
+                   <div>
+                    #foreach($s in $skins)
+                        <label>
+                            <input type="radio" name="skinName" value="$s" #if($s==$skinName) checked="checked" #end />
+                            <span class="label">$s</span>
+                        </label>
+                    #end
+                    <div>
+                        <button type="submit"><span>Select Skin</span></button>
+                    </div>
+                </div>
+            </form>
+            #end
+            <h2>Create Skin</h2>
+
+            <form id="formCreateSkin" action="$!action.url('custom_template_create_skin','admin')" method="post">
+                <input type="hidden" name="templateCode" value="$!templateCode"/>
+                <div>
+                    <label>
+                        <span class="label">Name of skin:</span>
+                        <input type="text" name="newSkin" value="" style="width: 280px"/>
+                    </label>
+                    <label>
+                        <span class="label">Based on skin:</span>
+                        <select name="skinName" style="width: 280px">
+                            #foreach($s in $skins)
+                                <option value="$s" #if($s==$skinName) selected="selected" #end >$s</option>
+                            #end
+                        </select>
+                    </label>
+
+                    <div>
+                        <button type="submit"><span>Create Skin</span></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="cssmodifiers" class="css-editor-block layout-resize" style="padding-top: 8px;">
+            <div id="csseditor" class="css-editor-form layout-resize"></div>
+        </div>
+        <div id="cssform" class="css-editor-block layout-resize">
+            <div class="css-editor-title layout-fixed">
+                <h2></h2>
+
+                <div>
+                    <a href="#" class="edit-css-modifier">edit css</a>
+                    <span>|</span>
+                    <a href="#" onclick="$('#cssform').hide();$('#cssmodifiers').show();return false;">back</a>
+                </div>
+            </div>
+            <div class="css-editor-form layout-resize" style="padding: 2px 0 12px 0;">
+                <table id="cssEditorTable" width="100%">
+                    #fieldSectionTitle('Font')
+                    #fieldColor('color' 'Color')
+                    #fieldLarge('font-family' 'Family' '')
+                    #fieldSize('font-size' 'Size' '-font')
+                    #fieldLarge('font-weight' 'Weight' '')
+                    #fieldLarge('font-style' 'Style' '')
+                    #fieldLarge('font-variant' 'Variant' '')
+                    #fieldLarge('text-transform' 'Transform' '')
+                    #fieldLarge('text-decoration' 'Decoration' '')
+
+                    #fieldSectionTitle('Paragraph')
+                    #fieldLarge('text-align' 'Align' '')
+                    #fieldSize('text-indent' 'Indent' '')
+                    #fieldSize('line-height' 'Line' '')
+                    #fieldSize('word-spacing' 'Word Spacing' '')
+                    #fieldSize('letter-spacing' 'Letter Spacing' '')
+
+                    #fieldSectionTitle('Background')
+                    #fieldColor('background-color' 'Color')
+                    <tr>
+                        <th><label for="background-image">Image</label></th>
+                        <td nowrap="nowrap"><input type="text" id="background-image" value="" class="fld-css image"/><a href="#" class="browse-image" title="Browse image..."></a><a href="#" class="clear-link clear-image" title="Clear image"></a></td>
+                    </tr>
+                    #fieldLarge('background-repeat' 'Repeat' '')
+                    <input type="hidden" id="background-position" class="fld-css" value=""/>
+                    <tr>
+                        <th><label>Hor. Position</label></th>
+                        <td nowrap="nowrap">
+                            <input type="text" id="background-position-h-value" value="" class="small"/><input type="text" id="background-position-h-unit" value="" class="small"/><a rel="background-position-h" href="#" class="clear-link clear-field-pos">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label>Vert. Position</label></th>
+                        <td nowrap="nowrap">
+                            <input type="text" id="background-position-v-value" value="" class="small"/><input type="text" id="background-position-v-unit" value="" class="small"/><a rel="background-position-v" href="#" class="clear-link clear-field-pos">
+                        </td>
+                    </tr>
+                    #fieldLarge('background-attachment' 'Attachment' '')
+
+                    #fieldSectionTitle('Borders')
+                    #foreach($p in $borders)
+                        #fieldSize("border-${p}-width" "${p} Width" '')
+                        #fieldColor("border-${p}-color" "${p} Color")
+                        #fieldLarge("border-${p}-style" "${p} Style" '')
+                    #end
+                    #fieldSize("border-top-left-radius" "Border Radius Top-Left" '')
+                    #fieldSize("border-top-right-radius" "Border Radius Top-Right" '')
+                    #fieldSize("border-bottom-right-radius" "Border Radius Bottom-Right" '')
+                    #fieldSize("border-bottom-left-radius" "Border Radius Bottom-Left" '')
+
+                    #fieldSectionTitle('Padding')
+                    #foreach($p in $borders)
+                        #fieldSize("padding-${p}" "${p}" '')
+                    #end
+
+                    #fieldSectionTitle('Margin')
+                    #foreach($p in $borders)
+                        #fieldSize("margin-${p}" "${p}" '-size')
+                    #end
+
+                    #fieldSectionTitle('Size and Position')
+                    #fieldLarge('display' 'Display' '')
+                    #fieldLarge('position' 'Position' '')
+                    #fieldSize('width' 'Width' '-size')
+                    #fieldSize('height' 'Height' '-size')
+                    #fieldSize('left' 'Left' '')
+                    #fieldSize('right' 'Right' '')
+                    #fieldSize('top' 'Top' '')
+                    #fieldSize('bottom' 'Bottom' '')
+                    #fieldLarge('float' 'Float' '')
+                    #fieldLarge('clear' 'Clear' '')
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="content" style="overflow:hidden;" class="layout-resize">
+    #if($skinName!='default')
+    <div class="layout-resize">
+        <iframe id="frame" style="border: 0;width: 100%;height: 100%" src="$!action.url('home','')"></iframe>
+    </div>
+    <div class="layout-fixed css-editor-bottom-bar">
+        <span id="tagBreadCrumb"><span>#label('tag.hierarchy')</span></span>
+    </div>
+    #else
+        <div class="info">
+            <h2>#label('default.skin.can.not.be.modified')</h2>
+            <p>#label('must.create.new.skin')</p>
+        </div>
+        <script type="text/javascript">
+            $(function(){
+                $('a.change-skin').trigger('click');
+            })
+        </script>
+    #end
+</div>
+<div id="dialog" style="position: absolute;display: none;"></div>
+</body>
+</html>

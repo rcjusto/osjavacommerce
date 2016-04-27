@@ -1,0 +1,63 @@
+#set($maxCant = $math.sub($product.getMaxToBuy($frontUser), $userSession.getNumProduct($product.idProduct)))
+#if($maxCant>0)
+    #set($listRelatedCombined = $action.getProductsRelatedCombined($listRelated))
+    #if($util.isNotEmpty($listRelatedCombined))
+    <div class="product-detail-packs clearfix block">
+        <h2>$!listRelatedCombined.size() #label('product.packs') </h2>
+        <div class="packs">
+        <table>
+            #foreach($r in $listRelatedCombined)
+                #set($p = $r.related)
+                #if($p.getMaxToBuy($frontUser)>0)
+                    <tr>
+                        #set($relName = $!p.getLanguage($locale.language,$defaultLanguage).productName)
+                        #set($relImage = $imageResolver.getImageForProduct($p,'list/'))
+                        #set( $relPrice = $action.toActualCurrency($math.add($p.getFinalPrice($frontUserLevel,1), $product.getFinalPrice($frontUserLevel,1))) )
+                        #surl('id=urlRelatedDetail' "action=product" "code=$!p.urlCode")
+                        <td class="combined-names">
+                            #if($util.isNotEmpty($image))
+                                <img src="$!action.storeFile('images/products/list')/$!image" alt="$!productLang.productName"/>
+                            #else
+                                <img src="$!action.skinFile('images/[lang]/not-available.gif')"/>
+                            #end
+                            <div>$!product.getProductName($locale.language)</div>
+                        </td>
+                        <td class="combined-plus">
+                            <span></span>
+                        </td>
+                        <td class="combined-names">
+                            #if($util.isNotEmpty($relImage))
+                                <a href="$urlRelatedDetail"><img src="$!action.storeFile('images/products/list')/$!relImage" alt="$!relName"/></a>
+                            #else
+                                <a href="$urlRelatedDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a>
+                            #end
+                            <div><a href="$urlRelatedDetail">$!relName</a></div>
+                        </td>
+                        <td class="combined-equals">
+                            <span></span>
+                        </td>
+                        <td class="combined-actions">
+                            <div class="combined-price clearfix">
+                                $!action.formatActualCurrency($r.combinedPrice)
+                            </div>
+                            #if($relPrice > $r.combinedPrice)
+                            <div class="save-combined-price clearfix">
+                                #label('save') $!action.formatActualCurrency($math.sub($relPrice,$r.combinedPrice))
+                            </div>
+                            #end
+                            <div class="add-cart">
+                                <form id="formCombined$velocityCount" action="$!action.url('addtocart','')" method="post" class="validable">
+                                    <input type="hidden" name="idProduct" value="$!product.idProduct"/>
+                                    <input type="hidden" name="idAdd" value="$!r.related.idProduct"/>
+                                    <a class="add-to-cart" href="#" onclick="$(this).closest('form').submit();return false;"></a>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                #end
+            #end
+        </table>
+        </div>
+    </div>
+    #end
+#end

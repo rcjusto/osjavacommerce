@@ -1,0 +1,85 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($product.idProduct)
+        #label('admin.complement.modify') ID: $!product.idProduct
+    #else
+        #label('admin.complement.new')
+    #end
+</h1>
+
+<div id="productTabs">
+#if($product.idProduct)
+<ul class="tabs">
+    <li><a href="#tabMainData" style="font-size:8pt;">Main Data</a></li>
+    <li><a href="#tabImages" style="font-size:8pt;">Images</a></li>
+</ul>
+#end
+
+    <div id="tabMainData" class="formulario #if($product.idProduct)tabpanel#end">
+        #surl('id=urlSave' "action=complementsave")
+        <form action="$urlSave" method="post" class="validable">
+            #shidden('name=idProduct' "value=$!product.idProduct")
+            #langSelector()
+            #formErrors()
+            <table class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th class="required">#label('admin.group')</th>
+                    <td>
+                        <select name="idGroup" class="field string-medium" onchange="$('#formList').submit();">
+                            #foreach($g in $complementGroups)
+                                <option value="$!g.idGroup" #if($g==$product.complementGroup || $g==$group) selected="selected" #end >$!g.getGroupName($defaultLanguage)</option>
+                            #end
+                        </select>
+                    </td>
+                    <th>#label('admin.active')</th>
+                    <td>#scheckbox('name=product.active' )</td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.name')</th>
+                    <td colspan="3">#langinput('productName' $product 'productName' 'field required string-large' )</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.description')</th>
+                    <td colspan="3">
+                        #langtextarea('description' $product 'description' 'field string-large' )
+                        <a href="#" class="textarea-ckeditor"></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.part.number')</th>
+                    <td>#stextfield('name=product.partNumber' 'cssClass=field required string-short')</td>
+                    <th class="required">#label('admin.stock')</th>
+                    <td>#stextfield('name=product.stock' 'cssClass=field required integer')</td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.cost.price')</th>
+                    <td>#stextfield('name=product.costPrice' "value=$!util.formatNumber($product.costPrice,'money')" 'cssClass=field decimal')</td>
+                    <th class="required">#label('admin.price')</th>
+                    <td>#stextfield('name=product.price' "value=$!util.formatNumber($product.price,'money')" 'cssClass=field decimal')</td>
+                </tr>
+            </table>
+
+            <div class="button-bar">
+                <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                #surl('id=urlCancel' "action=complementlist" "idGroup=$!group.idGroup" )
+                <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+            </div>
+        </form>
+    </div>
+
+    #if($product.idProduct)
+     <div id="tabImages" class="tabpanel">
+        <div id="divImages">
+            #parse('/WEB-INF/views/admin/complementedit_images.vm')
+        </div>
+    </div>
+    #end
+
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('#productTabs').tabs({});
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,90 @@
+#surl('id=urlSaveBlock' "action=blocksave")
+#set($_idBlock = $code.replace('.','_') )
+<div class="dialog-header">
+    <h2>#label('block.update.content') $!code</h2>
+    <h4>#label('block.update.content.text')</h4>
+</div>
+<div class="dialog-data">
+    <form id="dialog_saveStaticText">
+        #shidden('name=idStaticText' "value=$!staticText.id")
+        #shidden('name=staticText.code' "value=$!code")
+        <div class="formulario" style="text-align:left;">
+            #langSelector()
+            <div>
+                <table class="formulario">
+                    <tr>
+                        <td style="vertical-align:top;padding:0 12px 12px 12px;">
+                            #langtextarea('staticTextValue' $staticText 'value' 'field string-760' '10' )
+                            <a href="#" class="textarea-ckeditor"></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="button-bar">
+    <button id="dialogBtnOk" type="button" onclick="saveBlock();"><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="closeDialog();"><span class="cancel">#label('admin.close')</span></button>
+</div>
+<script type="text/javascript">
+    var thisLanguage = "$defaultLanguage";
+    $(function() {
+        $('button').button();
+        $('.multilang').blur(function() {
+            var nField = $(this).attr('name').substr('4');
+            $(this).siblings("[name='" + nField + "']." + thisLanguage).val($(this).val());
+        }).change(function() {
+            var nField = $(this).attr('name').substr('4');
+            $(this).siblings("[name='" + nField + "']." + thisLanguage).val($(this).val());
+        }).bind('loadContent', function() {
+            var nField = $(this).attr('name').substr('4');
+            $(this).val($(this).siblings("[name='" + nField + "']." + thisLanguage).val());
+        });
+        $('a.lang-selector').click(function() {
+            setLanguage($(this).attr('rel'));
+            return false;
+        });
+        $('#langfields_fillempty').attr('checked', jQuery.cookie('languages.fillempty')!='false' ).click(function() {
+            jQuery.cookie('languages.fillempty', ($(this).is(':checked')) ? 'true' : 'false');
+        });
+        var myInst = CKEDITOR.instances['vis_staticTextValue'];
+        if (myInst) CKEDITOR.remove(myInst);
+        $("textarea[name='vis_staticTextValue']").ckeditor({
+            height:200,
+            width:740,
+            filebrowserBrowseUrl : "$!{action.url('imgexplorer','admin')}",
+            filebrowserImageBrowseUrl : "$!{action.url('imgexplorer','admin')}?filterType=img",
+            filebrowserFlashBrowseUrl : "$!{action.url('imgexplorer','admin')}?filterType=swf"
+        });
+        setLanguage(thisLanguage)
+    });
+    function setLanguage(lang) {
+        $('a.lang-selector').removeClass('selected');
+        if (lang != thisLanguage) $('.multilang').trigger('blur').removeClass('lang-' + thisLanguage);
+        thisLanguage = lang;
+        $('.multilang').trigger('loadContent').addClass('lang-' + thisLanguage);
+        $("a[rel='" + thisLanguage + "'].lang-selector").addClass('selected');
+        $('.multilang:first').focus();
+    }
+    function saveBlock() {
+        $('.multilang').trigger('blur');
+        $('.multilang').each(function(){
+            var nField = $(this).attr('name').substr('4');
+            if ($('#langfields_fillempty').is(':checked')) {
+                var aValue;
+                $("input[name='"+nField+"']").each(function(){if ($(this).val()!='') aValue = $(this).val()});
+                if (aValue!='') $("input[name='"+nField+"']").each(function(){if ($(this).val()=='') $(this).val(aValue)});
+            }
+        });
+        $('#dialogBtnOk').hide();
+        var url = "$!urlSaveBlock";
+        jQuery.post(url, $('#dialog_saveStaticText').serialize(), function(data) {
+            $('#block_$!_idBlock').html(data);
+            closeDialog();
+        });
+    }
+    function closeDialog() {
+        $('#dialogo').dialog('close');
+    }
+</script>

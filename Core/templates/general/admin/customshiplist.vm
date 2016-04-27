@@ -1,0 +1,70 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.carriers.manager')</h1>
+<div class="listado">
+    <div id="tabShipping">
+        #surl('id=urlShipping' "action=listshipping")
+        #surl('id=urlLive' "action=listcarrierproperty")
+        <ul class="tabs">
+            <li><a href="$urlShipping">#label('admin.configure.shipping.methods')</a></li>
+            <li><a href="$urlLive">#label('admin.configure.live.carriers')</a></li>
+            <li><a href="#tabGeneral">#label('admin.configure.custom.carrier')</a></li>
+        </ul>
+        <div id="tabGeneral">
+            <h2 class="block-title">#label('admin.custom.shipping.list')</h2>
+            #surl('id=urlForm' "action=listcustomship")
+            <form action="$urlForm" method="post" class="validable">
+                #formErrors()
+                #if($util.isNotEmpty($customShippingMethods))
+                    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                            <th>#label('admin.code')</th>
+                            <th>#label('admin.name')</th>
+                            <th>#label('admin.rules')</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        #foreach($s in $customShippingMethods)
+                            #surl('id=urlEdit' "action=editcustomship" "idCustomShipping=$!s.id")
+                            <tr>
+                                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!s.id"/></td>
+                                <td>$!s.code</td>
+                                <td>$!s.getName($defaultLanguage)</td>
+                                <td>$!s.rules.size()</td>
+                                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                            </tr>
+                        #end
+                    </table>
+                #else
+                    <div class="info">
+                        <h2>#label('admin.custom.shippings')</h2>
+
+                        <p>#label('admin.custom.shippings.not.found')</p>
+                    </div>
+                #end
+                <div class="button-bar">
+                    <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+                    #surl('id=urlNew' "action=editcustomship")
+                    <button type="button" href="$urlNew"><span class="add">#label('admin.custom.shipping.new')</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#tabShipping').tabs({selected:2,
+            select: function(event, ui) {
+                var url = jQuery.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

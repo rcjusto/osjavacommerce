@@ -1,0 +1,158 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    .insert-token {background-color: #ffffff;border:1px solid #cccccc;margin: 2px;padding: 2px 6px;display: inline-block;float: left;border-radius: 4px;text-decoration: none}
+    .insert-token:hover {background-color: #dddddd;text-decoration: none}
+    .insert-token.selected {background-color: #921501;color: #ffffff;font-weight: bold;}
+    .insert-text-token {background-color: #e4e4e4;color:#333333;display: inline-block;padding: 3px 8px;border:1px solid #cccccc;text-decoration: none;border-radius: 3px;}
+    .insert-text-token:hover {background-color: #dddddd;border-color: #999999;text-decoration: none;}
+</style>
+<h1>
+    #label('admin.mail.customization')
+</h1>
+<div class="filters">
+    #surl('id=formMailFilter' "action=maildesigner")
+    <form id="formFilter" action="$formMailFilter" method="post">
+        <table class="formulario">
+            <tr>
+                <th>#label('admin.select.mail')</th>
+                <td>
+                    #set($listMail = ['global_top','global_bot','available_links','credentials','friend_purchase','friend_registered','invoice','order_pay_ready','order_status','product','product_review','referfriend','resetpassword','stock_alert_users','stock_alert_admin','welcome','welcome_newsletter','wishlist','global_css'])
+                    <select id="mail" name="mail" class="field string-medium" onchange="$('#formFilter').submit();">
+                        <option value="">#label('admin.select.mail')</option>
+                        #foreach($opt in $listMail)
+                            <option value="$opt" #if($opt==$mail) selected="selected" #end >$opt</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+#if($util.isNotEmpty($mail))
+<div class="formulario">
+    #surl('id=formMailSave' "action=maildesignersave")
+    <form action="$formMailSave" method="post">
+        <input type="hidden" name="mail" value="$!mail">
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>
+                    <div style="float:left;">#label('mail.content')</div>
+                    <div style="font-weight:lighter;float:right;">
+                        <a href="#" onclick="$('#blockDefault').toggle(); return false;">#label('admin.toggle.default')</a>
+                        <span>|</span>
+                        <a href="#" onclick="editor.setData($('#defaultValue').val()); return false;">#label('admin.copy.from.default')</a>
+                        <span>|</span>
+                        <a href="#" onclick="editor.setData(''); return false;">#label('admin.remove')</a>
+                    </div>
+                </th>
+            </tr>
+            <tr id="blockDefault" style="display:none;">
+                <td>
+                    <textarea id="defaultValue" rows="18" cols="60" readonly="readonly" wrap="off" class="field" style="background-color:#dcdcdc;width:800px;">$!esc.html($defaultContent)</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <textarea id="customValue" rows="18" cols="60" name="mailContent" wrap="off" class="field" style="width:800px;">$!esc.html($customContent)</textarea>
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            <button type="button" onclick="showPreview();"><span class="ok">#label('admin.preview')</span></button>
+        </div>
+    </form>
+</div>
+<div id="dialogToken" class="dialogo" style="display: none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('mail.insert.token')</h2>
+            <h4>#label('mail.insert.token.description')</h4>
+        </div>
+        <div class="dialog-data">
+            <div style="padding:10px;max-height: 300px;overflow-y: auto;">
+            #foreach($e in $mailTokens.entrySet())
+                <div style="font-weight: bold;margin: 12px 0 0 8px;">$e.key</div>
+                <div class="clearfix">
+                #foreach($t in $e.value)
+                    <a style="" href="#" data="$!t" class="insert-token">$!t</a>
+                #end
+                </div>
+            #end
+            </div>
+            <div style="padding: 10px;border-top: 1px dotted #aaaaaa;" class="clearfix">
+                <label for="textToken" style="float: left;margin-right: 10px;">Text Label: </label>
+                <input type="text" id="textToken" value="" class="field string-medium" />
+                <a href="#" class="insert-text-token" style="float: left;margin-left: 10px;">Insert Text Label</a>
+            </div>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#dialogToken').dialog('close');" ><span class="cancel">#label('admin.close')</span></button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var editor;
+    $(function(){
+        CKEDITOR.config.protectedSource.push(/<\?[\s\S]*?\?>/g);
+        CKEDITOR.config.protectedSource.push(/<hr[\s\S]*?\/>/g);
+        editor = CKEDITOR.replace( 'customValue', {
+            contentsCss : '/struts/css/mail.css',
+            language : thisLanguage,
+            filebrowserBrowseUrl : params.urlImgExplorer,
+            filebrowserImageBrowseUrl : params.urlImgExplorer + '?filterType=img',
+            filebrowserFlashBrowseUrl : params.urlImgExplorer + '?filterType=swf',
+            extraPlugins : 'velocitymacro',
+            toolbar:[
+                    ['Source','-','CreateVelocityMacro'],
+                    ['Cut','Copy','Paste','PasteText','PasteFromWord'],
+                    ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+                    '/',
+                    ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+                    ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+                    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+                    ['Link','Unlink','Anchor'],
+                    ['Image','Flash','Table','HorizontalRule','SpecialChar'],
+                    '/',
+                    ['Styles','Format','Font','FontSize'],
+                    ['TextColor','BGColor'],
+                    ['Maximize', 'ShowBlocks']
+                ]
+        });
+
+        $('.insert-token').click(function(){
+            CKEDITOR.plugins.velocitymacro.createToken( editor, element, '[['+$(this).attr('data')+']]' );
+            $('#dialogToken').dialog('close');
+        });
+        $('.insert-text-token').click(function(){
+            CKEDITOR.plugins.velocitymacro.createToken( editor, element, "[[t('"+$('#textToken').val()+"')]]" );
+            $('#dialogToken').dialog('close');
+        });
+    });
+    var wndCat = null;
+    function showPreview() {
+        if ($('#mail').val() != '') {
+            if (wndCat != null && !wndCat.closed) wndCat.close();
+
+            wndCat = window.open("$!action.url('maildesignerpreview','admin', $util.map.add('mail',$!mail))", 'wndCat', 'toolbar=no,location=0,directories=no,status=no,menubar=0,scrollbars=yes,resizable=yes,copyhistory=0,width=960,height=600');
+            wndCat.focus();
+        }
+    }
+    var element;
+    function editVelocityMacro(e) {
+        $('.insert-token').removeClass('selected');
+        $('#textToken').val('');
+        element = CKEDITOR.plugins.velocitymacro.getSelectedToken( e );
+        if (element) {
+            var token = element.getText().slice( 2, -2 );
+            if (token.indexOf('t(')===0) $('#textToken').val(token.substr(3,token.length-5));
+            else $(".insert-token[data='"+token+"']").addClass('selected');
+        }
+        $('#dialogToken').dialog({width:600,modal:true,resizable:false,position:['center',50]})
+    }
+
+</script>
+#end
+#parse('/WEB-INF/views/admin/page_bot.vm')

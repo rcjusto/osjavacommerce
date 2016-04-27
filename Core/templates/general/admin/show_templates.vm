@@ -1,0 +1,183 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    form { display: inline-block; margin: 0; padding: 0; }
+    .testing-template { background-color: #f8f8f8; margin-top: 12px; padding: 10px; }
+    ul {list-style: none inside;margin: 0;padding: 0;}
+    #templateList li {float: left;margin: 10px;text-align: center;padding: 10px;border: 1px solid #cccccc;background-color: #ffffff;}
+    #templateList li div.image {height: 160px;width: 120px;overflow: hidden;}
+    #templateList li div.name {height: 30px;line-height: 30px;overflow: hidden;margin-bottom: 10px;}
+    #templateList li img {max-width: 120px;max-height: 160px;}
+    #templateList li .template-editable {position: absolute;width: 55px;height: 55px;background: url("/struts/css/images/template_editable.png") no-repeat 0 0;margin-left: -10px;margin-top: -10px;}
+    img.current-template {float: left;margin: 0 30px;max-height: 240px;}
+    img.test-template {float: left;margin: 0 30px;max-height: 180px;}
+    .template-name {font-size: 20pt;margin-bottom: 20px;}
+    #skins li {float: left;width: 100px;margin: 4px;text-align: center;padding: 4px;border: 4px solid #f8f8f8;background-color: #f8f8f8;}
+    #skins li.selected {border: 4px solid #666666;}
+    #skins li .image {height: 120px;}
+    #skins li .name {height: 24px;line-height: 12px;overflow: hidden;margin-top: 4px;}
+    #skins li img {max-height: 120px;}
+    #skins li a {color: #333333;font-size: 8pt;}
+    ul.my-tab li {float: left;padding: 8px 20px;background-color: #e0e0e0;margin-right: 6px;}
+    ul.my-tab li.selected {float: left;background-color: #f8f8f8;}
+    ul.my-tab li a {color: #333333;text-decoration: none;}
+</style>
+<div style="width:900px;">
+    <h1>#label('admin.current.template')</h1>
+    <div class="clearfix" style="margin-top: 20px;">
+        #set($img = $util.findImage("/templates/$!{currTemplate.code}/skins/$!{skin}/thumbnail"))
+        #if($util.isEmpty($img)) #set($img = $util.findImage("/templates/$!{currTemplate.code}/thumbnail")) #end
+        #if($util.isNotEmpty($img))
+            <img class="current-template" src="$!img" alt=""/>
+        #else
+            <img class="current-template" src="/templates/no-thumbnail.gif" alt=""/>
+        #end
+        <div style="float: left;">
+            <div class="template-name">$!{currTemplate.name}</div>
+            #if($skins && $skins.size()>1)
+                <div id="skins">
+                    <div>#label('admin.change.skin')</div>
+                    <ul>
+                        #foreach($s in $skins)
+                            #set($img = $util.findImage("/templates/$!{currTemplate.code}/skins/${s}/thumbnail"))
+                            <li #if($s==$skin) class="selected" #end>
+                                <a href="#" onclick="$('#newSkin').val('$!s');$('#formSkin').submit();return false;">
+                                    <div class="image">#if($util.isNotEmpty($img))<img src="$!img" alt=""/>#else<img src="/templates/no-thumbnail.gif" alt=""/>#end</div>
+                                    <div class="name">$!s.replace('_',' ')</div>
+                                </a>
+                            </li>
+                        #end
+                    </ul>
+                </div>
+            #end
+        </div>
+    </div>
+    <form id="formSkin" action="$!action.url('changeskin','admin')" method="post">
+        <input type="hidden" id="newSkin" name="newSkin" value=""/>
+    </form>
+
+    #if($testTemplate)
+        <div class="testing-template clearfix">
+            <h3 style="margin: 0">#label('admin.testing.template')</h3>
+            <p style="margin: 0 0 12px 0;">#label('admin.testing.template.text')</p>
+            #set($img = $util.findImage("/templates/$!{testTemplate.code}/skins/$!{skin}/thumbnail"))
+            #if($util.isEmpty($img)) #set($img = $util.findImage("/templates/$!{testTemplate.code}/thumbnail")) #end
+            #if($util.isNotEmpty($img))
+                <img class="test-template" src="$!img" alt=""/>
+            #else
+                <img class="test-template" src="/templates/no-thumbnail.gif" alt=""/>
+            #end
+            <div style="float: left;">
+                <div class="template-name">$!{testTemplate.name}</div>
+                <div>
+                    #if($!util.isNotEmpty($testTemplate.edit))
+                        <form action="$!action.url($!testTemplate.edit,'admin')" method="post">
+                            <input type="hidden" name="templateCode" value="$!testTemplate.code"/>
+                            <button><span>#label('edit.template')</span></button>
+                        </form>
+                    #end
+                    <form action="$!action.url('untesttemplate','admin')" method="post">
+                        <button><span>#label('template.finish.test')</span></button>
+                    </form>
+                    <form action="$!action.url('changetemplate','admin')" method="post">
+                        <input type="hidden" name="newTemplate" value="$!testTemplate.code"/>
+                        <input type="hidden" name="removeTest" value="Y"/>
+                        <button type="submit"><span>#label('select')</span></button>
+                    </form>
+                </div>
+                #if($testSkins && $testSkins.size()>1)
+                    <div id="skins">
+                        <div>#label('admin.test.skin')</div>
+                        <ul>
+                            #foreach($s in $testSkins)
+                                #set($img = $util.findImage("/templates/$!{testTemplate.code}/skins/${s}/thumbnail"))
+                                <li #if($s==$skin) class="selected" #end>
+                                    <a href="#" onclick="$('#testSkin').val('$!s');$('#formTestSkin').submit();return false;">
+                                        <div class="image">#if($util.isNotEmpty($img))<img src="$!img" alt=""/>#else<img src="/templates/no-thumbnail.gif" alt=""/>#end</div>
+                                        <div class="name">$!s.replace('_',' ')</div>
+                                    </a>
+                                </li>
+                            #end
+                        </ul>
+                    </div>
+                #end
+            </div>
+        </div>
+        <form id="formTestSkin" action="$!action.url('testskin','admin')" method="post">
+            <input type="hidden" id="testSkin" name="newSkin" value=""/>
+        </form>
+    #end
+
+    <ul class="clearfix my-tab" style="margin-top: 20px;">
+        <li class="selected">
+            <a href="#templateList">
+                <h3 style="margin: 0;">#label('admin.templates.list')</h3>
+                <p style="margin: 0;">#label('admin.templates.list.select')</p>
+            <a>
+        </li>
+        <li>
+            <a href="#createTemplate">
+                <h3 style="margin: 0;">#label('create.your.template')</h3>
+                <p style="margin: 0;">#label('create.your.template.text')</p>
+            </a>
+        </li>
+    </ul>
+    <div style="background-color: #f8f8f8;padding: 10px;">
+        <div class="listado" id="templateList">
+            <ul class="clearfix">
+                #foreach($t in $templates.listado)
+                    <li>
+                        #if($util.isNotEmpty($t.edit))
+                            <div class="template-editable"></div> #end
+                        <div class="image">
+                            #set($img = $util.findImage("/templates/$!{t.code}/thumbnail"))
+                            #if($util.isNotEmpty($img))<img src="$!img" alt=""/>#else<img src="/templates/no-thumbnail.gif" alt=""/>#end
+                        </div>
+                        <div class="name">$t.name</div>
+                        <div class="button">
+                            <form action="$!action.url('changetemplate','admin')" method="post">
+                                <input type="hidden" name="newTemplate" value="$!t.code"/>
+                                <button type="submit"><span>#label('select')</span></button>
+                            </form>
+                            <form action="$!action.url('testtemplate','admin')" method="post">
+                                <input type="hidden" name="newTemplate" value="$!t.code"/>
+                                <button type="submit"><span>#label('test')</span></button>
+                            </form>
+                        </div>
+                    </li>
+                #end
+            </ul>
+        </div>
+        <div id="createTemplate">
+            <form action="$!action.url('custom_template_create_template','admin')" method="post">
+                <input type="hidden" name="templateCode" value="$!storeCode"/>
+                <div class="formulario">
+                    <table class="formulario">
+                        <tr>
+                            <th>#label('template.name'):</th>
+                            <td><input type="text" name="templateName" value="" class="field string-medium required"/></td>
+                        </tr>
+                    </table>
+                    <div class="button-bar">
+                        <button type="submit"><span>#label('create.template')</span></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')
+<script type="text/javascript">
+    $(function(){
+        $('ul.my-tab a').each(function(){
+            $($(this).attr('href')).addClass('tab-container');
+        });
+        $('ul.my-tab a').click(function(){
+            $('ul.my-tab li').removeClass('selected');
+            $(this).closest('li').addClass('selected');
+            $('.tab-container').hide();
+            $($(this).attr('href')).show();
+            return false;
+        })
+    });
+</script>

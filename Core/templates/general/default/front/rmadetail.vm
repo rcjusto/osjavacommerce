@@ -1,0 +1,123 @@
+#surl('id=urlRmaSave' "action=rmasave")
+<div id="blockContent" class="order-page clearfix">
+    <div id="blockOrderRma">
+        <div class="block">
+
+            #if($rma)
+                <div id="rma_data" class="clearfix">
+                    <div id="rma_summary">
+                        <h1>#label('rma.info')</h1>
+                        <div class="clearfix">
+                            #if($!rma.rmaNumber)<label><span class="label">#label('rma.number'):</span>$!rma.rmaNumber</label>#end
+                            <label><span class="label">#label('rma.status'):</span>#label("rma.status.$!rma.rmaStatus")</label>
+                            <label><span class="label">#label('rma.created'):</span>$!util.formatDate($rma.createdDate, $locale.language)</label>
+                            <label><span class="label">#label('rma.type'):</span> $!rma.rmaType.getName($locale.language)</label>
+                            <label><span class="label">#label('order.id'):</span> $!order.idOrder</label>
+                            <label><span class="label">#label('order.created'):</span> $!util.formatDate($order.createdDate, $locale.language)</label>
+                            <label><span class="label">#label('product.partnumber'):</span> $!rma.product.partNumber</label>
+                            <label><span class="label">#label('product.name'):</span> $!rma.product.getProductName($locale.language)</label>
+                            <label><span class="label">#label('product.delivery'):</span> $!util.formatDate($rma.orderProduct.packing.deliveryDate, $locale.language)</label>
+                            <label><span class="label">#label('product.serial.number'):</span> $!rma.rmaSerialNumber</label>
+                        </div>
+                    </div>
+                    <div id="rma_details">
+                        #if($rma.rmaStatus!='closed')
+                            <p>#label("rma.text.$rma.rmaStatus")</p>
+                            <div class="block add-comment">
+                                <div class="header-comment">
+                                    <h2>#label('rma.sendus.any.commentary')</h2>
+                                    <p>#label('rma.sendus.any.commentary.text')</p>
+                                </div>
+                                <form id="formComment" action="$urlRmaSave" method="post" class="validable">
+                                    <input type="hidden" name="idRma" value="$!rma.id">
+                                    <textarea name="rmaComment" class="field required" style="width:99%" rows="5"></textarea>
+                                    #fieldError('rmaComment')
+                                    <div class="button-bar">
+                                        <button type="submit"><span class="ok">#label('submit')</span></button>
+                                    </div>
+                                </form>
+                            </div>
+                        #end
+                        #if($rma.rmaStatus=='accepted1')
+                            #if($rma.verificationStatus=='complete')
+                                <p>#label("rma.text.accepted.complete")</p>
+                                <p>$!rma.verificationDetails</p>
+                            #else
+                                #if($rma.verificationStatus=='incomplete')
+                                    <p>#label("rma.text.accepted.incomplete")</p>
+                                    <p>$!rma.verificationDetails</p>
+                                #else
+                                    <div class="block">
+                                        <p>#label("rma.text.accepted.waiting")</p>
+                                        <form id="formShippingReturn" action="$urlRmaSave" method="post" class="validable">
+                                            <input type="hidden" name="idRma" value="$!rma.id">
+                                            <p>#label("rma.return.shipping.text")</p>
+                                            <label>
+                                                <span class="label">#label('return.shipping.method')</span>
+                                                #stextfield('name=rma.returnShippingMethod' 'cssClass=field required string-200')
+                                                #fieldError('rma.returnShippingMethod')
+                                            </label>
+                                            <label>
+                                                <span class="label">#label('return.tracking.number')</span>
+                                                #stextfield('name=rma.returnTrackingNumber' 'cssClass=field required string-200')
+                                                #fieldError('rma.returnTrackingNumber')
+                                            </label>
+                                            <div>
+                                                <label class="label">&nbsp;</label>
+                                                <button type="submit"><span>#label('rma.submit.shipping.info')</span></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                #end
+                            #end
+                        #end
+
+                        <h2>#label('rma.log')</h2>
+                        <ul class="rma-log">
+                            #foreach($rmaLog in $rma.logs)
+                                <li>
+                                    <div class="clearfix">
+                                        <span class="date">$!util.formatDate($rmaLog.actionDate, $locale.language)</span>
+                                        #if($util.isNotEmpty($rmaLog.rmaStatus))<span class="status">#label("rma.status.$!rmaLog.rmaStatus")</span>#end
+                                    </div>
+                                    <div class="clearfix">
+                                        <span class="user">$!rmaLog.actionUser.fullName:</span>
+                            <span class="comment">
+                                #if($util.isNotEmpty($rmaLog.actionComments))$rmaLog.actionComments #else #label('no.comment') #end
+                            </span>
+                                    </div>
+
+                                </li>
+                            #end
+                        </ul>
+
+                    </div>
+                </div>
+            #else
+                <div class="error">
+                    <h2>#label('rma.not.found')</h2>
+                    <p>#label('rma.not.found.text')</p>
+                </div>
+            #end
+            <div class="button-bar">
+                #if($order)
+                    #surl('id=urlRmas' "action=rmaorder" "idOrder=$!order.idOrder")
+                    <button type="button" href="$urlRmas"><span>#label('back.order.rmas')</span></button>
+                #end
+                #surl('id=urlOrders' "action=orders")
+                <button type="button" href="$urlOrders"><span>#label('my.orders')</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('#formComment').submit(function() {
+            return $('#formComment').validForm();
+        });
+        $('#formShippingReturn').submit(function() {
+            return $('#formShippingReturn').validForm();
+        });
+    });
+</script>

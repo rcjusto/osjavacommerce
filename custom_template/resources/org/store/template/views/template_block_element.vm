@@ -1,0 +1,13 @@
+<li data="$!z.name" #if($zone.fixed=='true') class="fixed ui-sortable-disabled" #else class="moveable" #end>
+    #if($zone.fixed=='true') #else
+    <a class="remove-block" href="#" title="$!action.getText('remove.block')"></a>
+    #end
+    <a class="edit-block" href="#" title="$!action.getText('edit.block')"></a>
+    <h4>$!zone.description</h4>
+    #if($zone.parametersArr)
+        #foreach($p in $zone.parametersArr)
+            #set($attValue = "$!list.get($z.parametersArr , $velocityCount)")
+            <div data="$!attValue" name="$!p"><span class="label">#label("zone.parameter.${p}")</span>: <a title="$!action.getText('click.to.change.attribute.value')" href="#" class="change-att-value">#if($util.isEmpty($attValue)) [$!action.getText('none')] #else $!attValue #end</a><div class="inline-editor"></div></div>
+        #end
+    #end
+</li>

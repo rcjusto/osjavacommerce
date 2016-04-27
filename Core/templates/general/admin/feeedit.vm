@@ -1,0 +1,100 @@
+#macro( processCategoryFeeNode $n )
+    #foreach( $cNode in $n.children() )
+        #set( $filstr = $util.getRepeatString('&nbsp;&nbsp;&nbsp;', $cNode.level) )
+        #set( $cat = $cNode.userObject )
+        #set( $catL = $cat.getLanguage($defaultLanguage) )
+        #if( $cat )
+
+            #set( $hasChild = 0 )
+            #foreach( $cCh in $cNode.children() )
+                #set( $hasChild = 1 )
+            #end
+        <tr id="cat-$!cat.idCategory" #if($!cat.idParent) class="child-of-cat-$!cat.idParent" #end>
+            <td style="padding-left:24px;"><input type="hidden" name="idCategory" value="$!cat.idCategory"/>$!catL.categoryName</td>
+            <td style="text-align:center;">
+                <input type="hidden" name="categoryId" value="$!cat.idCategory" class="field decimal">
+                <input type="text" name="feeValue" value="$!util.formatNumber($feeValues.get($cat.idCategory),'decimal4')" class="field decimal">
+            </td>
+            <td style="text-align:center;">
+                <input type="text" name="feePercent" value="$!util.formatNumber($feePercents.get($cat.idCategory),'decimal4')" class="field decimal">
+            </td>
+        </tr>
+            #processCategoryFeeNode( $cNode )
+        #end
+    #end
+#end
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=loadStates' "action=countrystates")
+<script type="text/javascript">
+    $(function() {
+        $('#countryCode').change(function() {
+            if ($(this).val() != '0') {
+                $('#statesContainer').load("$loadStates", {countryCode:$(this).val(),idState:"$!{fee.state.idState}",includeEmpty:"$!{action.getText('admin.all.states')}"});
+            } else {
+                $('#statesContainer').html("$!action.getText('admin.select.a.country')")
+            }
+        }).trigger('change');
+        $(function() {
+            $('table.tree').treeTable({initialState:'expanded'});
+        });
+    });
+</script>
+<h1>
+    #if ($fee.id)
+        #label('admin.fee.modify') ID: $!fee.id
+    #else
+        #label('admin.fee.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savefee")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=idFee' "value=$!fee.id")
+    <div class="formulario">
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.fee.name')</th>
+                <td>
+                    #stextfield('name=fee.feeName' 'cssClass=field required string-medium')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.country')</th>
+                <td>
+                    <select id="countryCode" name="fee.country" class="field string-medium">
+                        #foreach($c in $action.getCountries(false))
+                            <option value="$c.code" #if($c.code==$fee.country) selected="selected" #end >$c.name</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.state')</th>
+                <td id="statesContainer">
+                    #label('admin.select.a.country')
+                </td>
+            </tr>
+        </table>
+
+        #if($categoryTree.children())
+            <div class="listado" style="margin-top:20px;">
+                <table class="listado tree" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.category.name')</th>
+                        <th style="text-align:right;">#label('admin.value')</th>
+                        <th style="text-align:right;">#label('admin.percent')</th>
+                    </tr>
+                    #processCategoryFeeNode( $categoryTree )
+                </table>
+            </div>
+        #end
+
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listfee" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

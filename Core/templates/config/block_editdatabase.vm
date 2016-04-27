@@ -1,0 +1,80 @@
+#surl('id=urlListDatabase' 'action=listDatabase' 'namespace=/config')
+#surl('id=urlSaveDatabase' 'action=saveDatabase' 'namespace=/config')
+<form id="formSaveDatabase">
+    <input type="hidden" name="nuevo" value="$!nuevo" />
+<div class="errors" #if($action.hasActionErrors()) #else style="display:none;" #end>
+    #foreach($err in $action.getActionErrors())
+    <p>$!err</p>
+    #end
+</div>
+<table class="formulario" >
+    <tr>
+        <th>Id</th>
+        <td>
+            #if($nuevo=='N')
+            <span style="font-size:14pt;">$!id</span><input type="hidden" name="id" value="$!id">
+            #else
+                <input type="text" name="id" value="" size="20" class="field required"/>
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>Type</th>
+        <td>
+            <select name="dbType" class="field">
+                #foreach($opt in ['MySQL','SQLServer'])
+                <option value="$opt" #if($opt==$dbType) selected="selected" #end >$opt</option>
+                #end
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>Connection Url</th>
+        <td><input type="text" name="dbUrl" value="$!dbUrl" size="60" class="field required"/></td>
+    </tr>
+    <tr>
+        <th>Username</th>
+        <td><input type="text" name="dbUser" value="$!dbUser" size="20" class="field required"/></td>
+    </tr>
+    <tr>
+        <th>Password</th>
+        <td><input type="password" name="dbPassword" value="$!dbPassword" size="20" class="field"/></td>
+    </tr>
+    <tr>
+        <th>Use Lucene</th>
+        <td><input type="checkbox" name="dbUseLucene" value="true" #if($!dbUseLucene=='true') checked="checked" #end/></td>
+    </tr>
+</table>
+</form>
+<div style="margin:8px;">
+    <button type="button" id="btnSaveDatabase"><span class="ok">Save Database Connection</span></button>
+    <button type="button" id="btnCancelDatabase"><span class="cancel">Cancel</span></button>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('#btnCancelDatabase').click(function(){
+            $('#databases').loading('Loading. Please wait ...');
+            $('#databases').load("$urlListDatabase");
+        });
+        $('#btnSaveDatabase').click(function(){
+            $('#formSaveDatabase').find('.errors').html('');
+            $('#formSaveDatabase').find('.errors').hide();
+            var validForm = true;
+            $('#formSaveDatabase').find('input.required').each(function(){
+                $(this).removeClass('error');
+                if ($(this).val()=='') {
+                    alert($(this).attr('name'));
+                    $(this).addClass('error');
+                    $('#formSaveDatabase').find('.errors').show();
+                    $('#formSaveDatabase').find('.errors').html('<p>Los campos marcados en rojo son obligatorios</p>');
+                    validForm = false;
+                }
+            });
+            if (validForm) {
+                var data = $('#formSaveDatabase').serialize();
+                $('#databases').loading('Saving. Please wait ...');
+                $('#databases').load("$urlSaveDatabase", data);
+            }
+        });
+    });
+</script>

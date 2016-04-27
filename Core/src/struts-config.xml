@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+
+    <bean class="org.store.config.ConfigVelocityManager"/>
+
+    <package name="store-config" extends="struts-default" namespace="/config">
+        <result-types>
+            <result-type name="velocity" class="org.store.config.ConfigVelocityResult"/>
+        </result-types>
+
+        <interceptors>
+            <interceptor name="configSecurityInterceptor" class="org.store.config.SecurityInterceptor"/>
+            <interceptor-stack name="storeConfigDefaultStack">
+                <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="configSecurityInterceptor"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="storeConfigDefaultStack"/>
+
+        <global-results>
+            <result type="redirectAction" name="accessDeny">login</result>
+        </global-results>
+
+
+    </package>
+</struts>

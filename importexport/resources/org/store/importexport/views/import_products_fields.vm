@@ -1,0 +1,43 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.product.import.step2')</h1>
+<div class="formulario" style="padding-left: 12px;">
+    <p>Matched columns of imported file with product fields</p>
+    <form action="$!action.url('import_products_do','admin')" method="post" enctype="multipart/form-data" class="validable">
+        <input type="hidden" name="fileName" value="$!fileName">
+        <table class="grid" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>Column Name</th>
+                <th>Import into Field</th>
+            </tr>
+            #foreach($h in $fieldNames)
+                <tr>
+                    <td>$!h:</td>
+                    <td style="padding: 1px;">
+                        <select name="fields" class="field import-field" style="width:400px;float:none;">
+                            <option value="" style="color: #bbbbbb">[$!action.getText('admin.do.not.import')]</option>
+                            #foreach($fn in $action.productFields)
+                                #if($fn.trim().toLowerCase()==$h.trim().toLowerCase())
+                                    <option value="$fn" selected="selected">$fn</option>
+                                #else
+                                    <option value="$fn">$fn</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                </tr>
+            #end
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="next">#label('admin.next')</span></button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $('select.import-field').change(function(){
+        if ($(this).val()=='') $(this).css({'background-color':'#ffffff','color':'#aaaaaa'});
+        else $(this).css({'background-color':'#eeeeee','color':'#000000'})
+    }).trigger('change');
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

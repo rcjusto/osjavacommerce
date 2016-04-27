@@ -1,0 +1,279 @@
+.click-border {
+    position: absolute;
+    z-index: 99996;
+    background-color: #961300;
+}
+
+.hover-border {
+    position: absolute;
+    z-index: 99990;
+    background-color: #d7820d;
+}
+
+#leftBar {
+    font-family: Arial, serif;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+    width: 300px;
+    background: #eeeeee url("images/css_edit_bkg.png") repeat-y right;
+    color: #333;
+    text-align: left;
+    border-right: 1px solid #cccccc;
+    padding: 8px;
+}
+
+#leftBar h2 {
+    font-size: 13pt;
+    text-transform: uppercase;
+    margin: 12px 4px 4px 4px;
+}
+
+#leftBar li {
+    border-top:  1px dotted #cccccc;
+    padding: 4px;
+    margin: 0 4px;
+}
+
+#leftBar li a {
+    font-size: 12pt;
+    color: #003772;
+}
+
+#leftBar li a.css-selector-blink {
+    background: url("/struts/css/images/search_16.png") no-repeat; width: 16px; height: 16px; display: inline-block;
+    float: right;
+}
+
+#leftBar li div {
+    font-size: 9pt;
+}
+
+.css-editor-mode {
+    position: relative;
+    display: block;
+    border: 1px solid #666666;
+    background-color: #666666;
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-size: 12pt;
+}
+
+.css-editor-skin-name {
+    background-color: #111111;margin: 1px;padding: 4px 8px;font-weight: bold;
+}
+.css-editor-mode-switch {
+    margin: 8px 8px 4px 8px;
+}
+.css-editor-mode-switch label span {
+    display: none;
+}
+.css-editor-mode-links {
+    font-size: 10pt; color: #dddddd;padding: 3px 12px;
+}
+.css-editor-mode a  {
+    font-size: 10pt;color: #dddddd;
+}
+.css-editor-mode a:hover {text-decoration: underline;}
+
+.css-editor-mode label {
+    display: block;
+}
+
+.css-editor-block {
+    display: none;
+}
+
+.css-editor-form {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#cssEditorTable {
+    font-size: 10pt;
+    border: 1px solid #cccccc;
+    background-color: #f8f8f8;
+    color: #333333;
+}
+
+#cssEditorTable th {
+    width: 40%;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #eeeeee;
+    text-align: left;
+    padding: 2px 6px;
+    font-size: 9pt;
+    font-weight: lighter;
+    text-transform: capitalize;
+    color: #333333;
+}
+
+#cssEditorTable tr.active th {
+    font-weight: bold;
+    color: #961300;
+}
+
+#cssEditorTable td {
+    border-bottom: 1px solid #eeeeee;
+    padding: 1px;
+    width: 60%;
+}
+
+#cssEditorTable tr.title th {
+    background-color: #999999;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+#leftBar input, #leftBar select {
+    border: 1px solid #dddddd;
+    padding: 2px;
+    font-size: 10pt;
+    margin: 0;
+    height: 18px;
+}
+
+#leftBar input:focus,select:focus {
+    border: 1px solid #333333;
+}
+
+#leftBar input.large {
+    width: 160px;
+    background: #ffffff url("/struts/css/images/miselect.gif") no-repeat right center;
+}
+
+#leftBar input.small {
+    width: 77px;
+    background: #ffffff url("/struts/css/images/miselect.gif") no-repeat right center;
+}
+
+#leftBar input.small.option-value, #leftBar input.small.option-value-font {
+    margin-right: 2px;
+}
+
+#leftBar div.color-wrapper {
+    width: 124px;
+    height: 22px;
+    border: 1px solid #dddddd;
+    float: left;
+    background: url("/struts/css/images/transp_bkg.gif")
+}
+
+#leftBar div.color {
+    width: 124px;
+    height: 22px;
+}
+
+#leftBar a.transparent {
+    vertical-align: bottom;
+    background: url("/struts/css/images/fld_transp.gif") no-repeat;
+    width: 20px;
+    height: 24px;
+    display: inline-block;
+}
+
+#leftBar a.sel-color {
+    vertical-align: bottom;
+    background: url("/struts/css/images/fld_color.png") no-repeat;
+    width: 20px;
+    height: 24px;
+    display: inline-block;
+}
+
+#leftBar input.image {
+    width: 142px;
+}
+
+#leftBar a.browse-image {
+    vertical-align: bottom;
+    background: url("/struts/css/images/fld_ellipsis.gif") no-repeat;
+    width: 18px;
+    height: 24px;
+    display: inline-block;
+}
+
+#leftBar a.clear-link {
+    vertical-align: bottom;
+    background: url("/struts/css/images/fld_clear.gif") no-repeat;
+    width: 18px;
+    height: 24px;
+    display: inline-block;
+}
+
+#leftBar div.popup-help-options {
+    background-color: #333333;
+    border: 1px solid #333333;
+}
+
+#leftBar div.popup-help-options ul {
+    margin: 0;
+    padding: 0
+}
+
+#leftBar div.popup-help-options li {
+    margin: 0;
+    padding: 0
+}
+
+#leftBar div.popup-help-options li a {
+    display: block;
+    padding: 2px 8px;
+    font-size: 10pt;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#leftBar div.popup-help-options li a:hover {
+    background-color: #ffffff;
+    color: #333333;
+    text-decoration: none
+}
+
+.colorpicker {
+    z-index: 99999;
+}
+
+#formCreateSkin div {margin-left: 10px;margin-top:20px;}
+#formChangeSkin div {margin-left: 20px;margin-top:20px;}
+#csschangeskin div div {margin-top: 20px;margin-left: 0;}
+#csschangeskin label { display: block;margin: 8px;}
+#csschangeskin span.label { margin-left: 4px;}
+#csschangeskin input { vertical-align: bottom;}
+#formCreateSkin span.label {
+    display: block;
+    margin-top: 10px;
+    padding: 2px;
+}
+#formCreateSkin input, #formCreateSkin select {
+    background-color: #ffffff;
+    width: 240px !important;
+    padding: 2px;
+    height: auto;
+}
+#formCreateSkin select {
+    width: 246px !important;
+}
+
+.css-editor-bottom-bar {
+    font-family: Arial, serif;
+    font-size: 9pt;
+    background-color: #333333;
+    color: #eeeeee;
+    padding: 3px 12px;
+}
+#tagBreadCrumb span {
+    color: #cccccc;
+    padding: 2px;
+    display: inline-block;
+}
+#tagBreadCrumb a {
+    color: #eeeeee;
+    text-decoration: none;
+    padding: 2px;
+    display: inline-block;
+}
+#tagBreadCrumb a:hover {
+    background-color: #dddddd;
+    color: #333333;
+}

@@ -1,0 +1,238 @@
+#surl('id=urlSaveProp' "action=productsaveproperties")
+#set( $attlist = $productAttributes )
+<div style="width:900px;">
+    <form id="formproperties">
+        #shidden('name=idProduct' "value=$!product.idProduct")
+        #formErrors()
+        #set($productLang = $product.getLanguage($defaultLanguage))
+        #if($util.isNotEmpty($productLang.caract1) || $util.isNotEmpty($productLang.caract2) || $util.isNotEmpty($productLang.caract3))
+            <div class="formulario">
+                <h2 class="block-title">#label('admin.product.variants')</h2>
+                <table id="tableAttributes" class="sheet" cellpadding="0" cellspacing="0">
+                    <tr>
+                        #if($util.isNotEmpty($productLang.caract1))
+                            <th>$!productLang.caract1</th>#end
+                        #if($util.isNotEmpty($productLang.caract2))
+                            <th>$!productLang.caract2</th>#end
+                        #if($util.isNotEmpty($productLang.caract3))
+                            <th>$!productLang.caract3</th>#end
+                        <th>#label('admin.stock')</th>
+                        <th>#label('admin.cost')</th>
+                        <th>#label('admin.price')</th>
+
+                        <th>#label('admin.width')</th>
+                        <th>#label('admin.height')</th>
+                        <th>#label('admin.length')</th>
+                        <th>#label('admin.weight')</th>
+                    </tr>
+                    #foreach($v in $productVariations)
+                        <tr>
+                            #if($util.isNotEmpty($productLang.caract1))
+                                <td><input type="text" name="variationCaract1" value="$!v.caract1" class="field string-short"/></td>#end
+                            #if($util.isNotEmpty($productLang.caract2))
+                                <td><input type="text" name="variationCaract2" value="$!v.caract2" class="field string-short"/></td>#end
+                            #if($util.isNotEmpty($productLang.caract3))
+                                <td><input type="text" name="variationCaract3" value="$!v.caract3" class="field string-short"/></td>#end
+                            <td><input type="hidden" name="variationId" value="$!v.id"><input type="text" name="variationStock" value="$!v.stock" class="field integer"/></td>
+                            <td><input type="text" name="variationCost" value="$!util.formatNumber($v.costPriceInc,'money')" class="field decimal"/></td>
+                            <td><input type="text" name="variationPrice" value="$!util.formatNumber($v.priceInc,'money')" class="field decimal"/></td>
+
+                            <td><input type="text" name="variationWidth" value="$!util.formatNumber($v.dimentionWidth,'decimal2')" class="field decimal"/></td>
+                            <td><input type="text" name="variationHeight" value="$!util.formatNumber($v.dimentionHeight,'decimal2')" class="field decimal"/></td>
+                            <td><input type="text" name="variationLength" value="$!util.formatNumber($v.dimentionLength,'decimal2')" class="field decimal"/></td>
+                            <td><input type="text" name="variationWeight" value="$!util.formatNumber($v.weight,'decimal2')" class="field decimal"/></td>
+                            <td><a href="#" class="remove removeVariant"></a></td>
+                        </tr>
+                    #end
+                    #foreach($k in [1..5])
+                        <tr>
+                            #if($util.isNotEmpty($productLang.caract1))
+                                <td><input type="text" name="variationCaract1" value="" class="field string-short"/></td>#end
+                            #if($util.isNotEmpty($productLang.caract2))
+                                <td><input type="text" name="variationCaract2" value="" class="field string-short"/></td>#end
+                            #if($util.isNotEmpty($productLang.caract3))
+                                <td><input type="text" name="variationCaract3" value="" class="field string-short"/></td>#end
+                            <td><input type="hidden" name="variationId"><input type="text" name="variationStock" value="" class="field integer"/></td>
+                            <td><input type="text" name="variationCost" value="" class="field decimal"/></td>
+                            <td><input type="text" name="variationPrice" value="" class="field decimal"/></td>
+                            <td><input type="text" name="variationWidth" value="" class="field decimal"/></td>
+                            <td><input type="text" name="variationHeight" value="" class="field decimal"/></td>
+                            <td><input type="text" name="variationLength" value="" class="field decimal"/></td>
+                            <td><input type="text" name="variationWeight" value="" class="field decimal"/></td>
+                        </tr>
+                    #end
+                </table>
+
+                <div class="button-bar">
+                    <button type="button" onclick="saveProperties()"><span class="ok">#label('admin.save')</span></button>
+                    <div style="float: right">
+                        <a href="#" class="copy" id="attCopy">Copy</a>
+                        #if($session.getAttribute('CLIPBOARD_prod_att'))
+                            <a href="#" class="paste" id="attPaste" style="margin-left: 10px;">Paste</a>
+                        #end
+                    </div>
+                </div>
+            </div>
+        #end
+
+        <div class="formulario">
+            <h2 class="block-title">#label('admin.product.attributed')</h2>
+            #if($util.isNotEmpty($attlist))
+                <table border="0" cellspacing="0" cellpadding="0" class="formulario" width="100%">
+                    #foreach($row in $util.getRows($attlist, 2))
+                        <tr>
+                            #foreach($m in $row)
+                                #if($velocityCount>0)
+                                    <td style="width:30px;">&nbsp;</td>
+                                #end
+                                #if ($m!='')
+                                    #set($att = $m.get('ATTR'))
+                                    <th class="#if($m.get('FILTERED')=='Y') warning #end" >$!att.getAttributeName($defaultLanguage):</th>
+                                    <td>
+                                        <input type="hidden" name="propertyId" value="$!m.get('PP_ID')"/>
+                                        <input type="hidden" name="attributeId" value="$!att.id"/>
+                                        #if($util.isNotEmpty($att.options))
+                                            <select name="propertyValue" class="field string-short">
+                                                <option value=""></option>
+                                                #foreach($o in $att.options)
+                                                    <option value="$!o" #if($o==$!m.get('PP_VALUE')) selected="" #end >$!o</option>
+                                                #end
+                                            </select>
+                                            <a target="_blank" href="$!action.url('editproductatt','admin',$util.toMap(['idProductAtt','1']))">[#label('admin.edit.options')]</a>
+                                        #else
+                                            <input type="text" name="propertyValue" value="$!m.get('PP_VALUE')" class="field string-short"/>
+                                        #end
+                                    </td>
+                                #end
+                            #end
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.product.attributed')</h2>
+
+                    <p>#label('admin.product.attributes.not.found')</p>
+                </div>
+            #end
+            <div class="box">
+                <h3 style="margin:2px;">#label('admin.product.attribute.add.new')</h3>
+                <table class="formulario" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.select')</th>
+                        <td>
+                            <input type="hidden" id="newAttributeValue" name="attributeNew" value="" />
+                            <input type="text" id="newAttribute" value="" class="field string-medium"/>
+                        </td>
+                        <th style="padding-left:30px;">#label('admin.value')</th>
+                        <td><input type="text" name="attributeValue" value="" class="field string-medium"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+    <div class="button-bar">
+        <button type="button" onclick="saveProperties();"><span class="ok">#label('admin.save')</span></button>
+        <button type="button" onclick="showImportHtml()"><span>#label('admin.import.attributes.show')</span></button>
+    </div>
+    <div id="importAttributesFromText" class="formulario" style="display:none;">
+        <h2 class="block-title">#label('admin.import.product.attributes')</h2>
+        <p>#label('admin.import.product.attributes.instructions')</p>
+        <form id="formimport">
+            <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td>
+                        <textarea id="textToImport" name="htmlContent" class="field string-large"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div class="button-bar">
+            <button type="button" onclick="importHtmlStep1()"><span>#label('admin.import.attributes.proccess.text')</span></button>
+        </div>
+    </div>
+</div>
+#surl('id=urlImport1' "action=importattributes1")
+#surl('id=urlImport2' "action=importattributes2")
+#surl('id=urlCopy' "action=session_copy")
+#surl('id=urlPaste' "action=session_paste")
+<script type="text/javascript">
+    function showImportHtml() {
+        $('#importAttributesFromText').show();
+        $('#textToImport').ckeditor({});
+    }
+    function saveProperties() {
+        var data = $('#formproperties').serialize();
+        $('#divProperties').loading("$!action.getText('admin.updating.properties')", "$!action.getText('admin.please.wait')");
+        $.post("$urlSaveProp", data, function(res){
+            $('#divProperties').html(res);
+        });
+    }
+    function importHtmlStep1() {
+        $('#dialogContent').loading("$!action.getText('admin.processing.imported.text')", "$!action.getText('admin.please.wait')");
+        jQuery.post("$urlImport1", $('#formimport').serialize(), function(data) {$('#dialogContent').html(data)});
+        
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function importHtmlStep2() {
+        // validar
+        var selName = false;
+        var selValue = false;
+        $('#formImport2').find("select[name='fieldAction']").each(function(){
+            if ($(this).val()=='name') selName = true;
+            else if ($(this).val()=='value') selValue = true;
+        });
+        if (selName && selValue) {
+            $('#dialogContent').load("$urlImport2", $('#formImport2').serialize(), function() {
+                $('#idProductImport').val("$product.idProduct");
+                $('#idCategoryImport').find('option').each(function() {
+                    var l = eval($(this).attr('level')) * 20 + 4;
+                    if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+                });
+            });
+            $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        } else {
+            var err = "";
+            if (!selName) err += "$!{action.getText('error.import.attributes.step1.noname')}<br/>";
+            if (!selValue) err += "$!{action.getText('error.import.attributes.step1.novalue')}";
+            $('#formImport2').find('.validation-error').error('Incorrect Values',err);
+        }
+        return false;
+    }
+    $(function(){
+       $('#newAttribute').autocomplete({
+           source:"$!action.url('autocompleteAttributes','admin')",
+           comboBox: true,  hiddenField: '#newAttributeValue',
+           select: function(event, ui) {
+                 $('#newAttribute').val(ui.item.label);
+                 $('#newAttributeValue').val(ui.item.value);
+                 return false;
+           },
+           focus: function(event, ui) {
+                $('#newAttribute').val(ui.item.label);
+                $('#newAttributeValue').val(ui.item.value);
+                return false;
+           }
+       });
+
+        $('#attCopy').live('click',function(){
+            var tt = $('#tableAttributes').html();
+            $.post("$!urlCopy",{term: 'prod_att', toCopy: tt}, function(){
+                alert('Successfully copied');
+            });
+        });
+        $('#attPaste').live('click',function(){
+            $.post("$!urlPaste",{term: 'prod_att'}, function(d){
+                $('#tableAttributes').html(d);
+                $('input[name="variationId"]').val('');
+            });
+        });
+        $('.removeVariant').live('click', function(){
+            $(this).closest('tr').find('input').each(function(){
+                if ($(this).attr('name')!='variationId') $(this).val('');
+            });
+            return false;
+        });
+    });
+</script>

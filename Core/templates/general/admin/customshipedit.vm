@@ -1,0 +1,146 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+    <h1>#label('admin.carriers.manager')</h1>
+<div class="listado">
+    <div id="tabShipping">
+        #surl('id=urlShipping' "action=listshipping")
+        #surl('id=urlLive' "action=listcarrierproperty")
+        <ul class="tabs">
+            <li><a href="$urlShipping">#label('admin.configure.shipping.methods')</a></li>
+            <li><a href="$urlLive">#label('admin.configure.live.carriers')</a></li>
+            <li><a href="#tabGeneral">#label('admin.configure.custom.carrier')</a></li>
+        </ul>
+        <div id="tabGeneral">
+            <h2 class="block-title">
+                #if ($customShipping.id)
+                    #label('admin.custom.shipping.modify') ID: $!customShipping.id
+                #else
+                    #label('admin.custom.shipping.new')
+                #end
+            </h2>
+            #surl('id=urlForm' "action=savecustomship")
+            <form action="$urlForm" method="post" class="validable">
+            #shidden('name=idCustomShipping' "value=$!customShipping.id")
+            <div class="formulario">
+                #langSelector()
+                #formErrors()
+                <table class="formulario" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <th class="required">#label('admin.code')</th>
+                        <td>
+                            #stextfield('name=customShipping.code' 'cssClass=field required string-medium')
+                        </td>
+                        <th class="required">#label('admin.default.days')</th>
+                        <td>
+                            #stextfield('name=customShipping.days' 'cssClass=field integer')
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.name')</th>
+                        <td colspan="3">
+                            <input type="text" name="vis_methodName" class="multilang field string-large" value=""/>
+                            #foreach($l in $languages )
+                                <input type="hidden" class="$l" name="methodName" value="$!customShipping.getName($l)"/>
+                            #end
+                        </td>
+                    </tr>
+                </table>
+
+                    <h2 class="block-title">#label('admin.custom.shipping.rules')</h2>
+                    <div class="listado" >
+                        <table cellpadding="0" cellspacing="0" class="grid">
+                            <tr>
+                                <th style="text-align:center;">#label('admin.order')</th>
+                                <th style="text-align:center;">#label('admin.country-state')</th>
+                                <th style="text-align:center;">#label('admin.mintotal')</th>
+                                <th style="text-align:center;">#label('admin.maxtotal')</th>
+                                <th style="text-align:center;">#label('admin.minweight')</th>
+                                <th style="text-align:center;">#label('admin.maxweight')</th>
+                                <th style="text-align:center;">#label('admin.price')</th>
+                                <th style="text-align:center;">#label('admin.percent')</th>
+                                <th style="text-align:center;">#label('admin.perweight')</th>
+                                <th style="text-align:center;">#label('admin.days')</th>
+                            </tr>
+                            #foreach( $r in $customShipping.rules )
+                                <tr style="background-color:#f6f6f6;">
+                                    <td><input type="text" name="ruleOrder" value="$!r.ruleOrder" class="field integer"/></td>
+                                    <td>
+                                        <select name="ruleState" class="field string-short tree-select">
+                                            <option level="0" value=""> -</option>
+                                            #set($oldCountry = '')
+                                            #foreach($st in $action.getStates())
+                                                #if($oldCountry!=$st.countryCode)
+                                                    <option level="0" value="$!st.countryCode" #if($r.idCountry==$!st.countryCode && !$r.state) selected="selected" #end  >$!action.getCountryName($st.countryCode)</option>
+                                                    #set($oldCountry = $st.countryCode)
+                                                #end
+                                                <option level="1" value="$!{st.countryCode}||$!{st.stateCode}" #if($r.idCountry==$st.countryCode && $st.equals($r.state)) selected="selected" #end>$!st.stateName</option>
+                                            #end
+                                        </select>
+                                    </td>
+                                    <td><input type="text" name="ruleMinTotal" value="$!util.formatNumber($r.minTotal,'decimal2')" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMaxTotal" value="$!util.formatNumber($r.maxTotal,'decimal2')" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMinWeight" value="$!util.formatNumber($r.minWeight,'decimal2')" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMaxWeight" value="$!util.formatNumber($r.maxWeight,'decimal2')" class="field decimal"></td>
+                                    <td><input type="text" name="rulePrice" value="$!util.formatNumber($r.rulePrice,'decimal2')" class="field decimal"></td>
+                                    <td><input type="text" name="rulePercent" value="$!util.formatNumber($r.rulePercent,'decimal2')" class="field decimal"></td>
+                                    <td style="text-align:center;">#checkbox('rulePerWeight' $!r.perWeightUnit)</td>
+                                    <td><input type="text" name="ruleDays" value="$!r.days" class="field integer"></td>
+                                </tr>
+                            #end
+                            #foreach( $r in [1..10] )
+                                <tr>
+                                    <td><input type="text" name="ruleOrder" value="" class="field integer"/></td>
+                                    <td>
+                                        <select name="ruleState" class="field string-short tree-select">
+                                            <option level="0" value=""> -</option>
+                                            #set($oldCountry = '')
+                                            #foreach($st in $action.getStates())
+                                                #if($oldCountry!=$st.countryCode)
+                                                    <option level="0" value="$!st.countryCode">$!action.getCountryName($st.countryCode)</option>
+                                                    #set($oldCountry = $st.countryCode)
+                                                #end
+                                                <option level="1" value="$!{st.countryCode}||$!{st.stateCode}">$!st.stateName</option>
+                                            #end
+                                        </select>
+                                    </td>
+                                    <td><input type="text" name="ruleMinTotal" value="" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMaxTotal" value="" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMinWeight" value="" class="field decimal"></td>
+                                    <td><input type="text" name="ruleMaxWeight" value="" class="field decimal"></td>
+                                    <td><input type="text" name="rulePrice" value="" class="field decimal"></td>
+                                    <td><input type="text" name="rulePercent" value="" class="field decimal"></td>
+                                    <td style="text-align:center;">#checkbox('rulePerWeight' false)</td>
+                                    <td><input type="text" name="ruleDays" value="" class="field integer"></td>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+
+
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                    #surl('id=urlCancel' "action=listcustomship" )
+                    <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('#tabShipping').tabs({selected:2,
+            select: function(event, ui) {
+                var url = jQuery.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+        $('.tree-select').treeSelect(20);
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

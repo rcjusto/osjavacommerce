@@ -1,0 +1,92 @@
+#surl('id=urlPass' "action=sendpassword")
+<script type="text/javascript">
+    $(function() {
+        $('#shippingSameBilling').change(
+                                        function() {
+                                            if ($(this).is(':checked')) $('#shippingData').hide();
+                                            else $('#shippingData').show();
+                                        }).trigger('change');
+        $('#formRegister').submit(function() {
+            return $(this).validForm();
+        });
+        $('#sendPassword').submit(function() {
+            $('.validation-error').hide();
+            var err = $('#emailpassword').validField();
+            if (err == '') {
+                var email = $('#emailpassword').val();
+                $('#forgetPassword').hide();
+                $('#forgetPasswordRes').loading("$!action.getText('msg.sending.password')", "$!action.getText('msg.sending.email.with.your.account.info')").show();
+                jQuery.getJSON("$urlPass", {email:email}, function(data) {
+                    if (data.error != null && data.error != '')
+                        $('#forgetPasswordRes').error("$!action.getText('error.sending.password')", data.error + '. <a href="#" onclick="$(\'#forgetPasswordRes\').hide();$(\'#forgetPassword\').show(); return false;">$!action.getText('click.to.hide.message')</a>').show();
+                    else
+                        $('#forgetPasswordRes').info("$!action.getText('password.sent')", "$!action.getText('account.info.sent.to')" + data.email + '. <a href="#" onclick="$(\'#forgetPasswordRes\').hide();$(\'#forgetPassword\').show(); return false;">$!action.getText('click.to.hide.message')</a>').show();
+                });
+            }
+            return false;
+        });
+        countryStateEx('billingAdd_idCountry', 'billingStateBlock', '', '');
+        countryStateEx('shippingAdd_idCountry', 'shippingStateBlock', '', '');
+    });
+</script>
+<div id="blockContent" class="register-page only-login clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        <div class="block form clearfix">
+            <h1>#label('login.page.title')</h1>
+            <div id="blockOnlyLogin">
+                #surl("action=login" 'id=urlFormLogin')
+                <form action="$urlFormLogin" id="formLogin" method="post">
+                    #shidden('name=redirectUrl')
+                    #actionErrors("$!action.getText('error.login.title')")
+                    <div id="loginData" class="form">
+                        <h2>#label('login.page.subtitle.id-password')</h2>
+
+                        <p>#label('login.page.text.id-password')</p>
+                        <label>
+                            #if($action.getStoreProperty('use.email.as.login','Y')=='Y')
+                                <span class="label">#label('email.address')</span>
+                            #else
+                                <span class="label">#label('user.id')</span>
+                            #end
+                            #stextfield('id=loginemail' 'name=loginemail' 'cssClass=field required email string-200' 'cssErrorClass=invalid')
+                        </label>
+                        <label>
+                            <span class="label">#label('password')</span>
+                            #spassword('name=loginpassword' 'cssClass=field required string-150' 'cssErrorClass=invalid')
+                        </label>
+                        <label>
+                            <span>#label('remember.me')</span>
+                            #scheckbox('name=rememberMe' )
+                        </label>
+
+                        <div class="button-bar">
+                            <button id="submitLogin" type="submit"><span class="ok">#label('submit.login')</span></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="rememberPwdForm">
+                <div id="forgetPasswordRes" class="hidden"></div>
+                <form id="sendPassword">
+                    <div id="forgetPassword">
+                        <h2>#label('forget.password')</h2>
+
+                        <p>#label('login.forgetpassword.text')</p>
+                        <label>
+                            <span class="label">#label('forgetpwd.email.address')</span>
+                            #stextfield('id=emailpassword'  'cssClass=field required email string-200' 'cssErrorClass=invalid')
+                            #fieldError('emailpassword')
+                        </label>
+
+                        <div class="button-bar">
+                            <button type="submit"><span class="ok">#label('send.password')</span></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,117 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text() == 'hide filters') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+            jQuery.cookie('filters.visible', 'false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text('hide filters');
+            jQuery.cookie('filters.visible', 'true');
+        }
+    }
+    $(function() {
+        if (jQuery.cookie('filters.visible') == 'false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+        }
+    });
+</script>
+<h1 style="float:left;">#label('admin.rma.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">hide filters</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    #surl('id=urlformfilter' "action=rmalist")
+    <form id="form_filter" action="$urlformfilter" method="post" class="validable">
+    <div id="filterContainer" class="filters formulario">
+        #formErrors()
+        <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+            <tr>
+                <th>#label('admin.rma.id')</th>
+                <td>#stextfield('name=filterCode' 'cssClass=field string-short')</td>
+                <th rowspan="5">#label('admin.status')</th>
+                <td rowspan="5">
+                    #foreach($st in $action.getRmaStatuses())
+                        <div><label>
+                            <input type="checkbox" name="filterRmaStatus" value="$!st" #if($list.contains($filterRmaStatus,$st)) checked="checked" #end  />
+                            #label("rma.status.$!st")
+                        </label></div>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.from')</th>
+                <td><input type="text" name="filterDateFrom" value="$!util.formatDate($filterDateFrom)" class="field date"/></td>
+            </tr>
+            <tr>
+                <th>#label('admin.to')</th>
+                <td><input type="text" name="filterDateTo" value="$!util.formatDate($filterDateTo)" class="field date"/></td>
+            </tr>
+            <tr>
+                <th>#label('admin.type')</th>
+                <td>
+                    <select name="filterType" class="field string-short">
+                        <option value="">[ no filter ]</option>
+                        #foreach($rt in $rmaTypes)
+                            <option value="$rt.id" #if($rt.id==$filterType) selected="selected" #end  >$!rt.getName($defaultLanguage)</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.items.per.page')</th>
+                <td>
+                    <select onchange="$('#$!{rmas.name}_pagerows').val($(this).val());" class="field">
+                        #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                            #if($opt==$rmas.pageRows)
+                                <option value="$opt" selected="selected">$opt</option>
+                            #else
+                                <option value="$opt">$opt</option>
+                            #end
+                        #end
+                    </select>
+                </td>
+                <th colspan="2">
+                    <button type="submit"><span class="search">#label('admin.update')</span></button>
+                </th>
+            </tr>
+        </table>
+    </div>
+    #set($nav=$rmas)
+    #parse('/WEB-INF/views/admin/navigator.vm')
+    #if($util.isNotEmpty($rmas.listado))
+        <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                <th>#label('admin.rma.number')</th>
+                <th>#label('admin.created')</th>
+                <th>#label('admin.status')</th>
+                <th>#label('admin.type')</th>
+                <th>#label('admin.product')</th>
+                <th>#label('admin.serial.number')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($rma in $rmas.listado)
+                #surl('id=urlEdit' "action=rmadata" "idRma=$!rma.id")
+                <tr>
+                    <td>$!rma.rmaNumber</td>
+                    <td>$!util.formatDate($rma.createdDate)</td>
+                    <td>#label("rma.status.$!rma.rmaStatus")</td>
+                    <td>$!rma.rmaType.getName($defaultLanguage)</td>
+                    <td>$!rma.product.getProductName($defaultLanguage)</td>
+                    <td>$!rma.rmaSerialNumber</td>
+                    <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.rmas.not.found')</h2>
+            <p>#label('admin.rmas.not.found.text')</p>
+        </div>
+    #end
+</form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,21 @@
+#set($_productList = $_parameters.get('_prodList'))
+#set($_productTemplate = $_parameters.get('_prodTemplate'))
+#set($_viewMode = $_parameters.get('_viewMode'))
+#set($_blockTitle = $_parameters.get('_blockTitle'))
+#if($_productList && !$_productList.isEmpty())
+<div class="$!{_productTemplate} $!{_viewMode}" >
+    #if($_blockTitle) <div class="title">#label($_blockTitle)</div> #end
+    <ul class="clearfix">
+        #set($classLi = $!alternator.auto(['odd','even']))
+        #foreach($p in $_productList)
+            <li class="$!classLi hoverable">
+                #parse("/WEB-INF/views/${template}/front/$!{_productTemplate}.vm")
+            </li>
+        #end
+    </ul>
+</div>
+#end
+#set($_productList = $util.null)
+#set($_productTemplate = $util.null)
+#set($_blockTitle = $util.null)
+#set($_parameters = $util.null)

@@ -1,0 +1,51 @@
+<form id="formCategoryTree">
+    <input type="hidden" name="idCategory" value="$!category.idCategory">
+    <input type="hidden" id="idParent" name="idParent" value="">
+    <div>
+        <div style="float:left;margin-right:40px;width:400px;">
+            <h2 class="block-title">#label('admin.parent.categories')</h2>
+            <ul style="list-style:none;margin:0;padding:0;">
+                #foreach($catPar in $categoryParents)
+                    <li class="cat-tree-parent">
+                        <span style="float:left;width:300px;">$!{catPar.getLanguage($defaultLanguage).categoryName}</span>
+                        <span style="float:right;"><a class="delete-row" href="#" onclick="return dialogConfirm('Category Tree','Are you sure you want to remove this parent?',function(){delCategoryTree('p',$catPar.idCategory);});" title="Delete parent category"></a></span>
+                        <div style="clear:both;"></div>
+                    </li>
+                #end
+            </ul>
+            <div class="button-bar">
+                <button type="button" onclick="addCategoryTree('p')"><span class="add">#label('admin.parent.category.add')</span></button>
+            </div>
+        </div>
+        <div style="float:left;width:400px;">
+            <h2 class="block-title">#label('admin.child.categories')</h2>
+            <p>#label('admin.child.categories.cansort')</p>
+            <ul style="list-style:none;margin:0;padding:0;" class="can-move">
+                #foreach($catChild in $action.sortCategories($categoryChildren))
+                    <li class="cat-tree-child">
+                        <input type="hidden" name="idChild" value="$!catChild.idCategory">
+                        <span style="float:left;width:300px;">$!{catChild.name}</span>
+                        <span style="float:right;"><a class="delete-row" href="#" onclick="return dialogConfirm('Category Tree','Are you sure you want to remove this child?',function(){delCategoryTree('c',$catChild.idCategory);});" title="Delete child category"></a></span>
+                        <div style="clear:both;"></div>
+                    </li>
+                #end
+            </ul>
+            <div class="button-bar">
+                <button type="button" onclick="addCategoryTree('c')"><span class="add">#label('admin.child.category.add')</span></button>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <input type="hidden" id="idChild" name="idChild" value="">
+</form>
+<script type="text/javascript">
+    $(function() {
+        $('table.listado').find("tr:not(.nohover)").hover(function() {$(this).addClass('hover');}, function() {$(this).removeClass('hover')});
+        $('ul.can-move').sortable({
+            update: function(event, ui) {
+                updateTreeChild();
+            }
+        });
+        $('ul.can-move').disableSelection();
+    });
+</script>

@@ -1,0 +1,32 @@
+#if($util.isNotEmpty($categories))
+<ul>
+    #foreach($cat in $categories)
+        <li>
+            <div class="data clearfix">
+                <div class="check-cell"><input type="checkbox" class="selecteds" name="selecteds" value="$!cat.idCategory"/></div>
+                <div class="title">
+                    <a href="#" data-id="$!cat.idCategory" class="more-data">$!cat.getCategoryName($action.defaultLanguage)</a><input type="hidden" name="categoryId" value="$!cat.idCategory"/>
+                </div>
+                <div class="cell-active">#checkbox('categoryActive' $cat.active)</div>
+                <div class="cell-active">#checkbox('categoryVisible' $cat.visible)</div>
+                <div class="cell-shipping">
+                    <select name="categoryNeedShipping" style="float:none;" class="field string-50">
+                        <option value=""></option>
+                        <option value="Y" #if($cat.needShipping=='Y') selected="selected" #end >Yes</option>
+                        <option value="N" #if($cat.needShipping=='N') selected="selected" #end >No</option>
+                    </select>
+                </div>
+                <div class="cell-markup"><input type="text" style="float:none;" name="categoryMarkup" value="$!util.formatNumber($cat.markupFactor,'decimal4')" class="field decimal"/></div>
+                <div class="cell-markup"><input type="text" style="float:none;" name="categoryERMarkup" value="$!util.formatNumber($cat.erMarkupFactor,'decimal4')" class="field decimal"/></div>
+                <div class="cell-markup"><input type="text" style="float:none;#if($hidePosition)display:none;#end" name="categoryPosition" value="$!cat.defaultPosition" class="field integer"/></div>
+                <div class="link-bar">
+                    #surl('id=urldata' "action=categorydata" "idCategory=$cat.idCategory" )
+                    <a href="$!urldata"><span class="edit">#label('admin.modify')</span></a>
+                    #surl('id=urladd' "action=categorydata" "idParent=$cat.idCategory" )
+                    <a href="$!urladd"><span class="add">Add Child</span></a>
+                </div>
+            </div>
+        </li>
+    #end
+</ul>
+#end

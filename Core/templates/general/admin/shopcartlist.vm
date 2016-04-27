@@ -1,0 +1,116 @@
+#set($menuSelected='sales')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text()=='hide filters') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+            jQuery.cookie('filters.visible','false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text('hide filters');
+            jQuery.cookie('filters.visible','true');
+        }
+    }
+    $(function(){
+        if (jQuery.cookie('filters.visible')=='false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text('show filters');
+        }
+        $('#tab_listado').sortedTable('userSortField','userSortDirection',function(){$('#form_filter').submit();});
+    });
+</script>
+
+
+
+<h1 style="float:left;">#label('admin.shopcart.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">#label('admin.hide.filters')</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    #surl('id=urlformfilter' "action=listshopcart")
+    <form id="form_filter" action="$urlformfilter" method="post" class="validable">
+    <div id="filterContainer" class="filters formulario">
+        #formErrors()
+        <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+            <tr>
+                <th>#label('admin.status')</th>
+                <td>
+                    <select name="filters.status" class="field string-medium">
+                        <option value="">#label('admin.not.filter')</option>
+                        #foreach($st in ['saved','pending','approved','finished'])
+                            <option value="$st" #if($st==$filters.get('status')) selected="selected" #end >#label("shopcart.status.${st}")</option>
+                        #end
+                    </select>
+                </td>
+                <th>Created:</th>
+                <td style="line-height:22px;">
+                    <span style="float:left;margin-right:10px;">#label('admin.between')</span>
+                    #stextfield('name=filters.minDate' "value=$!{util.formatDate(${filters.get('minDate')})}" 'cssClass=field date')
+                    <span style="float:left;margin:0 10px;"> #label('admin.and') </span>
+                    #stextfield('name=filters.maxDate' "value=$!{util.formatDate(${filters.get('maxDate')})}" 'cssClass=field date')
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.items.per.page')</th>
+                <td>
+                    <select onchange="$('#$!{shopcarts.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                    #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                        #if($opt==$shopcarts.pageRows)
+                        <option value="$opt" selected="selected">$opt</option>
+                        #else
+                        <option value="$opt">$opt</option>
+                        #end
+                    #end
+                    </select>
+                </td>
+                <th colspan="2">
+                    <button type="submit"><span class="search">#label('admin.update')</span></button>
+                </th>
+            </tr>
+        </table>
+    </div>
+    #set($nav=$shopcarts)
+    #parse('/WEB-INF/views/admin/navigator.vm')
+
+    #if($util.isNotEmpty($shopcarts.listado))
+    <table id="tab_listado" class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.id')</th>
+            <th>#label('admin.date')</th>
+            <th>#label('admin.status')</th>
+            <th>#label('admin.customer')</th>
+            <th class="quantity">#label('admin.numproducts')</th>
+            <th class="price">#label('admin.total')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($s in $shopcarts.listado)
+            #surl('id=urlShow' "action=showshopcart" "idCart=$!s.id")
+            #surl('id=urlEdit' "action=editshopcart" "idCart=$!s.id")
+            #surl('id=urlUser' "action=customeredit" "idUser=$!s.user.idUser")
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!s.id"/></td>
+                <td>$!s.id</td>
+                <td>$!util.formatDate($s.createdDate,$defaultLanguage)</td>
+                <td>#if($util.isNotEmpty($s.status)) #label("shopcart.status.$!{s.status}") #else &nbsp; #end</td>
+                <td>#if($s.user) <a href="$urlUser" target="_blank">$!s.user.fullName</a> #else &nbsp; #end</td>
+                <td class="quantity">$!s.items.size()</td>
+                <td class="price">$!action.formatActualCurrency($s.total)</td>
+                <td class="link-bar"><a href="$urlShow"><span class="edit">#label('admin.show')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.shopcarts')</h2>
+            <p>#label('admin.shopcarts.not.found')</p>
+        </div>
+    #end
+
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+    </div>
+</form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

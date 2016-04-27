@@ -1,0 +1,52 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($registration.id)
+        #label('admin.product.registration') ID: $!registration.id
+    #end
+</h1>
+<div class="formulario">
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.customer'):</th>
+            <td>$!registration.user.fullName ($!registration.user.email)</td>
+        </tr>
+        <tr>
+            <th>#label('admin.date'):</th>
+            <td>$!util.formatDate($registration.purchaseDate)</td>
+        </tr>
+        <tr>
+            <th>#label('admin.purchase.country'):</th>
+            <td>$!registration.purchaseCountry</td>
+        </tr>
+        <tr>
+            <th>#label('admin.purchase.city'):</th>
+            <td>$!registration.purchaseCity</td>
+        </tr>
+        <tr>
+            <th>#label('admin.purchase.place'):</th>
+            <td>$!registration.purchasePlace</td>
+        </tr>
+        <tr>
+            <th>#label('admin.invoice.number'):</th>
+            <td>$!registration.invoiceNumber</td>
+        </tr>
+        <tr>
+            <th>#label('admin.model.number'):</th>
+            <td>
+                #foreach($m in $!registration.modelNumbers)
+                <div>$!m</div>
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.details'):</th>
+            <td>$!registration.details</td>
+        </tr>
+    </table>
+
+    <div class="button-bar">
+        <button type="button" href="$action.url('product_registrations')"><span class="cancel">#label('admin.back')</span></button>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!--suppress Struts2ModelInspection -->
+<struts>
+    <package name="store-front" extends="store-default" namespace="/">
+
+        <interceptors>
+            <interceptor-stack name="storeFrontDefaultStack">
+                <interceptor-ref name="servletConfig"/>
+                <interceptor-ref name="storeDetectInterceptor"/>
+                <interceptor-ref name="hibernateSessionInterceptor"/>
+                <interceptor-ref name="secure">
+                    <param name="httpPort">80</param>
+                    <param name="httpsPort">443</param>
+                </interceptor-ref>
+                <interceptor-ref name="storeDefaultStack"/>
+                <interceptor-ref name="storeSessionInterceptor"/>
+                <interceptor-ref name="frontSecurityInterceptor"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="storeFrontDefaultStack"/>
+
+        <default-action-ref name="index" />
+
+        <global-results>
+            <result name="error" type="velocity">/WEB-INF/views/front/error.vm</result>
+            <result name="home" type="redirectAction">home</result>
+            <result name="homeView" type="velocity">/WEB-INF/views/front/home.vm</result>
+            <result name="register" type="velocity">/WEB-INF/views/front/register.vm</result>
+            <result name="notStore" type="velocity">/WEB-INF/views/not-stores.vm</result>
+            <result name="shopcart" type="redirectAction">shopcart</result>
+            <result name="address" type="redirectAction">paystepAddress</result>
+            <result name="confirm" type="redirectAction">paystepPayment</result>
+            <result name="paymentResult" type="redirectAction">paystepResult?idOrder=${idOrder}&amp;blockCode=${blockCode}</result>
+            <result name="redirectUrl" type="redirect">
+                <param name="location">${redirectUrl}</param>
+                <param name="parse">true</param>
+            </result>
+            <result name="storeClosed" type="velocity">/WEB-INF/views/front/storeClosed.vm</result>
+            <result name="Exception" type="velocity">/WEB-INF/views/front/exception.vm</result>
+            <result name="org.hibernate.HibernateException" type="velocity">/WEB-INF/views/front/db_exception.vm</result>
+            <result name="HibernateException" type="velocity">/WEB-INF/views/front/db_exception.vm</result>
+        </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="org.hibernate.HibernateException" result="HibernateException"/>
+            <exception-mapping exception="java.lang.Exception" result="Exception"/>
+        </global-exception-mappings>
+
+        <action name="index" class="org.store.core.front.GeneralAction" method="home">
+            <result type="velocity">/WEB-INF/views/front/home.vm</result>
+        </action>
+
+        <action name="home" class="org.store.core.front.GeneralAction" method="home">
+            <result type="velocity">/WEB-INF/views/front/home.vm</result>
+        </action>
+
+        <action name="banner" class="org.store.core.front.GeneralAction" method="banner">
+            <result type="redirect">${banner.bannerUrl}</result>
+        </action>
+
+        <action name="page" class="org.store.core.front.GeneralAction" method="staticPage">
+            <result type="velocity">/WEB-INF/views/front/staticpage.vm</result>
+        </action>
+
+        <action name="news" class="org.store.core.front.GeneralAction" method="news">
+            <result type="velocity">/WEB-INF/views/front/news.vm</result>
+            <result type="velocity" name="news">/WEB-INF/views/front/newsView.vm</result>
+        </action>
+
+        <action name="search" class="org.store.core.front.GeneralAction" method="search">
+            <result type="velocity">/WEB-INF/views/front/search.vm</result>
+            <result type="redirectAction" name="product">product?idProduct=${product.idProduct}</result>
+        </action>
+        <action name="quicksearch" class="org.store.core.front.GeneralAction" method="quickSearch">
+            <result type="json">
+                <param name="root">quickSearchResult</param>
+            </result>
+        </action>
+
+        <action name="category" class="org.store.core.front.GeneralAction" method="category">
+            <result type="velocity">/WEB-INF/views/front/category.vm</result>
+            <result type="velocity" name="ajax">/WEB-INF/views/front/category_ajax.vm</result>
+        </action>
+
+        <action name="quickProduct" class="org.store.core.front.GeneralAction" method="quickProduct">
+            <result type="velocity">/WEB-INF/views/front/quickProduct.vm</result>
+        </action>
+
+        <action name="product" class="org.store.core.front.GeneralAction" method="product">
+            <result type="velocity">/WEB-INF/views/front/product.vm</result>
+            <result type="velocity" name="print">/WEB-INF/views/front/product_print.vm</result>
+        </action>
+
+        <action name="productmail" class="org.store.core.front.GeneralAction" method="productMail">
+            <result type="velocity">/WEB-INF/views/front/mailproduct.vm</result>
+        </action>
+
+        <action name="productImage" class="org.store.core.front.GeneralAction" method="productImage">
+            <result type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+        </action>
+
+        <action name="addstockalert" class="org.store.core.front.GeneralAction" method="productStockAlert">
+            <result type="json">
+                <param name="root">code</param>
+            </result>
+        </action>
+
+        <action name="productShippingCost" class="org.store.core.front.GeneralAction" method="productShippingCost">
+            <result type="json">
+                <param name="root">result</param>
+            </result>
+        </action>
+
+        <action name="addreview" class="org.store.core.front.GeneralAction" method="addReview">
+            <result type="redirectAction">product?code=${product.urlCode}</result>
+        </action>
+        <action name="getreviews" class="org.store.core.front.GeneralAction" method="getReviews">
+            <result type="velocity">/WEB-INF/views/front/product_reviews.vm</result>
+        </action>
+
+        <action name="shopcart" class="org.store.core.front.ShopcartAction" method="shopcart">
+            <result name="input" type="velocity">/WEB-INF/views/front/shopcart.vm</result>
+            <result type="velocity">/WEB-INF/views/front/shopcart.vm</result>
+        </action>
+        <action name="addtocart" class="org.store.core.front.ShopcartAction" method="addToCart">
+            <result name="input" type="velocity">/WEB-INF/views/front/shopcart.vm</result>
+            <result type="redirectAction">shopcart</result>
+            <result type="velocity" name="ajax-cart">/WEB-INF/views/front/ajax_cart.vm</result>
+        </action>
+        <action name="shopcartlist" class="org.store.core.front.ShopcartAction" method="shopCartList">
+            <result type="velocity">/WEB-INF/views/front/shopcartlist.vm</result>
+        </action>
+        <action name="shopcartdata" class="org.store.core.front.ShopcartAction" method="shopCartData">
+            <result type="velocity">/WEB-INF/views/front/shopcartdata.vm</result>
+            <result type="velocity" name="print">/WEB-INF/views/front/shopcartdata_print.vm</result>
+        </action>
+        <action name="shopcartdel" class="org.store.core.front.ShopcartAction" method="shopCartDel">
+            <result type="redirectAction">shopcartlist</result>
+        </action>
+        <action name="shopcart_tocart" class="org.store.core.front.ShopcartAction" method="shopCartToCart">
+            <result type="redirectAction">shopcart</result>
+        </action>
+        <action name="shopcartsave" class="org.store.core.front.ShopcartAction" method="shopCartSave">
+            <result type="redirectAction">shopcart</result>
+        </action>
+        <action name="shopcartload" class="org.store.core.front.ShopcartAction" method="shopCartLoad">
+            <result type="redirectAction">shopcart</result>
+        </action>
+        <action name="shopcartPromotion" class="org.store.core.front.ShopcartAction" method="shopCartPromotion">
+        </action>
+
+        <action name="payanonymousform" class="org.store.core.front.GeneralAction" method="emptyMethod">
+            <result type="velocity">/WEB-INF/views/front/pay_anonymous.vm</result>
+        </action>
+
+        <action name="paystepanonymous" class="org.store.core.front.UserAction" method="payStepAnonymous">
+            <result type="velocity" name="input">/WEB-INF/views/front/pay_anonymous.vm</result>
+            <result type="redirectAction">paystepAddress</result>
+            <result type="redirectAction" name="onepage">checkout</result>
+        </action>
+
+        <action name="profile" class="org.store.core.front.UserAction" method="gotoProfile">
+            <result type="velocity">/WEB-INF/views/front/profile.vm</result>
+        </action>
+
+        <action name="profile_addresssave" class="org.store.core.front.UserAction" method="profileSaveAddress">
+            <result type="redirectAction">profile</result>
+        </action>
+
+        <action name="register" class="org.store.core.front.UserAction" method="register">
+            <result type="velocity" name="input">/WEB-INF/views/front/register.vm</result>
+            <result type="redirectAction">home</result>
+            <result type="redirect" name="redirect">${redirectUrl}</result>
+        </action>
+        <action name="registernewsletter" class="org.store.core.front.UserAction" method="registerForNewsletter">
+            <result type="json">
+                <param name="root">code</param>
+            </result>
+        </action>
+
+        <action name="login" class="org.store.core.front.UserAction" method="login">
+            <result type="velocity" name="input">/WEB-INF/views/front/register.vm</result>
+            <result type="redirectAction">home</result>
+            <result type="redirect" name="redirect">${redirectUrl}</result>
+        </action>
+
+        <action name="loginAjax" class="org.store.core.front.UserAction" method="loginAjax">
+            <result type="json">
+                <param name="root">jsonResult</param>
+            </result>
+        </action>
+
+        <action name="logout" class="org.store.core.front.UserAction" method="logout">
+            <result type="redirectAction">home</result>
+        </action>
+
+        <action name="saveprofile" class="org.store.core.front.UserAction" method="saveprofile">
+            <result type="velocity" name="input">/WEB-INF/views/front/profile.vm</result>
+            <result type="velocity">/WEB-INF/views/front/profile.vm</result>
+        </action>
+
+        <action name="wishlist" class="org.store.core.front.UserAction" method="wishlist">
+            <result type="velocity" name="print">/WEB-INF/views/front/wishlist_print.vm</result>
+            <result type="velocity" name="input">/WEB-INF/views/front/wishlist.vm</result>
+            <result type="velocity">/WEB-INF/views/front/wishlist.vm</result>
+        </action>
+        <action name="wishlistmail" class="org.store.core.front.UserAction" method="wishlistmail">
+            <result type="velocity">/WEB-INF/views/front/mailwishlist.vm</result>
+        </action>
+        <action name="addtowishlist" class="org.store.core.front.GeneralAction" method="addToWishList">
+            <result type="json">
+                <param name="root">code</param>
+            </result>
+        </action>
+        <action name="delfromwishlist" class="org.store.core.front.GeneralAction" method="delFromWishList">
+            <result type="redirectAction">wishlist</result>
+        </action>
+
+        <action name="orders" class="org.store.core.front.UserAction" method="orders">
+            <result type="velocity">/WEB-INF/views/front/orders.vm</result>
+        </action>
+
+        <action name="order" class="org.store.core.front.UserAction" method="order">
+            <result type="velocity">/WEB-INF/views/front/order.vm</result>
+            <result type="velocity" name="print">/WEB-INF/views/front/order_print.vm</result>
+        </action>
+
+        <action name="tracking" class="org.store.core.front.UserAction" method="tracking">
+            <result type="velocity">/WEB-INF/views/front/tracking.vm</result>
+        </action>
+
+        <action name="useraction" class="org.store.core.front.UserAction" method="userAction">
+            <result type="velocity">/WEB-INF/views/front/useraction.vm</result>
+        </action>
+
+        <action name="rmaorder" class="org.store.core.front.UserAction" method="rmaOrder">
+            <result type="velocity">/WEB-INF/views/front/rmaorder.vm</result>
+        </action>
+
+        <action name="rmadetail" class="org.store.core.front.UserAction" method="rmaDetail">
+            <result type="velocity">/WEB-INF/views/front/rmadetail.vm</result>
+        </action>
+
+        <action name="rmanew" class="org.store.core.front.UserAction" method="rmaNew">
+            <result type="redirectAction">rmadetail?idRma=${rma.id}</result>
+        </action>
+
+        <action name="rmasave" class="org.store.core.front.UserAction" method="rmaSave">
+            <result type="redirectAction">rmadetail?idRma=${rma.id}</result>
+        </action>
+
+        <action name="addordertocart" class="org.store.core.front.UserAction" method="addOrderToCart">
+            <result name="input" type="velocity">/WEB-INF/views/front/shopcart.vm</result>
+            <result type="redirectAction">shopcart</result>
+        </action>
+
+        <action name="sendpassword" class="org.store.core.front.UserAction" method="sendPassword">
+            <result type="json">
+                <param name="root">jsonResult</param>
+            </result>
+        </action>
+        <action name="resetpassword" class="org.store.core.front.UserAction" method="resetPassword">
+            <result type="redirectAction">profile</result>
+        </action>
+
+        <action name="comments" class="org.store.core.front.UserAction" method="comments">
+            <result type="velocity">/WEB-INF/views/front/comments.vm</result>
+        </action>
+
+        <action name="comment" class="org.store.core.front.UserAction" method="comment">
+            <result type="json">
+                <param name="root">jsonResult</param>
+            </result>
+        </action>
+
+        <action name="sendcomment" class="org.store.core.front.UserAction" method="sendComment">
+            <result type="velocity" name="input">/WEB-INF/views/front/contact_us.vm</result>
+            <result type="velocity">/WEB-INF/views/front/contact_us.vm</result>
+        </action>
+
+        <action name="enc" class="org.store.core.front.GeneralAction" method="enc">
+        </action>
+
+        <action name="friendRefer" class="org.store.core.front.UserAction" method="referToFriend">
+            <result type="velocity">/WEB-INF/views/front/refer_friend.vm</result>
+        </action>
+        <action name="friendData" class="org.store.core.front.UserAction" method="friendData">
+            <result type="velocity">/WEB-INF/views/front/refer_friend_data.vm</result>
+        </action>
+        <action name="friendRegister" class="org.store.core.front.UserAction" method="friendRegister">
+        </action>
+        <action name="friendMessage" class="org.store.core.front.UserAction" method="messageToUser">
+            <result type="velocity">/WEB-INF/views/front/refer_friend_data.vm</result>
+        </action>
+        <action name="rewardHistory" class="org.store.core.front.UserAction" method="rewardHistory">
+            <result type="velocity">/WEB-INF/views/front/reward_history.vm</result>
+        </action>
+        <action name="friendsSalesReport" class="org.store.core.front.UserAction" method="friendsSalesReport">
+            <result type="velocity">/WEB-INF/views/front/friends_sales_report.vm</result>
+        </action>
+
+        <action name="countrystates" class="org.store.core.front.UserAction" method="countryStates">
+            <result type="stream">
+                <param name="contentType">application/json</param>
+                <param name="allowCaching">false</param>
+                <param name="inputName">inputStream</param>
+            </result>
+        </action>
+
+        <action name="countrystatesex" class="org.store.core.front.UserAction" method="countryStatesEx">
+            <result type="velocity">/WEB-INF/views/front/country_states_ex.vm</result>
+        </action>
+
+        <action name="resource" class="org.store.core.front.GeneralAction" method="resourceDownload">
+            <result type="stream">
+                <param name="allowCaching">false</param>
+            </result>
+        </action>
+
+        <action name="blockedit" class="org.store.core.front.GeneralAction" method="blockEdit">
+            <result type="velocity">/WEB-INF/views/front/blockedit.vm</result>
+        </action>
+
+        <action name="blocksave" class="org.store.core.front.GeneralAction" method="blockSave">
+            <result type="json">
+                <param name="root">output</param>
+            </result>
+        </action>
+
+
+        <action name="paystepExternal" class="org.store.core.front.GeneralAction" method="payStepExternal">
+        </action>
+        <action name="paystepAddress" class="org.store.core.front.GeneralAction" method="payStepAddress">
+            <result type="velocity">/WEB-INF/views/front/paystep_address.vm</result>
+        </action>
+        <action name="paystepAddress_billing" class="org.store.core.front.GeneralAction" method="payStepAddressBilling">
+            <result type="velocity">/WEB-INF/views/front/paystep_address_billing.vm</result>
+        </action>
+        <action name="paystepAddress_shipping" class="org.store.core.front.GeneralAction" method="payStepAddressShipping">
+            <result type="velocity">/WEB-INF/views/front/paystep_address_shipping.vm</result>
+        </action>
+        <action name="paystepPayment" class="org.store.core.front.GeneralAction" method="payStepPayment">
+            <result type="velocity">/WEB-INF/views/front/paystep_payment.vm</result>
+        </action>
+        <action name="paystepSaveOrder" class="org.store.core.front.GeneralAction" method="payStepSaveOrder">
+            <result type="redirectAction">paystepResult?idOrder=${idOrder}&amp;blockCode=${blockCode}</result>
+            <result type="velocity" name="hostedPage">/WEB-INF/views/front/paystep_hostedpage.vm</result>
+        </action>
+        <action name="paystepPayOrder" class="org.store.core.front.GeneralAction" method="payStepPayOrder">
+            <result type="redirectAction">paystepResult?idOrder=${idOrder}&amp;blockCode=${blockCode}</result>
+            <result type="velocity" name="hostedPage">/WEB-INF/views/front/paystep_hostedpage.vm</result>
+        </action>
+        <action name="paystepResult" class="org.store.core.front.GeneralAction" method="payStepResult">
+            <result type="velocity">/WEB-INF/views/front/paystep_result.vm</result>
+        </action>
+
+        <action name="payorder" class="org.store.core.front.GeneralAction" method="payOrder">
+            <result type="velocity">/WEB-INF/views/front/payorder.vm</result>
+        </action>
+
+        <action name="checkout" class="org.store.core.front.CheckoutAction" method="checkout">
+            <result type="velocity">/WEB-INF/views/front/checkout.vm</result>
+        </action>
+        <action name="checkout_get_complements" class="org.store.core.front.CheckoutAction" method="checkoutGetComplements">
+            <result type="velocity">/WEB-INF/views/front/checkout_complements.vm</result>
+        </action>
+        <action name="checkout_set_complements" class="org.store.core.front.CheckoutAction" method="checkoutSetComplements">
+            <result type="json"><param name="root">jsonResp</param></result>
+        </action>
+        <action name="checkout_get_billing" class="org.store.core.front.CheckoutAction" method="checkoutGetBilling">
+            <result type="velocity">/WEB-INF/views/front/checkout_billing.vm</result>
+        </action>
+        <action name="checkout_set_billing" class="org.store.core.front.CheckoutAction" method="checkoutSetBilling">
+            <result type="json"><param name="root">jsonResp</param></result>
+        </action>
+        <action name="checkout_get_shipping" class="org.store.core.front.CheckoutAction" method="checkoutGetShipping">
+            <result type="velocity">/WEB-INF/views/front/checkout_shipping.vm</result>
+        </action>
+        <action name="checkout_set_shipping" class="org.store.core.front.CheckoutAction" method="checkoutSetShipping">
+            <result type="json"><param name="root">jsonResp</param></result>
+        </action>
+        <action name="checkout_get_method" class="org.store.core.front.CheckoutAction" method="checkoutGetMethod">
+            <result type="velocity">/WEB-INF/views/front/checkout_delivery.vm</result>
+        </action>
+        <action name="checkout_set_method" class="org.store.core.front.CheckoutAction" method="checkoutSetMethod">
+            <result type="json"><param name="root">jsonResp</param></result>
+        </action>
+        <action name="checkout_get_payment" class="org.store.core.front.CheckoutAction" method="checkoutGetPayment">
+            <result type="velocity">/WEB-INF/views/front/checkout_payment.vm</result>
+        </action>
+        <action name="checkout_set_payment" class="org.store.core.front.CheckoutAction" method="checkoutSetPayment">
+            <result type="json"><param name="root">jsonResp</param></result>
+        </action>
+        <action name="checkout_get_confirm" class="org.store.core.front.CheckoutAction" method="checkoutGetConfirm">
+            <result type="velocity">/WEB-INF/views/front/checkout_confirm.vm</result>
+        </action>
+        <action name="checkout_save_order" class="org.store.core.front.CheckoutAction" method="checkoutSaveOrder">
+            <result type="redirectAction">paystepResult?idOrder=${order.idOrder}</result>
+            <result type="redirectAction" name="payment-ok">paystepResult?idOrder=${order.idOrder}&amp;blockCode=${blockCode}</result>
+            <result type="velocity" name="hosted-page">/WEB-INF/views/front/paystep_hostedpage.vm</result>
+        </action>
+
+        <action name="captcha" class="org.store.core.front.OtherAction" method="captcha">
+            <result type="stream">
+                <param name="inputName">inputStream</param>
+                <param name="allowCaching">false</param>
+                <param name="contentType">image/jpeg</param>
+            </result>
+        </action>
+        <action name="validcaptcha" class="org.store.core.front.OtherAction" method="validCaptcha">
+            <result type="json">
+                <param name="root">result</param>
+            </result>
+        </action>
+        <action name="menuSubcategories" class="org.store.core.front.GeneralAction" method="doDefault">
+            <result type="velocity">/WEB-INF/views/front/menu_subcategorias.vm</result>
+        </action>
+
+        <action name="*" class="org.store.core.front.OtherAction" method="unknownAction">
+            <result type="velocity">/WEB-INF/views/front/home.vm</result>
+            <result type="stream" name="custom">
+                <param name="inputName">inputStream</param>
+                <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">${contentDisposition}</param>
+            </result>
+        </action>
+
+    </package>
+</struts>

@@ -1,0 +1,12 @@
+#set($productLabels = $action.getProductLabels($product))
+#if($util.isNotEmpty($productLabels))
+    <div class="labels">
+        <ul class="clearfix">
+            #foreach($lab in $productLabels)
+                #if($util.isNotEmpty($lab.getContentDetail($locale.language)))
+                    <li>$!lab.getContentDetail($locale.language)</li>
+                #end
+            #end
+        </ul>
+    </div>
+#end

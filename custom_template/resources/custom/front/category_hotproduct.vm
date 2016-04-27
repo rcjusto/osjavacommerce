@@ -1,0 +1,20 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'')")
+#set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+<div class="product">
+    <a class="name" href="$urlDetail">$!pName</a>
+    #if($util.isNotEmpty($image))
+        <a href="$urlDetail" class="image"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!pName" /></a>
+    #else
+        <a href="$urlDetail" class="image not-found"></a>
+    #end
+    <a href="$urlDetail" class="desc">$!util.left($pDesc,120)</a>
+    #if($action.canShowPrices)
+        <div class="price" style="">#fancyPrice($price)</div>
+        #control('addtocart' $util.map.add('product',$p))
+    #end
+</div>
+

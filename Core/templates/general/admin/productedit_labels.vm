@@ -1,0 +1,150 @@
+#surl('id=urlAddLabel' "action=productaddlabels")
+#surl('id=urlDelLabel' "action=productdellabels")
+<form id="formlabels">
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    <div class="listado">
+        #formErrors()
+        <div style="float:left;width:400px;">
+            #set($parentLabels = $action.getProductLabelParent())
+            #if ($util.isNotEmpty($parentLabels))
+                <h2 class="block-title">#label('admin.labels.inherited')</h2>
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    <tr>
+                        <th>#label('admin.label')</th>
+                        <th style="width:1%">&nbsp;</th>
+                    </tr>
+                    #foreach($l in $parentLabels)
+                        <tr>
+                            <td style="min-width:120px;">$!l.getName($defaultLanguage)</td>
+                            <td><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+                        </tr>
+                    #end
+                </table>
+            #end
+
+            <h2 class="block-title">#label('admin.labels.assigned')</h2>
+            #if($util.isNotEmpty($product.labels))
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    <tr>
+                        <th>#label('admin.label')</th>
+                        <th style="width:1%">&nbsp;</th>
+                    </tr>
+                    #foreach($l in $product.labels)
+                        <tr>
+                            <td style="min-width:120px;">$!l.getName($defaultLanguage)</td>
+                            <td>
+                                <a class="delete-row" href="#" onclick="return delLabel('$!l.code');"></a>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.labels.assigned')</h2>
+                    <p>#label('admin.labels.assigned.not.found')</p>
+                </div>
+            #end
+            <div class="formulario">
+            <h3>#label('admin.add.label.to.product')</h3>
+            <table class="formulario" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.select.label')</th>
+                    <td>
+                        <select name="labels" class="field string-medium">
+                            #foreach($lab in $labelList)
+                                <option value="$!lab.code">$!lab.getName($defaultLanguage)</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="button-bar">
+                <button type="button" onclick="addLabel();"><span class="add">#label('admin.add.label')</span></button>
+            </div>
+            </div>    
+        </div>
+    </form>
+
+<!-- Categories -->
+    #surl('id=urlAddCategory' "action=productaddcategory")
+    #surl('id=urlDelCategory' "action=productdelcategory")
+        <div style="float:left;width:400px;margin-left:50px;" >
+            <form id="formcategory">
+                #shidden('name=idProduct' "value=$!product.idProduct")
+        <h2 class="block-title">#label('admin.categories')</h2>
+                <div class="listado">
+            #if($util.isNotEmpty($product.productCategories))
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    <tr>
+                        <th>#label('admin.category')</th>
+                        <th style="width:1%">&nbsp;</th>
+                    </tr>
+                    #foreach($c in $product.productCategories)
+                        <tr>
+                            <td style="min-width:120px;">$!c.getLanguage($defaultLanguage).categoryName #if($product.category.idCategory==$c.idCategory)(default)#end</td>
+                            <td>
+                                #if($product.category.idCategory==$c.idCategory)
+
+                                #else
+                                    <a class="delete-row" href="#" onclick="return delCategory($!c.idCategory);"></a>
+                                #end
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.product.categories')</h2>
+                    <p>#label('admin.product.categories.not.found')</p>
+                </div>
+            #end
+            </div>        
+            <div class="formulario">
+            <h3>#label('admin.add.product.to.category')</h3>
+            <table class="formulario" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.select')</th>
+                    <td>
+                        #set($catTree1 = $dao.getCategoryTree(false))
+                        <select id="treecat1" name="idCategory" class="field string-medium">
+                            <option value=""></option>
+                            #categoryOption($catTree1 0 '')
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="button-bar">
+                <button type="button" onclick="addCategory();"><span class="add">#label('admin.add.category')</span></button>
+            </div>
+            </div>
+            </form>
+
+        </div>
+        <br style="clear:both;"/>
+</div>
+<script type="text/javascript">
+    function delLabel(l) {
+        $('#divLabels').loading("$!action.getText('admin.deleting.label')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlDelLabel", {idProduct:$!{product.idProduct},labels:l});
+    }
+    function addLabel() {
+        var data = $('#formlabels').serialize();
+        $('#divLabels').loading("$!action.getText('admin.adding.label')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlAddLabel", data);
+    }
+    function delCategory(c) {
+        $('#divLabels').loading("$!action.getText('admin.deleting.category')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlDelCategory", {idProduct:$!{product.idProduct},idCategory:c});
+    }
+    function addCategory() {
+        var data = $('#formcategory').serialize();
+        $('#divLabels').loading("$!action.getText('admin.adding.category')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlAddCategory", data);
+    }
+    $(function(){
+        $('#treecat1').find('option').each(function(){
+            var l = eval($(this).attr('level'))*20+4;
+            if (!isNaN(l)) $(this).css('padding-left',l+'px')
+        });
+    });
+</script>

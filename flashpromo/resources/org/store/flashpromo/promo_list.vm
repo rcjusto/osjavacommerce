@@ -1,0 +1,72 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function() {
+        $('#mytabs').tabs({
+            selected: 1,
+            select: function(event, ui) {
+                var url = $.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+<form action="$!action.url('flash_promo_list','admin')" method="post">
+    <h1>#label('fp.config.title')</h1>
+
+    <div id="mytabs">
+        <ul class="tabs">
+            <li><a href="$!action.url('flash_page_edit','admin')">#label('fp.page.config.title')</a></li>
+            <li><a href="#promo">#label('fp.promo.config.title')</a></li>
+        </ul>
+        <div id="promo" class="tabpanel">
+            <div class="listado" style="width: 900px;">
+                <h2 class="block-title">#label('fp.popup.content.list')</h2>
+                 #actionErrors()
+                #if($util.isNotEmpty($promotions.listado))
+                    #set($nav=$manufacturers)
+                    #parse('/WEB-INF/views/admin/navigator.vm')
+                    <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                            <th>#label('admin.name')</th>
+                            <th>#label('fp.width')</th>
+                            <th>#label('fp.position')</th>
+                            <th>#label('admin.created')</th>
+                            <th style="text-align: center;">#label('fp.subscription')</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        #foreach($p in $promotions.listado)
+                            <tr>
+                                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!p.id"/></td>
+                                <td>$!{p.name}</td>
+                                <td>$!{p.width} px</td>
+                                <td>$!{p.horizontal} $!{p.vertical}</td>
+                                <td>$!{date.format('yyyy-MM-dd HH:mm',$p.created)}</td>
+                                <td class="#if($p.subscription) chk_true #else chk_false #end">&nbsp;</td>
+                                <td class="link-bar"><a href="$!action.url('flash_promo_edit','admin', $util.map.add('id',$!p.id.toString()))"><span class="edit">#label('admin.modify')</span></a></td>
+                            </tr>
+                        #end
+                    </table>
+                #else
+                    <div class="info">
+                        <p>#label('fp.promos.not.found')</p>
+                    </div>
+                #end
+
+            </div>
+            <div class="button-bar">
+                #if($util.isNotEmpty($promotions.listado))
+                    <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+                #end
+                <button type="button" href="$!action.url('flash_promo_edit','admin')"><span class="add">#label('fp.configure.new.promo')</span></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

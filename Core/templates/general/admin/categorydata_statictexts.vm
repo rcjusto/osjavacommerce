@@ -1,0 +1,68 @@
+#surl('id=formStaticText' "action=categorystatictextsave")
+<form id="formStaticText" action="urlformStaticText" method="post" class="validable">
+#shidden('name=idCategory' "value=$!category.idCategory")
+#formErrors()
+
+#if($util.isNotEmpty($categoryStaticTextsParent) || $util.isNotEmpty($categoryStaticTexts))
+<table class="sheet formulario" cellpadding="0" cellspacing="0">
+    #if($util.isNotEmpty($categoryStaticTextsParent))
+        <tr class="nohover block-title">
+            <th colspan="4">#label('admin.product.static.texts.inherited')</th>
+        </tr>
+        <tr>
+            <th style="text-align:left;">#label('admin.code')</th>
+            <th style="text-align:left;">#label('admin.title')</th>
+            <th style="text-align:left;">#label('admin.order')</th>
+            <th style="text-align:left;">#label('admin.place')</th>
+        </tr>
+        #foreach($p in $categoryStaticTextsParent)
+        <tr>
+            <td style="padding-right:20px;">$!p.staticText.code</td>
+            <td style="padding-right:20px;width:250px;" nowrap="nowrap">$!p.staticText.getLanguage($defaultLanguage).title</td>
+            <td><input type="text" readonly="readonly" value="$!p.contentOrder" class="field integer readonly"/></td>
+            <td><input type="text" readonly="readonly" value="$!p.contentPlace" class="field string-short readonly"/></td>
+            <td><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+        </tr>
+        #end
+    #end
+    #if($util.isNotEmpty($categoryStaticTexts))
+        <tr class="nohover block-title">
+            <th colspan="4">#label('admin.product.static.texts.configured')</th>
+        </tr>
+    <tr>
+        <th style="text-align:left;">#label('admin.code')</th>
+        <th style="text-align:left;">#label('admin.title')</th>
+        <th style="text-align:left;">#label('admin.order')</th>
+        <th style="text-align:left;">#label('admin.place')</th>
+    </tr>
+        #foreach($p in $categoryStaticTexts)
+        <tr>
+            <td style="padding-right:20px;">
+                <input type="hidden" class="contentStaticTextId" value="$!p.staticText.id"/>
+                <input type="hidden" name="contentStaticTextId" value="$!p.id"/>
+                $!p.staticText.code
+            </td>
+            <td  style="padding-right:20px;width:250px;" nowrap="nowrap">$!p.staticText.getLanguage($defaultLanguage).title</td>
+            <td><input type="text" name="contentOrder" value="$!p.contentOrder" class="field integer"/></td>
+            <td>
+                <select name="contentPlace" class="field string-short">
+                    #foreach($place in ['tabs'])
+                    <option value="$place" #if($place==$!p.contentPlace) selected="selected" #end >$place</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        #end
+    #end
+</table>
+#else
+    <div class="info">
+        <h2>#label('admin.product.static.texts.not.found')</h2>
+        <p>#label('admin.product.static.texts.not.found.text')</p>
+    </div>
+#end
+<div class="button-bar">
+    <button type="button" onclick="configureStaticTexts();"><span class="add">#label('admin.add.and.remove.items')</span></button>
+    <button type="button" onclick="saveStaticTexts();"><span class="ok">#label('admin.save')</span></button>
+</div>
+</form>

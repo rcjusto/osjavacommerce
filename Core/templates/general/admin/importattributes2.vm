@@ -1,0 +1,54 @@
+#surl('id=urlFormImport3' "action=importattributes3")
+<form id="formImport2" action="$urlFormImport3" class="validable">
+<div class="dialog-header">
+    <h2>#label('admin.product.import.attributes.step2')</h2>
+    <h4>#label('admin.product.import.attributes.step2.text')</h4>
+</div>
+<div class="dialog-data" style="padding:0 10px;height:440px;">
+        <input type="hidden" id="idProductImport" name="idProduct" value="">
+        <input type="hidden" name="openTab" value="2"/>
+        <div class="formulario" style="margin-top:8px;">
+            #if($attributes && $attributes.size()>0)
+                #set($catTree = $dao.getCategoryTree(false))
+                <div class="clearfix">
+                    <label>
+                        <span style="float:left;line-height:24px;margin-right:8px;font-weight:bold;">#label('admin.product.import.attributes.step2.includeincategory')</span>
+                        <select id="idCategoryImport" class="field string-200" name="idCategory">
+                            <option value="">[none]</option>
+                            #categoryOption($catTree 0 $!product.category.idCategory)
+                        </select>
+                    </label>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="clearfix" style="float:none;">
+                    <table class="formulario" cellpadding="0" cellspacing="0" style="margin-bottom:8px;" width="100%">
+                        <tr>
+                            <th style="text-align:center;">#label('admin.import')</th>
+                            <th style="text-align:left;">#label('admin.attribute.names')</th>
+                            <th style="text-align:left;">#label('admin.attribute.values')</th>
+                        </tr>
+                        #foreach($att in $attributes)
+                            <tr>
+                                <td style="text-align:center;" >#checkbox('attImport' true)</td>
+                                <td><input type="text" name="attImportName" value="$!att.get('name')" class="field string-150"/></td>
+                                <td><input type="text" name="attImportValue" value="$!att.get('value')" class="field" style="width:250px;"/></td>
+                            </tr>
+                        #end
+                    </table>
+                </div>
+            #else
+                <div class="error">
+                    <h2>#label('admin.import.error')</h2>
+                    <p>#label('admin.import.pasted.text.do.not.contains.table')</p>
+                </div>
+            #end
+        </div>
+
+</div>
+<div class="button-bar">
+    #if($attributes && $attributes.size()>0)
+        <button id="dialogBtnOk" type="submit"><span class="ok">#label('admin.import.attributes')</span></button>
+    #end
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+</form>

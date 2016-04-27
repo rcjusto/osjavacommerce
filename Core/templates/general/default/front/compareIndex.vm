@@ -1,0 +1,22 @@
+#set($comparedProducts = $action.getComparedProducts())
+#if($util.isNotEmpty($comparedProducts))
+<h2>#label('products.to.compare')</h2>
+#if($maxExceed)
+<div class="max-exceed">
+    #label('only.4.products.to.compare')
+</div>
+#end
+<ul>
+    #foreach($product in $comparedProducts)
+        <li>
+            <a class="remove-compare" data="$!product.idProduct" href="#"></a>
+            <a class="name" href="$!action.urlProduct($product)">$!product.getProductName($locale.language)</a>
+        </li>
+    #end
+</ul>
+<div class="button">
+    <form action="$!action.url('compare')" method="post">
+        <button type="submit"><span>#label('goto.compare')</span></button>
+    </form>
+</div>
+#end

@@ -1,0 +1,223 @@
+<!--
+    TEMPLATE FOR PDF INVOICE
+    This must be a xHtml document.
+-->
+<html>
+<head>
+    <title>Invoice No. $!action.getOrderInvoice($order)</title>
+    <meta name="author" content="Peonline.ca" />
+    <meta name="creator" content="Peonline.ca" />
+    <meta name="subject" content="Invoice of order $!order.idOrder" />
+    <style type="text/css">
+        body {font-family:sans-serif;font-size:10pt;}
+        h2 {margin:2px 0;font-size:12pt;}
+        p {margin:1px 0;}
+        table {border-collapse: separate;border-spacing: 0;}
+        table.with-border {border-left:1px solid black;border-top:1px solid black;margin-top:12px;}
+        table.with-border td, table.with-border th {padding:2px 4px; border-bottom:1px solid black;border-right:1px solid black;}
+        table.with-border th {background-color:#f0f0f0;text-align:center;}
+        table.bigger {font-size:12pt;}
+        tr.total td,tr.total th {font-size:11pt;font-weight:bold;}
+    </style>
+</head>
+<body >
+<div>
+
+    <!-- header -->
+
+    <table width="100%">
+        <tr>
+            <td>
+                <img alt="" src="$!{util.siteUrl}$!action.storeFile('images/custom/print_logo.gif')"/>
+
+                <p>la direccion y el telefono</p>
+            </td>
+            <td style="text-align:right;">
+                <table align="right" class="bigger with-border">
+                    <tr>
+                        <th>Invoice No.</th>
+                        <td>$!action.getOrderInvoice($order)</td>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <td>$!util.formatDate($order.invoiceDate)</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!-- SHipping and billing -->
+    <table width="100%" style="margin-top:30px;">
+        <tr style="vertical-align:top">
+            <td width="50%" valign="top">
+                <h2>BILL TO</h2>
+
+                <p>$!order.billingAddress.fullName</p>
+
+                <p>$!order.billingAddress.address</p>
+                #if($util.isNotEmpty($order.billingAddress.address2))<p>$!order.billingAddress.address2</p>#end
+                <p>$!order.billingAddress.city $!order.billingAddress.stateCode $!order.billingAddress.zipCode $!order.billingAddress.idCountry</p>
+                #if($util.isNotEmpty($order.billingAddress.phone))<p>$!order.billingAddress.phone</p>#end
+            </td>
+            <td width="50%" valign="top">
+                <h2>SHIP TO</h2>
+                #if($order.shippingMethod)
+                    #if($order.deliveryAddress)
+                        <p>$!order.deliveryAddress.fullName</p>
+
+                        <p>$!order.deliveryAddress.address</p>
+                        #if($util.isNotEmpty($order.deliveryAddress.address2))<p>$!order.deliveryAddress.address2</p>#end
+                        <p>$!order.deliveryAddress.city $!order.deliveryAddress.stateCode $!order.deliveryAddress.zipCode $!order.deliveryAddress.idCountry</p>
+                        #if($util.isNotEmpty($order.deliveryAddress.phone))<p>$!order.deliveryAddress.phone</p>#end
+
+                    #end
+                #else
+                    #if($order.pickInStore)
+                        <p>#label('shipping.type.pickinstore')</p>
+                    #end
+                #end
+            </td>
+        </tr>
+    </table>
+
+    <!-- general data -->
+
+    <table width="100%" class="with-border">
+        <tr>
+            <th width="20%" bgcolor="#dcdcdc">Account No.</th>
+            <td width="15%"> </td>
+            <th width="25%" bgcolor="#dcdcdc">Customer Email</th>
+            <td width="40%">$!order.user.email</td>
+        </tr>
+    </table>
+
+    <table width="100%" class="with-border">
+        <tr>
+            <th width="20%">PO No</th>
+            <th width="15%">Order ID</th>
+            <th width="25%">Payment Method</th>
+            <th width="25%">Ship Via</th>
+            <th width="15%">Ship Date</th>
+        </tr>
+        <tr>
+            <td align="center">$!order.purchaseOrder</td>
+            <td align="center">$!order.idOrder</td>
+            <td align="center">#if($util.isNotEmpty($order.paymentCard)) $!order.paymentCard #else $!order.paymentMethod #end</td>
+            <td align="center">#if($order.shippingMethod) $!order.shippingMethod.getMethodName($locale.language) #else #if($order.pickInStore) #label('shipping.type.pickinstore') #else - #end #end</td>
+            <td align="center"> </td>
+        </tr>
+    </table>
+
+    <table width="100%" class="with-border">
+        <tr>
+            <th width="10%">#label('shopcart.webid')</th>
+            <th width="57%">#label('shopcart.product')</th>
+            <th width="11%">#label('shopcart.quantity')</th>
+            <th width="11%">#label('shopcart.unitary.price')</th>
+            <th width="11%">#label('shopcart.line.price')</th>
+        </tr>
+        #foreach($detail in $order.orderDetails)
+            #set( $firstODP = $detail.getFirstDetailProducts() )
+            <tr class="product">
+                <td>$!firstODP.product.idProduct</td>
+                <td>
+                    #foreach($odp in $detail.orderDetailProducts)
+                        <div>
+                            $!odp.product.getProductName($locale.language)
+                            #if($util.isNotEmpty($odp.barCode)), #label('bar.code'): $odp.barCode #end
+                            #if($detail.promotionCode && $util.isNotEmpty($detail.promotionCode))
+                                <div class="promo">#label('promo') $!detail.promotionCode - $!detail.promotionName</div>
+                            #end
+                        </div>
+                    #end
+                </td>
+                <td align="center">$!detail.quantity</td>
+                <td align="right">$!action.formatActualCurrency($detail.price,$order.currency)</td>
+                <td align="right">$!action.formatActualCurrency($detail.subTotal,$order.currency)</td>
+            </tr>
+            #foreach($odp in $detail.orderDetailProducts)
+                #if($odp.feeValue)
+                    <tr class="fee">
+                        <td> </td>
+                        <td>#label('fee') $!odp.feeName</td>
+                        <td align="center">$!detail.quantity</td>
+                        <td align="right">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
+                        <td align="right">$!action.formatActualCurrency($math.mul($odp.feeValue,$detail.quantity),$order.currency)</td>
+                    </tr>
+                #end
+            #end
+        #end
+        <tr class="subtotal">
+            <td colspan="4">#label('admin.merchandise.subtotal')</td>
+            <td align="right">$!action.formatActualCurrency($order.totalProducts,$order.currency)</td>
+        </tr>
+        #if($order.interestPercent && $order.interestPercent>0)
+            <tr class="subtotal">
+                <td colspan="4">#label('interest.percent') $!number.format('0.##',$order.interestPercent)</td>
+                <td align="right">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
+            </tr>
+        #end
+        #if($order.totalFees && $order.totalFees>0)
+            <tr class="subtotal">
+                <td colspan="4">#label('subtotal.fees')</td>
+                <td align="right">$!action.formatActualCurrency($order.totalFees,$order.currency)</td>
+            </tr>
+        #end
+        #foreach($prom in $order.getPromotions('discount-percent'))
+            <tr class="promotion">
+                <td colspan="4" class="promo">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+                <td align="right">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+            </tr>
+        #end
+        #foreach($prom in $order.getPromotions('discount'))
+            <tr class="promotion" class="promo">
+                <td colspan="4">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+                <td align="right">$!action.formatActualCurrency($prom.get('value'), $order.currency)</td>
+            </tr>
+        #end
+        <tr class="subtotal">
+            #set($freeShipPromList = $order.getPromotions('free-shipping') )
+            #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                #set( $freeShipProm = $list.get($freeShipPromList,0))
+                <td colspan="4">#label('admin.promo'): $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
+            #else
+                <td colspan="4">#label('admin.subtotal.shipping')</td>
+            #end
+            <td align="right">$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
+        </tr>
+        #if($order.totalInsurance && $order.totalInsurance>0)
+            <tr class="subtotal">
+                <td colspan="4">#label('admin.subtotal.shipping.insurance')</td>
+                <td align="right">$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
+            </tr>
+        #end
+
+        #set($taxesl = $order.getTaxes())
+        #if($taxesl && !$taxesl.isEmpty())
+            #foreach($tax in $taxesl)
+                <tr class="subtotal">
+                    <td colspan="4">
+                        #label('admin.subtotal.tax') $!tax.name
+                        #if($tax.totax) <span class="tax-detail">( $!number.format('0.##',$math.mul($tax.percent,100))% #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span>#end
+                    </td>
+                    <td align="right">$!action.formatActualCurrency($tax.value,$order.currency)</td>
+                </tr>
+            #end
+        #end
+
+        #if($order.totalRewards && $order.totalRewards>0)
+            <tr class="subtotal">
+                <td colspan="4">#label('used.rewards')</td>
+                <td align="right">- $!action.formatActualCurrency($order.totalRewards,$order.currency)</td>
+            </tr>
+        #end
+
+        <tr class="total">
+            <td colspan="4">#label('admin.total')</td>
+            <td align="right">$!action.formatActualCurrency($order.total,$order.currency)</td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>

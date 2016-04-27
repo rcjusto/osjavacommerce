@@ -1,0 +1,4 @@
+<p>#label('mail.shopcart.request.quote')</p>
+<p><strong>#label('mail.customer')</strong> $!frontUser.fullName</p>
+<p><strong>#label('mail.num.products')</strong> $!shoppingCart.items.size()</p>
+<p><strong>#label('mail.total')</strong> $!util.formatNumber($shoppingCart.total,'money')</p>

@@ -1,0 +1,2 @@
+#* @implicitly included *#
+#* @vtlvariable name="util" type="org.store.core.velocity.VelocityUtils" *#

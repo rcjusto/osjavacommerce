@@ -1,0 +1,33 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.payterm.list')</h1>
+<div class="listado">
+    #if($util.isNotEmpty($payterms))
+        <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                <th>#label('admin.id')</th>
+                <th>#label('admin.description')</th>
+                <th>#label('admin.days.number')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($p in $payterms)
+                #surl('id=urlEdit' "action=editpayterm" "idPayterm=$!p.idPayterms")
+                <tr>
+                    <td>$!p.idPayterms</td>
+                    <td>$!p.description</td>
+                    <td>$!number.format('#',$p.numDays)</td>
+                    <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <p>#label('admin.payterms.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        #surl('id=urlButton' "action=editpayterm")
+        <button type="button" href="$urlButton"><span class="add">#label('admin.payterm.configure.new')</span></button>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

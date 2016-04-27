@@ -1,0 +1,21 @@
+$!{action.mailGlobalTop}
+<p><br/></p>
+<p style="margin-bottom:8px;">$!{mailFromName} $!{action.getText('mail.user.ask.to.sent.email')}</p>
+<p>$!{mailComment}</p>
+
+<h2>$!{action.getText('items.in.wishlist')}</h2>
+<table>
+    <tbody>
+    #foreach($product in $wishlist.items)
+        <tr>
+            <td style="vertical-align: top;"><a href="$!{product.url}"><img src="$!{product.imageSmall}" style="border: 0"/></a></td>
+            <td style="vertical-align: top;">
+                <p style="font-size: 12pt;color: #333333;"><a href="$!{product.url}">$!{product.name}</a></p>
+                <p style="font-weight: bold;margin-top: 6px;">$!{product.stock}</p>
+                <p style="font-size: 14pt;margin-top: 8px;">$!{product.price}</p>
+            </td>
+        </tr>
+    #end
+    </tbody>
+</table>
+

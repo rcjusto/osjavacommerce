@@ -1,0 +1,103 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($staticText.id)
+        #label("admin.static.${filterType}.modify") ID: $!staticText.id
+    #else
+        #label("admin.static.${filterType}.new")
+    #end
+</h1>
+#surl('id=urlForm' "action=savestatic${filterType}")
+<form action="$urlForm" method="post" class="validable">
+<div class="formulario">
+    #shidden('name=staticTextCode' "value=$!{staticText.id}")
+    #shidden('name=staticText.id')
+    #langSelector()
+    #formErrors()
+    #if(${filterType}=='page')
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.code')</th>
+                <td>
+                    #stextfield('name=staticText.code' 'cssClass=field required string-medium')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.title')</th>
+                <td>
+                    #langinput('staticTextTitle' $staticText 'title' 'field string-large' )
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.content')</th>
+                <td>
+                    #langtextarea('staticTextValue' $staticText 'value' 'field string-large' '10' )
+                    <a href="#" class="textarea-ckeditor"></a>
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.url')</th>
+                <td style="padding: 6px;">$!action.urlPage($staticText,true)</td>
+            </tr>
+        </table>
+    #end
+    #if(${filterType}=='news')
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.date')</th>
+                <td>
+                    #stextfield('name=contentDate' "value=$!util.formatDate($staticText.contentDate)" 'cssClass=field required date')
+                </td>
+                <th class="required">#label('admin.time')</th>
+                <td>
+                    #stextfield('name=contentTime' "value=$!util.formatTime($staticText.contentDate)" 'cssClass=field required time')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.title')</th>
+                <td colspan="3">
+                    #langinput('staticTextTitle' $staticText 'title' 'field string-large' )
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.external.url')</th>
+                <td colspan="3">
+                    #stextfield('name=staticText.contentUrl' 'cssClass=field string-large')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.content')</th>
+                <td colspan="3">
+                    #langtextarea('staticTextValue' $staticText 'value' 'field string-large' '10' )
+                    <a href="#" class="textarea-ckeditor"></a>
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.url')</th>
+                <td style="padding: 6px;"><a target="_blank" href="$!action.urlPage($staticText,true)">$!action.urlPage($staticText,true)</a></td>
+            </tr>
+        </table>
+    #end
+    #if(${filterType}=='block')
+        #set( $blockData = $action.getBlockData($staticText.code) )
+        <h3 style="margin-bottom:0;padding-bottom:0">$!blockData.getName($defaultLanguage)</h3>
+        #shidden('name=staticText.code')
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <td><img src="/struts/templates/${template}/${blockData.code}.gif" style="border:1px solid #d0d0d0"/>
+                </td>
+                <td>
+                    #langtextarea('staticTextValue' $staticText 'value' 'field string-large' '10' )
+                    <a href="#" class="textarea-ckeditor"></a>
+                </td>
+            </tr>
+        </table>
+    #end
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=liststatic${filterType}" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

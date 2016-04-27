@@ -1,0 +1,515 @@
+#macro (langinput $name $obj $prop $class)
+<input type="text" name="vis_$name" value="" class="multilang $!class"/>
+    #foreach($lang in $languages )
+        #if($obj)
+        <input type="hidden" class="$lang" name="$name" value="$!util.multiLangField($obj, $lang, $prop)"/>
+        #else
+        <input type="hidden" class="$lang" name="$name" value=""/>
+        #end
+
+    #end
+#end
+
+#macro (langtextarea $name $obj $prop $class $rows)
+<textarea name="vis_$name" class="multilang $!class" rows="$!rows"></textarea>
+    #foreach($lang in $languages )
+        #if($obj)
+        <input type="hidden" class="$lang" name="$name" value="$!esc.html($util.multiLangField($obj, $lang, $prop))"/>
+        #else
+        <input type="hidden" class="$lang" name="$name"/>
+        #end
+    #end
+#end
+
+#macro (langSelector)
+<div class="lang-selector">
+    #label('admin.select.input.language')
+    #foreach($l in $languages)
+        <a href="#$l" rel="$l" class="lang-selector lang-$l">#label("admin.lang.$l")</a>
+    #end
+    <label style="margin-left:50px;">
+        <input type="checkbox" id="langfields_fillempty" checked="checked">
+        #label('admin.fill.empty.languages')
+    </label>
+
+    <br style="clear:both;"/>
+</div>
+#end
+
+#macro (parentValue $obj $par $prop $class $format)
+    #if((!$action.getBeanProperty($obj,$prop) || $util.isEmpty($action.getBeanProperty($obj,$prop))) && $par)
+        #set($parentBean = 0 )
+        #set($parentBean = $action.getParentPropertyBean($obj,$prop))
+        #if($parentBean && $parentBean!=0)
+            #set( $pValue = $action.getBeanProperty($parentBean,$prop) )
+            #if($format=='decimal2' || $format=='decimal4' || $format=='money')
+                #set( $pValue = $util.formatNumber($action.getBeanProperty($parentBean,$prop),$format) )
+            #end
+        <div class="inherited" title="Inherited from $parentBean.getLanguage($defaultLanguage).categoryName">$pValue</div>
+        #end
+    #end
+#end
+
+#macro (checkbox $name $checked )
+    #set($friendlyName = $name.replace('.','_'))
+    #if($checked)
+    <input type="checkbox" class="chk_$friendlyName" checked="checked" onclick="$(this).parent().find('input.$friendlyName').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="Y">
+    #else
+    <input type="checkbox" class="chk_$friendlyName" onclick="$(this).parent().find('input.$friendlyName').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="N">
+    #end
+#end
+
+#macro (checkboxEx $uniqueName $name $checked )
+    #set($friendlyName = $uniqueName.replace('.','_'))
+    #if($checked)
+    <input type="checkbox" class="chk_$friendlyName" checked="checked" onclick="$(this).parent().find('input.$friendlyName').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="Y">
+    #else
+    <input type="checkbox" class="chk_$friendlyName" onclick="$(this).parent().find('input.$friendlyName').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="N">
+    #end
+#end
+
+#macro (radiobox $name $checked )
+    #set($friendlyName = $name.replace('.','_'))
+    #if($checked)
+    <input type="radio" name="radio_$name" checked="checked" onclick="$('input.$friendlyName').val('N');$(this).parent().find('input.$name').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="Y">
+    #else
+    <input type="radio" name="radio_$name" onclick="$('input.$friendlyName').val('N');$(this).parent().find('input.$name').val( $(this).is(':checked') ? 'Y' : 'N' );"/>
+    <input type="hidden" name="$name" class="$friendlyName" value="N">
+    #end
+#end
+
+#macro( processCatNode $n )
+    #foreach( $cNode in $n.children() )
+        #set( $cat = $cNode.userObject )
+        #set( $catL = $cat.getLanguage($defaultLanguage) )
+        #if( $cat )
+
+            #set( $hasChild = 0 )
+            #foreach( $cCh in $cNode.children() )
+                #set( $hasChild = 1 )
+            #end
+        <li class="expanded" id="cat_$cat.idCategory">$!catL.categoryName
+            #if( $hasChild>0 )
+                <ul>
+                    #processCatNode( $cNode )
+                </ul>
+            #end
+        </li>
+        #end
+    #end
+#end
+
+#macro( processCategoryNode $n )
+    #foreach( $cNode in $n.children() )
+        #set( $filstr = $util.getRepeatString('&nbsp;&nbsp;&nbsp;', $cNode.level) )
+        #set( $cat = $cNode.userObject )
+        #set( $catL = $cat.getLanguage($defaultLanguage) )
+        #if( $cat )
+
+            #set( $hasChild = 0 )
+            #foreach( $cCh in $cNode.children() )
+                #set( $hasChild = 1 )
+            #end
+        <tr id="cat-$!cat.idCategory" #if($!cat.idParent) class="child-of-cat-$!cat.idParent" #end>
+            <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!cat.idCategory"/></td>
+            <td style="padding-left:24px;"><input type="hidden" name="categoryId" value="$!cat.idCategory"/>$!catL.categoryName</td>
+            <td style="text-align:center;">#checkbox('categoryActive' $cat.active)</td>
+            <td style="text-align:center;">#checkbox('categoryVisible' $cat.visible)</td>
+            <td style="text-align:center;">
+                <select name="categoryNeedShipping" style="float:none;" class="field string-50">
+                    <option value=""></option>
+                    <option value="Y" #if($cat.needShipping=='Y') selected="selected" #end >Yes</option>
+                    <option value="N" #if($cat.needShipping=='N') selected="selected" #end >No</option>
+                </select>
+            </td>
+            <td style="text-align:center;"><input type="text" style="float:none;" name="categoryMarkup" value="$!util.formatNumber($cat.markupFactor,'decimal4')" class="field decimal"/></td>
+            <td style="text-align:center;"><input type="text" style="float:none;" name="categoryERMarkup" value="$!util.formatNumber($cat.erMarkupFactor,'decimal4')" class="field decimal"/></td>
+            <td class="link-bar">
+                #surl('id=urldata' "action=categorydata" "idCategory=$cat.idCategory" )
+                <a href="$!urldata"><span class="edit">#label('admin.modify')</span></a>
+            </td>
+            <td class="link-bar">
+                #surl('id=urladd' "action=categorydata" "idParent=$cat.idCategory" )
+                <a href="$!urladd"><span class="add">Add Child</span></a>
+            </td>
+        </tr>
+            #processCategoryNode( $cNode )
+        #end
+    #end
+#end
+
+#macro(categoryOption $n $level $selected)
+    #foreach( $cNode in $n.children() )
+        #set( $cat = $cNode.userObject )
+        #set( $catL = $cat.getLanguage($defaultLanguage) )
+        #if( $cat )
+            #set( $hasChild = 0 )
+            #foreach( $cCh in $cNode.children() )
+                #set( $hasChild = 1 )
+            #end
+            #if($selected==$cat.idCategory)
+            <option class="category" value="$cat.idCategory" level="$level" selected="selected">$!catL.categoryName</option>
+            #else
+            <option class="category" value="$cat.idCategory" level="$level">$!catL.categoryName</option>
+            #end
+            #if( $hasChild>0 )
+                #categoryOption( $cNode $math.add($level,1) $selected)
+            #end
+        #end
+    #end
+#end
+
+#macro(menuOption $n $level $selected)
+    #foreach( $cNode in $n.children() )
+        #set( $_m = $cNode.userObject )
+        #if( $_m )
+            #set( $hasChild = 0 )
+            #foreach( $cCh in $cNode.children() )
+                #set( $hasChild = 1 )
+            #end
+            #if($selected==$_m.id)
+            <option class="menu" value="$_m.id" level="$level" selected="selected">$!_m.getLabel($defaultLanguage)</option>
+            #else
+            <option class="menu" value="$_m.id" level="$level">$!_m.getLabel($defaultLanguage)</option>
+            #end
+            #if( $hasChild>0 )
+                #menuOption( $cNode $math.add($level,1) $selected)
+            #end
+        #end
+    #end
+#end
+
+#macro (formErrors $title)
+    #if($action.hasActionErrors() || $action.hasFieldErrors())
+    <div class="validation-error error">
+        <h2>$!title</h2>
+        <p>
+            #foreach($err in $action.actionErrors)
+                $!err<br/>
+            #end
+            #foreach($errList in $action.fieldErrors.values())
+                #foreach($err in $errList)
+                    $!err<br/>
+                #end
+            #end
+        </p>
+    </div>
+    #else
+    <div class="validation-error error hidden"></div>
+    #end
+#end
+
+#macro (actionMessages $title)
+    #if($action.hasActionMessages())
+    <div class="info">
+        #if($title)<h2>$!title</h2>#end
+        <p>
+            #foreach($m in $action.actionMessages)
+                $!m<br/>
+            #end
+        </p>
+    </div>
+    #end
+#end
+
+#macro (actionErrors $title)
+    #if($action.hasActionErrors())
+    <div class="validation-error error">
+        <h2>$!title</h2>
+        <p>
+            #foreach($err in $action.actionErrors)
+                $!err<br/>
+            #end
+        </p>
+    </div>
+    #else
+    <div class="validation-error error hidden"></div>
+    #end
+#end
+
+#macro (fieldErrors $fieldName $title)
+    #if($action.hasFieldErrors() && $action.fieldErrors.containsKey($fieldName))
+    <div class="validation-error error">
+        #if($util.isNotEmpty($title))<h2>$!title</h2>#end
+        <p>
+            #set($errf = $action.fieldErrors.get($fieldName))
+            #foreach($err in $errf)
+                $!err<br/>
+            #end
+        </p>
+    </div>
+    #else
+    <div class="validation-error error hidden"></div>
+    #end
+#end
+
+#macro(fieldError $fieldName)
+    #if($action.hasFieldErrors() && $action.fieldErrors.containsKey($fieldName))
+        #set($errf = $action.fieldErrors.get($fieldName))
+        #foreach($e in $errf)
+        <span class="field_error" style="display:inline-block;">$!e</span>
+        #end
+    #else
+    <span class="field_error"></span>
+    #end
+#end
+
+#macro(label $key)   #if($action.hasRole('superadmin'))<span class="label-change" key="$!key">$!action.getText($key, $key)</span>#else<span>$!action.getText($key, $key)</span>#end
+#end
+#macro(linklabel $key $href $cssclass)
+    #if($action.hasRole('superadmin'))
+    <a class="label-change $!cssclass" href="$!href" key="$!key">$!action.getText($key, $key)</a>
+    #else
+    <a href="$!href" class="$!cssclass">$!action.getText($key, $key)</a>
+    #end
+#end
+
+#macro(subcategories $lista $showAll)
+    #foreach($it in $lista)
+    <li id="cat_${it.id}">
+        <a href="#$!{it.urlCode}" class="filter-category">$!{it.name}</a>
+        <span>${it.numProducts}</span>
+        #if($showAll && $util.isNotEmpty($it.children))
+            <ul>
+                #subcategories($it.children true)
+            </ul>
+        #end
+    </li>
+    #end
+#end
+
+#macro(banners $zone, $cant, $cat)
+    #set( $bannerData = $util.map.add('_bannerZone',$zone).add('_bannerCant',$cant).add('_bannerCategory', $cat))
+    #control('banners')
+    #set( $bannerData = $util.null )
+#end
+
+#macro(fancyPrice $value $curr)
+    #if(!$curr) #set($curr=$action.getActualCurrency()) #end
+    #set( $vStr = $util.formatNumber($value, 'money') )
+    #set( $partInt = $util.left($vStr,'.'))
+    #set( $partDec = $util.right($vStr,'.'))
+<span class="fancy-price"><span class="part-symbol">$!curr.symbol</span><span class="part-integer">${partInt}</span><span class="part-point">.</span><span class="part-decimal">${partDec}</span><span class="part-currency">$!actualCurrency.code</span><br style="clear:both;"/></span>
+#end
+
+#macro(applyLayout $layout $contentPage)
+    #parse("/WEB-INF/views/front/layouts/${layout}.vm")
+#end
+
+#macro(storePropertyField $map $key $class $list)
+    #set( $stValue = '' )
+    #set( $stValue = $map.get($key).value )
+    #set($_id = $key.replace('.','_') )
+<input type="hidden" name="storeProperties_id" value="$!key"/>
+    #if($list && $list.size()>0)
+    <select id="$_id" name="storeProperties_value" class="$class">
+        #foreach($opt in $list)
+            <option value="$opt" #if($opt==$stValue) selected="selected" #end >$!action.getText("admin.$opt","admin.$opt")</option>
+        #end
+    </select>
+    #else
+    <input id="$_id" type="text" name="storeProperties_value" class="$!class" value="$!stValue"/>
+    #end
+#end
+
+#macro(storePropertyText $map $key $class)
+    #set( $stValue = '' )
+    #set( $stValue = $map.get($key).value )
+    #set($_id = $key.replace('.','_') )
+    <input type="hidden" name="storeProperties_id" value="$!key"/>
+    <textarea id="$_id" type="text" name="storeProperties_value" class="$!class" rows="3">$!stValue</textarea>
+#end
+
+#macro(storePropertyFieldEx $map $key $value $class $list)
+    #set( $stValue = '' )
+    #set( $stValue = $value )
+    #set($_id = $key.replace('.','_') )
+<input type="hidden" name="storeProperties_id" value="$!key"/>
+    #if($list && $list.size()>0)
+    <select id="$_id" name="storeProperties_value" class="$class">
+        #foreach($opt in $list)
+            <option value="$opt" #if($opt==$stValue) selected="selected" #end >$!action.getText("admin.$opt","admin.$opt")</option>
+        #end
+    </select>
+    #else
+    <input id="$_id" type="text" name="storeProperties_value" class="$!class" value="$!stValue"/>
+    #end
+#end
+
+#macro(storePropertyTextLang $map $key $class $name)
+<textarea name="vis_$!name" class="multilang $!class" rows="3"></textarea>
+    #foreach($l in $languages )
+    <input type="hidden" class="$l" name="$!name" value="$!map.get($key).getValue($l)"/>
+    #end
+#end
+
+#macro(storePropertyFieldLang $map $key $class $name)
+<input name="vis_$!name" class="multilang $!class" value=""/>
+    #foreach($l in $languages )
+    <input type="hidden" class="$l" name="$!name" value="$!map.get($key).getValue($l)"/>
+    #end
+#end
+
+#macro(productTableHeader $fInfo)
+    #set($align = 'left')
+    #if($fInfo.name.endsWith('rice')) #set($align = 'right') #end
+    #if($fInfo.name.startsWith('label.') || $fInfo.name=='stock' || $fInfo.name=='active' || $fInfo.name=='archived' || $fInfo.name=='hits' || $fInfo.name=='public') #set($align = 'center') #end
+    #if($fInfo.show)
+    <th #if($fInfo.canSort) class="sort" sortby="$!fInfo.sortName" #end style="text-align:$align;">
+        #if($fInfo.name=='partNumber')#label('admin.part.number')#end
+        #if($fInfo.name=='mfgPartnumber')#label('admin.mfg.part.number')#end
+        #if($fInfo.name=='productName')#label('admin.product.name')#end
+        #if($fInfo.name=='manufacter')#label('adminmanufacturer')#end
+        #if($fInfo.name=='category')#label('admin.category')#end
+        #if($fInfo.name=='basicPrice')#label('admin.basic.price')#end
+        #if($fInfo.name=='price')#label('admin.fixed.price')#end
+        #if($fInfo.name=='costPrice')#label('admin.cost.price')#end
+        #if($fInfo.name=='stock')#label('admin.stock')#end
+        #if($fInfo.name=='active')#label('admin.active')#end
+        #if($fInfo.name=='archived')#label('admin.archived')#end
+        #if($fInfo.name=='hits')#label('admin.hits')#end
+        #if($fInfo.name=='public')#label('admin.public')#end
+        #if($fInfo.name.startsWith('label.'))#label($fInfo.name)#end
+    </th>
+    #end
+#end
+#macro(productTableData $fInfo $product)
+    #set($align = 'left')
+    #if($fInfo.name.endsWith('rice')) #set($align = 'right') #end
+    #if($fInfo.name.startsWith('label.') || $fInfo.name=='stock' || $fInfo.name=='active' || $fInfo.name=='archived' || $fInfo.name=='hits') #set($align = 'center') #end
+    #if($fInfo.show)
+        #if($fInfo.edit)
+        <td style="padding:0;text-align:$align" class="#if($fInfo.name=='stock' && $p.stock<1) no-stock #end">
+            #if($fInfo.name=='partNumber')<input type="text" style="float:none;" name="productPartNumber" value="$!product.partNumber" class="field required string-short"/>#end
+            #if($fInfo.name=='mfgPartnumber')<input type="text" style="float:none;" name="productMfgPartNumber" value="$!product.mfgPartnumber" class="field string-short"/>#end
+            #if($fInfo.name=='productName')<input type="text" style="float:none;" name="productName" value="$!product.getProductName($defaultLanguage)" class="field required string-medium"/>#end
+            #if($fInfo.name=='manufacter')
+                <select name="productManufacturer" style="float:none;" class="field string-short">
+                    <option value=""></option>
+                    #foreach($opt in $action.getManufacturerList())
+                        <option value="$opt.idManufacturer" #if($opt==$product.manufacturer) selected="selected" #end >$!opt.manufacturerName</option>
+                    #end
+                </select>
+            #end
+            #if($fInfo.name=='category')
+                <select name="productCategory" style="float:none;" class="field string-short tree-category">
+                    #categoryOption($catTree 0 $!product.category.idCategory)
+                </select>
+            #end
+            #if($fInfo.name=='basicPrice')$!util.formatNumber($product.basePrice,'money')#end
+            #if($fInfo.name=='price')<input type="text" style="float:none;" name="productPrice" value="$!util.formatNumber($product.price,'money')" class="field decimal"/>#end
+            #if($fInfo.name=='costPrice')<input type="text" style="float:none;" name="productCostPrice" value="$!util.formatNumber($product.costPrice,'money')" class="field decimal"/>#end
+            #if($fInfo.name=='stock')<input type="text" name="productStock" value="$!product.stock" class="field integer" style="float:none;"/>#end
+            #if($fInfo.name=='hits')$!product.hits#end
+            #if($fInfo.name=='active')#checkbox('productActive' $product.active)#end
+            #if($fInfo.name=='archived')#checkbox('productArchived' $product.archived)#end
+            #if($fInfo.name=='public') <div class="#if($!product.public) chk_true #else chk_false #end ">&nbsp;</div>#end
+            #if($fInfo.name.startsWith('label.'))
+                #checkbox("productLabel$!fInfo.name.substring(6)" $!product.hasLabel($fInfo.name.substring(6)))
+            #end
+        </td>
+        #else
+        <td style="text-align:$!align;" class="#if($fInfo.name=='stock' && $p.stock<1) no-stock #end">
+            #if($fInfo.name=='partNumber')$!product.partNumber#end
+            #if($fInfo.name=='mfgPartnumber')$!product.mfgPartnumber#end
+            #if($fInfo.name=='productName')$!product.getProductName($defaultLanguage)#end
+            #if($fInfo.name=='manufacter') $!product.manufacturer.manufacturerName#end
+            #if($fInfo.name=='category')$!product.category.getCategoryName($defaultLanguage)#end
+            #if($fInfo.name=='basicPrice')$!util.formatNumber($product.basePrice,'money')#end
+            #if($fInfo.name=='price')$!util.formatNumber($product.price,'money')#end
+            #if($fInfo.name=='costPrice')$!util.formatNumber($product.costPrice,'money')#end
+            #if($fInfo.name=='stock')$!product.stock#end
+            #if($fInfo.name=='hits')$!product.hits#end
+            #if($fInfo.name=='active') <div class="#if($!product.active) chk_true #else chk_false #end ">&nbsp;</div>#end
+            #if($fInfo.name=='archived') <div class="#if($!product.archived) chk_true #else chk_false #end ">&nbsp;</div>#end
+            #if($fInfo.name=='public') <div class="#if($!product.public) chk_true #else chk_false #end ">&nbsp;</div>#end
+            #if($fInfo.name.startsWith('label.'))<div class="#if($product.hasLabel($fInfo.name.substring(6))) chk_true #else chk_false #end ">&nbsp;</div>#end
+        </td>
+        #end
+    #end
+#end
+
+#macro(block $blockId)
+    #set($block = '' )
+    #set($block = $action.getStaticText($blockId, 'block'))
+    #control('custom_block')
+    #set($block = $util.null)
+#end
+
+
+#macro(staticText $st)
+    #if($action.hasRole('superadmin'))
+        #set($_id = $st.code.replace('.','_') )
+    <div class="editable-block">
+        <div class="editable-block-link">
+            <a href="#" onclick="return editStaticText($!st.id);">Click to edit</a>
+        </div>
+        <div id="block_$_id">$!st.getLanguage($locale.language,$defaultLanguage).value</div>
+    </div>
+    #else
+        $!st.getLanguage($locale.language,$defaultLanguage).value
+    #end
+#end
+
+#macro(category_link $category)#if($category)$!action.urlCategory($category)#end#end
+
+#macro(news $cant)
+    #set($news =  $action.getNews($cant, 1))
+    #control('news')
+    #set($news = $util.null)
+#end
+
+#macro(menucatalog $it $opened $actual $children)
+<li class="#if($actual.idCategory==$it.idCategory) selected #end ">
+    <a href="#category_link($it)" data="$!{it.urlCode}" class="filter-category #if($actual.idCategory==$it.idCategory) selected #end">$!{it.name}</a>
+    #if($actual && $actual.idCategory==$it.idCategory && $children && $util.isNotEmpty($children))
+        <ul>
+            #foreach($it in $action.sortCategories($children))
+                #if(${it.numProducts}>0)
+                    <li><a href="#category_link($it)" data="$!{it.urlCode}" class="filter-category child">$!{it.name}</a> (${it.numProducts})</li>
+                #end
+            #end
+        </ul>
+    #else
+        #if($util.isNotEmpty($it.children))
+            #if( $action.containsCategory($opened,$it))
+                <ul>
+                    #foreach($subIt in $action.sortCategories($it.children))#menucatalog($subIt, $opened, $actual, $children)#end
+                </ul>
+            #end
+        #end
+    #end
+</li>
+#end
+
+#macro(reviewImage $product)
+    #if($product.ratingBy && $product.ratingBy>0)
+    <div class="product-review-background" title="$!action.getText('product.customer.rating') $!util.formatNumber($math.div($product.ratingBy,2),'0.0')">
+        <div class="product-review-foreground" style="width:$!{util.formatNumber($math.mul($product.ratingBy,10),'0')}%"></div>
+    </div>
+    #end
+#end
+
+#macro(addToCart $p $q $na)
+    #if($na && $na=='Y')
+    <div class="add-to-cart"><a href="#" onclick="$('#formAddToCart_$!{p.idProduct}').submit(); return false;"><img src="$!action.skinFile('images/[lang]/addtocart.png')" alt="Add to cart"></a></div>
+    #else
+    <div class="add-to-cart"><a href="#" #if($action.getStoreProperty('enable.ajax.shopcart','N')=='Y') class="ajax-cart" data="$!p.idProduct" #else onclick="$('#formAddToCart_$!{p.idProduct}').submit(); return false;" #end><img src="$!action.skinFile('images/[lang]/addtocart.png')" alt="Add to cart"></a></div>
+    #end
+<form id="formAddToCart_$!p.idProduct" action="$!action.url('addtocart','')" method="post" class="form-addtocart" style="display: inline-block;">
+    #if($q)
+        <input type="hidden" name="quantity" value="$q"/>
+    #else
+        <input type="hidden" name="quantity" value="1"/>
+    #end
+    <input type="hidden" name="idProduct" value="$!p.idProduct"/>
+</form>
+#end
+
+#macro(control $name $filters)#set($_parameters = $filters)#parse("/WEB-INF/views/${template}/cntrl/${name}.vm")#set($_parameters = $util.null)#end
+

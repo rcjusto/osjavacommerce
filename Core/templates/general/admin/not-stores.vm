@@ -1,0 +1,16 @@
+<html>
+<body>
+#if($stores && !$stores.isEmpty())
+
+<h1>Available Stores</h1>
+<ul>
+    #foreach($s in $stores)
+        <li><a href="${util.siteUrl}/${s}/admin/home.jsp">$!s</a></li>
+    #end
+</ul>
+#else
+<h1>Sorry, there are not stores configured in the system</h1>
+<h3>Please, contact System Administrators</h3>
+#end
+</body>
+</html>

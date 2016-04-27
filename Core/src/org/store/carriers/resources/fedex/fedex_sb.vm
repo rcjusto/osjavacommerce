@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FDXSubscriptionRequest xmlns:api="http://www.fedex.com/fsmapi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FDXSubscriptionRequest.xsd">
+    <RequestHeader>
+        <AccountNumber>$!bean.user.accountNumber</AccountNumber>
+    </RequestHeader>
+    <Contact>
+        <PersonName>$!bean.shipper.attentionName</PersonName>
+        <CompanyName>$!bean.shipper.name</CompanyName>
+        <PhoneNumber>$!bean.shipper.phoneNumber</PhoneNumber>
+    </Contact>
+    <Address>
+        <Line1>$!bean.shipper.address.addressLine1</Line1>
+        #if( $bean.shipper.address.addressLine2 && $bean.shipper.address.addressLine2!='' )<Line2>$!bean.shipper.address.addressLine2</Line2>#end
+        <City>$!bean.shipper.address.city</City>
+        <StateOrProvinceCode>$!bean.shipper.address.stateProvinceCode</StateOrProvinceCode>
+        <PostalCode>$!bean.shipper.address.postalCode</PostalCode>
+        <CountryCode>$!bean.shipper.address.countryCode</CountryCode>
+    </Address>
+</FDXSubscriptionRequest>

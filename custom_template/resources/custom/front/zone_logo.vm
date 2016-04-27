@@ -1,0 +1,3 @@
+<div class="logo template-block">
+    <a href="$!action.url('home')" ></a>
+</div>

@@ -1,0 +1,12 @@
+<div id="blockContent" class="clearfix">
+
+    <div>
+        <h2>We sorry. Your order has been rejected by the payment gateway.</h2>
+    </div>
+
+    <div>
+        #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+    </div>
+
+
+</div>

@@ -1,0 +1,62 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.complement.list')</h1>
+<div class="listado">
+    #surl('id=urlListado' "action=complementlist")
+    <form id="formList" action="$urlListado" method="post">
+        #if($complementGroups && $util.isNotEmpty($complementGroups))
+            <div>
+                <select name="idGroup" class="field string-medium" onchange="$('#formList').submit();">
+                    <option value="">#label('admin.select.group')</option>
+                    #foreach($g in $complementGroups)
+                        <option value="$!g.idGroup" #if($g==$group) selected="selected" #end >$!g.getGroupName($defaultLanguage)</option>
+                    #end
+                </select>
+                <div style="clear:both;"></div>
+            </div>
+            #if($group)
+                #if($util.isNotEmpty($products))
+                    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                            <th>#label('admin.code')</th>
+                            <th>#label('admin.name')</th>
+                            <th style="text-align:center;">#label('admin.active')</th>
+                            <th style="text-align:right;">#label('admin.stock')</th>
+                            <th style="text-align:right;">#label('admin.price')</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        #foreach($p in $products)
+                            #surl('id=urlEdit' "action=complementedit" "idProduct=$!p.idProduct")
+                            <tr>
+                                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!p.idProduct"/></td>
+                                <td>$!p.partNumber</td>
+                                <td>$!p.getProductName($defaultLanguage)</td>
+                                <td class="#if($p.active) chk_true #else chk_false #end ">&nbsp;</td>
+                                <td class="price">$!p.stock</td>
+                                <td class="price">$!util.formatNumber($p.price,'money')</td>
+                                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                            </tr>
+                        #end
+                    </table>
+                #else
+                    <div class="info">
+                        <h2>#label('admin.complements.for.group')</h2>
+                        <p>#label('admin.complements.for.group.not.found')</p>
+                    </div>
+                #end
+                <div class="button-bar">
+                    <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+                    #surl('id=urlNewComplement' "action=complementedit" "idGroup=$group.idGroup")
+                    <button type="button" href="$!urlNewComplement"><span class="add">#label('admin.complement.new')</span></button>
+                </div>
+            #end
+        #else
+            <div class="info">
+                <h2>#label('admin.complement.groups.not.found')</h2>
+                <p>#label('admin.complement.groups.not.found.text')</p>
+            </div>
+        #end
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

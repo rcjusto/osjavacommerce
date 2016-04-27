@@ -1,0 +1,31 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<h2>$!action.getText('subject.new.product.review','New review for {0}',[$!product.name])</h2>
+<table class="with-border" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <th>$!{action.getText('admin.link')}</th>
+        <td><a href="$!{review.adminUrl}">$!{review.adminUrl}</td>
+    </tr>
+    <tr>
+        <th>$!{action.getText('admin.date')}</th>
+        <td>$!{review.created}</td>
+    </tr>
+    <tr>
+        <th>$!{action.getText('admin.email')}</th>
+        <td>$!{review.username} (<a href="mailto:$!{review.email}">$!{review.email}</a>)</td>
+    </tr>
+    <tr>
+        <th>$!{action.getText('admin.score')}</th>
+        <td>$!{review.score}</td>
+    </tr>
+    <tr>
+        <th>$!{action.getText('review.title')}</th>
+        <td>$!{review.title}</td>
+    </tr>
+    <tr>
+        <th>$!{action.getText('review.content')}</th>
+        <td>$!{review.opinion}</td>
+    </tr>
+</table>

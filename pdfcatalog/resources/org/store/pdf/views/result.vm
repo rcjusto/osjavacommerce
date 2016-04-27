@@ -1,0 +1,15 @@
+#if($files && !$files.isEmpty())
+    #foreach($f in $files)
+        <p><a class="ext_pdf" href="/stores/$!{storeCode}/pdf/$!{f}" target="_blank">$!f</a></p>
+    #end
+#end
+#if($action.hasActionErrors())
+    <div class="error">
+        <h2>#label('admin.errors')</h2>
+        <p>
+            #foreach($err in $action.actionErrors)
+                $!err<br/>
+            #end
+        </p>
+    </div>
+#end

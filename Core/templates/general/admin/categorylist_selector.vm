@@ -1,0 +1,16 @@
+<div class="dialog-header">
+<h2>#label('admin.select.category')</h2>
+<h4>#label('admin.select.category.instructions')</h4>
+</div>
+<div id="treecat1" class="dialog-data" style="height:300px;">
+<ul>  
+    #processCatNode( $categoryTree )
+</ul>
+</div>
+<div class="button-bar">
+    <input class="buttonOk" type="button" value="OK" onclick=""/>
+    <input type="button" value="Cancel" onclick="$('#dialogo').dialog('close');"/>
+</div>
+<script type="text/javascript">
+$(function(){$('#treecat1').dynatree();});
+</script>

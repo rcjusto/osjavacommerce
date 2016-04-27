@@ -1,0 +1,51 @@
+<div style="margin:10px;">
+    #if($util.isNotEmpty($mails.listado))
+        <form id="form_list_campaigns">
+            <input type="hidden" name="modal" value="true"/>
+            <div style="width: 300px;float: left;" class="listado">
+                #set($nav=$campaigns)
+                #parse('/WEB-INF/views/admin/navigator.vm')
+                <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <th>#label('admin.id')</th>
+                        <th>#label('admin.date')</th>
+                        <th>#label('admin.template')</th>
+                    </tr>
+                    #foreach($c in $mails.listado)
+                        <tr class="mail-row" data="$!c.id">
+                            <td><a href="#" class="select-mail" rel="$!c.id">$!c.id</a></td>
+                            <td><a href="#" class="select-mail" rel="$!c.id">$!util.formatDate($c.created)</a></td>
+                            <td><a href="#" class="select-mail" rel="$!c.id">$!c.templateName</a></td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+            <div style="width: 200px; height: 300px;overflow: hidden; float: left;margin-left: 20px;">
+                <div id="txtPreview" style="display: none;padding-left: 12px;"><strong>#label('mail.preview.id'): <span id="mailIdPreview"></span></strong></div>
+                <img src="" alt="" id="imgPreview" >
+            </div>
+        </form>
+    #else
+        <div class="info">
+            <p>#label('admin.designed.mails.not.found')</p>
+        </div>
+    #end
+</div>
+<script type="text/javascript">
+    var rnd = Math.random();
+    $(function() {
+        $('.mail-row').mouseenter(function() {
+            $('#mailIdPreview').html($(this).attr('data'));
+            $('#txtPreview').show();
+            $('#imgPreview').attr('src', "$!{action.storeFile('images/mails')}/" + $(this).attr('data') + '_th.jpg?rnd=' + rnd).show();
+        });
+        $('#form_list_campaigns').submit(function() {
+            if ($('#form_list_campaigns').validForm()) {
+                var data = $('#form_list_campaigns').serialize();
+                $('#listadoMails').loading('Loading Mails', 'Please wait...');
+                $('#listadoMails').load("$action('designedmaillist','admin')", data);
+            }
+            return false;
+        });
+    });
+</script>

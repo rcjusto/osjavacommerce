@@ -1,0 +1,78 @@
+#surl('id=urlAddLabel' "action=categoryaddlabels")
+#surl('id=urlDelLabel' "action=categorydellabels")
+<form id="formlabels">
+    #shidden('name=idCategory' "value=$!category.idCategory")
+    <div class="listado clearfix">
+        #formErrors()
+        <div style="float:left;width:400px;">
+            #set($parentLabels = $action.getCategoryLabelsParent())
+            #if($util.isNotEmpty($parentLabels))
+                <h2 class="block-title">#label('admin.labels.inherited')</h2>
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    <tr>
+                        <th>#label('admin.label')</th>
+                        <th style="width:1%">&nbsp;</th>
+                    </tr>
+                    #foreach($l in $parentLabels)
+                        <tr>
+                            <td style="min-width:120px;">$!l.getName($defaultLanguage)</td>
+                            <td><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+                        </tr>
+                    #end
+                </table>
+            #end
+
+            <h2 class="block-title">#label('admin.labels.assigned')</h2>
+            #if($util.isNotEmpty($category.labels))
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    <tr>
+                        <th>#label('admin.label')</th>
+                        <th style="width:1%">&nbsp;</th>
+                    </tr>
+                    #foreach($l in $category.labels)
+                        <tr>
+                            <td style="min-width:120px;">$!l.getName($defaultLanguage)</td>
+                            <td>
+                                <a class="delete-row" href="#" onclick="return delLabel('$!l.code');"></a>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.labels.assigned')</h2>
+                    <p>#label('admin.category.labels.assigned.not.found')</p>
+                </div>
+            #end
+            <div class="formulario">
+                <h3>#label('admin.add.label.to.category')</h3>
+                <table class="formulario" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.select.label')</th>
+                        <td>
+                            <select name="labels" class="field string-medium">
+                                #foreach($lab in $labelList)
+                                    <option value="$!lab.code">$!lab.getName($defaultLanguage)</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <div class="button-bar">
+                    <button type="button" onclick="addLabel();"><span class="add">#label('admin.add.label')</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    function delLabel(l) {
+        $('#divLabels').loading("$!action.getText('admin.deleting.label')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlDelLabel", {idCategory:$!{category.idCategory}, labels:l});
+    }
+    function addLabel() {
+        var data = $('#formlabels').serialize();
+        $('#divLabels').loading("$!action.getText('admin.adding.label')", "$!action.getText('admin.please.wait')");
+        $('#divLabels').load("$urlAddLabel", data);
+    }
+</script>

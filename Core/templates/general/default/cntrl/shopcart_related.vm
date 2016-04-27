@@ -1,0 +1,18 @@
+#if($util.isNotEmpty($associatedProducts))
+<div id="productRelated" class="clearfix">
+    <h2>#label('product.related')</h2>
+    <ul class="clearfix">#set($_index = 0)
+        #foreach($p in $associatedProducts)
+            #if($p.getMaxToBuy($frontUser)>0)
+                #if($_index < $_parameters)
+                <li class="hoverable">
+                    #parse("/WEB-INF/views/${template}/front/shopcart_relatedproduct.vm")
+                </li>
+                    #set($_index = $math.add($_index,1))
+                #end
+            #end
+        #end
+    </ul>
+</div>
+#set($_listado = $util.null)
+#end

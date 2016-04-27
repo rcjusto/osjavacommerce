@@ -1,0 +1,169 @@
+#set($languageList = ['en','es','fr'])
+#set($currencyList = ['USD','EUR','CAD'])
+#set($dimensionUnitList = ['Inch','cm','m'])
+#set($weightUnitList = ['Pound','Kg'])
+
+#surl('id=urlSaveCommerce' 'action=saveCommerce' 'namespace=/config')
+#surl('id=urlListCommerce' 'action=listCommerce' 'namespace=/config')
+#surl('id=urlRunScript' 'action=executeScript' 'namespace=/config')
+
+<form id="formCommerceSave">
+    <div class="errors" style="display:none;">Errors in data. Please review required fields.</div>
+    <table class="formulario" width="100%">
+        <tr>
+            <th>Store Code</th>
+            <td><input type="text" class="field required" name="store" value="$!store" style="width:150px" maxlength="10"></td>
+            <th>Store Name</th>
+            <td><input type="text" class="field required" name="siteName" value="$!properties.get('site.name')" style="width:300px"></td>
+        </tr>
+        <tr>
+            <th>Template</th>
+            <td>
+                <select name="template" class="field" style="width:200px">
+                    #foreach($l in $templates)
+                        <option value="$l.code" #if($!properties.get('site.template')==$l.code) selected="selected" #end  >$l.name</option>
+                    #end
+                </select>
+            </td>
+            <th>Database</th>
+            <td>
+                <select name="database" class="field" style="width:200px;">
+                    #foreach($db in $databases)
+                        <option value="$db" #if($db==$commerce.database) selected="selected" #end>$db</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Default Country</th>
+            <td>
+                <select name="defaultCountry" class="field" style="width:200px">
+                    #foreach($c in $countries)
+                        <option value="$c.code" #if($!properties.get('country.default')==$c.code) selected="selected" #end  >$!c.name</option>
+                    #end
+                </select>
+            </td>
+            <td colspan="2">
+                <label>
+                    #scheckbox('name=generateStates') Generate states for this country automatically
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th>Languages</th>
+            <td>
+                #foreach($l in $languageList)
+                    <label>
+                        <input type="checkbox" name="languages" value="$l" #if($list.contains($languages,$l)) checked="checked" #end >
+                        <span>$l</span>
+                    </label>
+                #end
+            </td>
+            <th>Default Language</th>
+            <td>
+                <select name="defaultLanguage" class="field" style="width:100px">
+                    #foreach($l in $languageList)
+                        <option value="$l" #if($!properties.get('language.default')==$l) selected="selected" #end  >$l</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Currencies</th>
+            <td>
+                #foreach($l in $currencyList)
+                    <label>
+                        <input type="checkbox" name="currencies" value="$l" #if($list.contains($currencies,$l)) checked="checked" #end >
+                        <span>$l</span>
+                    </label>
+                #end
+            </td>
+            <th>Default Currency</th>
+            <td>
+                <select name="defaultCurrency" class="field" style="width:100px">
+                    #foreach($l in $currencyList)
+                        <option value="$l" #if($!properties.get('default.currency')==$l) selected="selected" #end  >$l</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Dimension Unit</th>
+            <td>
+                <select name="dimensionUnit" class="field" style="width:100px">
+                    #foreach($l in $dimensionUnitList)
+                        <option value="$l" #if($!properties.get('dimension.unit')==$l) selected="selected" #end  >$l</option>
+                    #end
+                </select>
+            </td>
+            <th>Weight Unit</th>
+            <td>
+                <select name="weightUnit" class="field" style="width:100px">
+                    #foreach($l in $weightUnitList)
+                        <option value="$l" #if($!properties.get('weight.unit')==$l) selected="selected" #end  >$l</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+    </table>
+</form>
+<div style="margin:10px;">
+    <button type="button" id="btnCommerceSave"><span class="ok">Save</span></button>
+    <button type="button" id="btnCommerceCancel"><span class="cancel">Cancel</span></button>
+</div>
+#if($store && $util.isNotEmpty($store))
+    #surl('id=urlScript' 'action=storeScript' 'namespace=/config')
+<h2 style="margin-top:30px;">Execute Script</h2>
+<form id="formRunScript" >
+    <input type="hidden" name="store" value="$!store">
+    <ul style="list-style:none;margin:0;padding:0">
+        <li style="margin:6px;">
+            <label>
+                <input type="radio" name="scriptName" value="db/labels.properties"> Generate Labels
+            </label>
+        </li>
+        <li style="margin:6px;">
+            <label>
+                <input type="radio" name="scriptName" value="db/menu.sql"> Generate Bottom Menu
+            </label>
+        </li>
+    </ul>
+</form>
+<div style="margin:10px;">
+    <button type="button" id="btnRunScript"><span class="run">Run Selected Script</span></button>
+    <button type="button" id="btnBackList"><span class="cancel">Back to list</span></button>
+</div>
+#end
+<script type="text/javascript">
+    $(function() {
+        $('#btnCommerceSave').click(function() {
+            var valid = true;
+            $('#formCommerceSave').find('.errors').hide();
+            $('#formCommerceSave').find('input.required').each(function() {
+                $(this).removeClass('error');
+                if ($(this).val() == '') {
+                    $(this).addClass('error');
+                    $('#formCommerceSave').find('.errors').show();
+                    valid = false;
+                }
+            });
+            if (valid) {
+                var data = $('#formCommerceSave').serialize();
+                $('#commerces').loading('Saving. Please wait ...');
+                $('#commerces').load("$!urlSaveCommerce", data);
+            }
+            return false;
+        });
+        $('#btnCommerceCancel,#btnBackList').click(function() {
+            $('#commerces').loading('Loading. Please wait...');
+            $('#commerces').load("$urlListCommerce");
+        });
+        $('#btnRunScript').click(function(){
+            if ($('#formRunScript').find('input:radio:checked').size()>0) {
+                var data = $('#formRunScript').serialize();
+                $('#commerces').loading('Executing script. Please wait ...');
+                $('#commerces').load("$!urlRunScript", data);
+            }
+        });
+    });
+</script>

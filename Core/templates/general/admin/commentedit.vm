@@ -1,0 +1,60 @@
+#set($menuSelected='customer')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($comment.idComment)
+        #label('admin.comment.modify') ID: $!comment.idComment
+    #else
+        #label('admin.comment.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savecomment")
+<form action="$urlForm" method="post" enctype="multipart/form-data" class="validable">
+#shidden('name=comment.idComment')
+<div class="formulario">
+#formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.type')</th>
+            <td>
+                #sselect('name=comment.commentType' 'list=commentTypeList' 'cssClass=myselect field string-medium' )
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.status')</th>
+            <td>
+                #sselect('name=comment.commentStatus' 'list=commentStatusList' 'cssClass=myselect field string-medium' )
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td>
+                #stextfield('name=comment.userName' 'cssClass=field required string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.email')</th>
+            <td>
+                #stextfield('name=comment.userEmail' 'cssClass=field required string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.title')</th>
+            <td>
+                #stextfield('name=comment.title' 'cssClass=field string-large')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.comment')</th>
+            <td>
+                #stextarea('name=comment.comment' 'cssClass=field string-large' 'rows=10')
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listcomment" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,17 @@
+#* @vtlvariable name="order" type="org.store.core.beans.mail.MOrder" *#
+
+<table width="100%" cellpadding="0" cellspacing="0" xmlns:velocity="http://www.w3.org/1999/html">
+    <tr>
+        <td>
+            $!{action.mailGlobalTop}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><br/><br/></p>
+            <p>Packing Slip is attached. Please send a blind shipment.</p>
+            <p>&nbsp;</p>
+            <p>Regards,<br>$!action.getStoreProperty('site.name','[Name of Store]')</p>
+        </td>
+    </tr>
+</table>

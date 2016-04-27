@@ -1,0 +1,103 @@
+#set($menuSelected='sales')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<form action="$action.url('saveshopcart')" method="post">
+    <h1>#label('admin.shopcart.details') ID: $!shopcart.id</h1>
+    <div class="formulario" style="margin-top:12px;">
+        <table class="formulario" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.created')</th>
+                <td><input type="text" readonly="readonly" class="field readonly string-medium" value="$!util.formatDate($shopcart.createdDate)"/></td>
+            </tr>
+            #if($util.isNotEmpty($shopcart.status))
+                <tr>
+                    <th>#label('admin.status')</th>
+                    <td><input type="text" readonly="readonly" class="field readonly string-medium" value="$!action.getText('shopcart.status.$!{shopcart.status}')"/></td>
+                </tr>
+            #end
+            <tr>
+                <th>#label('admin.valid.to')</th>
+                <td><input type="text" name="validUntil" value="$!util.formatDate($shopcart.validUntil, $defaultLanguage)" class="field date"></td>
+            </tr>
+            <tr>
+                <th>#label('admin.message.to.client')</th>
+                <td>
+                    <textarea rows="6" cols="40" name="message" class="field string-large">$!shopCart.quoteMessage</textarea>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <input type="hidden" name="idCart" value="$!shopcart.id"/>
+
+    <div class="listado" style="margin-top:12px;">
+        <table class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.code')</th>
+                <th>#label('admin.name')</th>
+                <th class="quantity">#label('admin.quantity')</th>
+                <th class="price">#label('admin.price')</th>
+                <th class="price">#label('admin.subtotal')</th>
+                <th class="price">#label('admin.new.price')</th>
+                <th class="price">#label('admin.new.subtotal')</th>
+            </tr>
+            #foreach($it in $shopcart.items)
+                <tr>
+                    <td>$!it.fullCode</td>
+                    <td>$!it.fullName</td>
+                    <td class="quantity">$!it.quantity</td>
+                    <td class="price">$!util.formatNumber($it.priceOriginal,'money')</td>
+                    <td class="price">$!util.formatNumber($it.subtotalOriginal,'money')</td>
+                    <td class="price">
+                        <input type="hidden" id="ori_line_${velocityCount}" value="$!util.formatNumber($it.priceOriginal,'money')"/>
+                        <input type="hidden" id="q_line_${velocityCount}" value="$!it.quantity"/>
+                        <input type="hidden" name="itemId" value="$!it.id"/>
+                        <input type="text" id="line_${velocityCount}" name="newPrice" value="$!util.formatNumber($it.price,'money')" class="field decimal new-price"/>
+                    </td>
+                    <td class="price line-price" id="price_line_${velocityCount}">$!util.formatNumber($it.subtotal,'money')</td>
+                </tr>
+            #end
+            <tr class="total">
+                <td colspan="4">#label('admin.total')</td>
+                <td class="price">$!util.formatNumber($shopcart.totalOriginal,'money')</td>
+                <td>
+                    <button type="button" id="btnReset"><span>#label('admin.reset')</span></button>
+                </td>
+                <td class="price" id="newTotal">$!util.formatNumber($shopcart.total,'money')</td>
+            </tr>
+        </table>
+    </div>
+    <div class="button-bar" style="margin-top:10px;">
+        <button type="submit"><span class="ok">#label('admin.sendto.customer')</span></button>
+        <button type="button" href="$action.url('listshopcart')"><span class="back">#label('admin.back')</span></button>
+    </div>
+</form>
+<script type="text/javascript">
+    function formatCurrency(cad) {
+        cadStr = cad + '';
+        arrTemp = cadStr.split(".");
+        intPart = (arrTemp.length > 0) ? arrTemp[0] : cadStr;
+        decPart = (arrTemp.length > 1) ? arrTemp[1] : '';
+        decPart = decPart + '00';
+        return intPart + '.' + decPart.substring(0, 2);
+    }
+    $(function() {
+        $('.new-price').change(
+                              function() {
+                                  var q = $('#q_' + $(this).attr('id')).val();
+                                  var p = parseFloat($(this).val());
+                                  if (!isNaN(p)) $('#price_' + $(this).attr('id')).html(formatCurrency(p * q));
+
+                                  var subt = 0;
+                                  $('.line-price').each(function() {
+                                      var s = parseFloat($(this).html());
+                                      if (!isNaN(s)) subt += s;
+                                  });
+                                  $('#newTotal').html(formatCurrency(subt));
+                              }).trigger('change');
+        $('#btnReset').click(function() {
+            $('.new-price').each(function() {
+                $(this).val($('#ori_' + $(this).attr('id')).val()).trigger('change');
+            });
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

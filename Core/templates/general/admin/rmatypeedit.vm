@@ -1,0 +1,39 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($rmaType.id)
+        #label('admin.rma.type.modify') ID: $!rmaType.id
+    #else
+        #label('admin.rma.type.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savermatype")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=idRmaType' "value=$!rmaType.id")
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.name')</th>
+        <td>
+            <input name="vis_rmaTypeName" class="multilang field string-large" value=""/>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="rmaTypeName" value="$!rmaType.getName($l)"/>
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.days.limit')</th>
+        <td>#stextfield('name=rmaType.maxDays' 'cssClass=field integer')</td>
+    </tr>
+</table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listrmatype" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

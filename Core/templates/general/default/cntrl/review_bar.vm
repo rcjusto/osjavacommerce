@@ -1,0 +1,6 @@
+#set($_value = 0)
+#if($_parameters) #set($_value = $_parameters) #end
+<div class="review-bar-wraper">
+<div class="review-bar" style="width:$!math.mul($!_value,10)%;background-position:0 $!math.mul($!_value,10)%;"></div>
+</div>
+#set($_value = $util.null)

@@ -1,0 +1,7 @@
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+
+<div>
+    <div class="quick-product-images"></div>
+    <div class="quick-product-data"></div>
+</div>

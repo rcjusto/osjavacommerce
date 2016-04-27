@@ -1,0 +1,7 @@
+#set($imgLogo = $!util.findImage($!action.storeFile("images/custom/top_logo")))
+#set($storeName = $action.getStoreProperty("site.name","Logo"))
+#if($util.isNotEmpty($imgLogo))
+<div id="blockTopLogo"><a href="$!action.url('home')" class="logo"><img id="logo" alt="$!storeName" src="$!imgLogo"/></a></div>
+#else
+<div id="blockTopLogo"><a href="$!action.url('home')" class="logo">$!storeName</a></div>
+#end

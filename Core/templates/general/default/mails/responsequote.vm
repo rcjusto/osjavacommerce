@@ -1,0 +1,4 @@
+<div id="mailContent">
+    <h1>#label('mail.shopcart.response.quote.title')</h1>
+    <p>#label('mail.shopcart.response.quote.text')</p>
+</div>

@@ -1,0 +1,231 @@
+<script type="text/javascript">
+    $(function() {
+        $('#shippingSameBilling').change(function() {
+            if ($(this).is(':checked')) $('#shippingData').hide();
+            else $('#shippingData').show();
+        }).trigger('change');
+        $('#formRegister').submit(function() {
+            return $(this).validForm();
+        });
+        countryStateEx('billingAdd_idCountry', 'billingStateBlock', "$!billingAdd.state.idState", "$!billingAdd.stateName");
+        countryStateEX('shippingAdd_idCountry', 'shippingStateBlock', "$!shippingAdd.state.idState", "$!shippingAdd.stateName");
+    });
+</script>
+<div id="blockContent" class="register-page anonymous clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter" >
+        #surl("action=paystepanonymous" 'id=urlFormRegister')
+        <form action="$urlFormRegister" id="formRegister" method="post">
+            <div id="registerData" class="block">
+                <h1>#label('anonymous.checkout.page.title')</h1>
+                <div id="userData" class="form">
+                    <h2>#label('anonymous.checkout.subtitle.personal')</h2>
+                    <p>#label('anonymous.checkout.text.personal')</p>
+                    #if($action.getStoreProperty('address.show.name','Y')=='Y')
+                    <label>
+                        <span class="label">#label('salutation')</span>
+                        #sselect('name=billingAdd.title' 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+                        #stextfield('name=billingAdd.firstname' "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.firstname')
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+                        #stextfield('name=billingAdd.lastname' "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.lastname')
+                    </label>
+                    #end
+                    <label>
+                        <span class="label required">#label('email.address')</span>
+                        #stextfield('name=email' 'cssClass=field required email string-200' 'cssErrorClass=invalid')
+                        #fieldError('email')
+                    </label>
+                </div>
+
+                #set($countryList = $action.getCountries(true))
+                <div id="billingData" class="form">
+                    <h2>#label('anonymous.checkout.subtitle.billing-add')</h2>
+                    <p>#label('anonymous.checkout.text.billing-add')</p>
+                    #if($action.getStoreProperty('address.show.company','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+                        #stextfield('name=billingAdd.company' "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.company')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address.1')</span>
+                        #stextfield('name=billingAdd.address' "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.address')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">#label('address.2')</span>
+                        #stextfield('name=billingAdd.address2' "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.address2')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.city','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+                        #stextfield('name=billingAdd.city' "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.city')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+                    #if($countryList && $countryList.size()>1)
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                            <select name="billingAdd.idCountry" id="billingAdd_idCountry" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                                #foreach($c in $countryList)
+                                    <option value="$!c.code" #if($c.code==$billingAdd.idCountry) selected="selected" #end>$!c.name</option>  #end
+                            </select>
+                            #fieldError('billingAdd.idCountry')
+                        </label>
+                    #end
+                    #if($countryList && $countryList.size()==1)
+                        <input type="hidden" id="billingAdd_idCountry" name="billingAdd.idCountry" value="$countryList.get(0).code">
+                    #end
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+                        <span id="billingStateBlock" field-id="billingState" field-name="billingState" field-name-ex="billingAdd.stateName"></span>
+                        ##sselect('id=billingState' 'name=billingState' "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        ##fieldError('billingState')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+                        #stextfield('name=billingAdd.zipCode' "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.zipCode')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+                        #stextfield('name=billingAdd.phone' "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('billingAdd.phone')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('phone')</span>
+                            #stextfield('name=billingAdd.phone' "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError('billingAdd.phone')
+                        </label>
+                    #end
+
+                    <label>
+                        #label('register.page.shipping.same.billing')
+                        <input type="checkbox" value="Y" id="shippingSameBilling" name="shippingSameBilling" checked="checked">
+                    </label>
+                </div>
+
+                <div id="shippingData" class="form">
+                    <h2>#label('anonymous.checkout.subtitle.shipping-add')</h2>
+                    <p>#label('anonymous.checkout.text.shipping-add')</p>
+                    #if($action.getStoreProperty('address.show.name','Y')=='Y')
+                    <label>
+                        <span class="label">#label('salutation')</span>
+                        #sselect('name=shippingAdd.title' 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+                        #stextfield('name=shippingAdd.firstname' "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.firstname')
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+                        #stextfield('name=shippingAdd.lastname' "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.lastname')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.company','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+                        #stextfield('name=shippingAdd.company' "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.company')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address.1')</span>
+                        #stextfield('name=shippingAdd.address' "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.address')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">#label('address.2')</span>
+                        #stextfield('name=shippingAdd.address2' "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.address2')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.city','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+                        #stextfield('name=shippingAdd.city' "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.city')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+                    #if($countryList && $countryList.size()>1)
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                            <select name="shippingAdd.idCountry" id="shippingAdd_idCountry" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                                #foreach($c in $countryList)
+                                    <option value="$!c.code" #if($c.code==$shippingAdd.idCountry) selected="selected" #end>$!c.name</option>  #end
+                            </select>
+                            #fieldError('shippingAdd.idCountry')
+                        </label>
+                    #end
+                    #if($countryList && $countryList.size()==1)
+                        <input type="hidden" id="shippingAdd_idCountry" name="shippingAdd.idCountry" value="$countryList.get(0).code">
+                    #end
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+                        <span id="shippingStateBlock" field-id="shippingState" field-name="shippingState" field-name-ex="shippingAdd.stateName"></span>
+                        ##sselect('id=shippingState' 'name=shippingState' "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        ##fieldError('shippingState')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+                        #stextfield('name=shippingAdd.zipCode' "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.zipCode')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+                        #stextfield('name=shippingAdd.phone' "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError('shippingAdd.phone')
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('fax')</span>
+                            #stextfield('name=shippingAdd.fax' "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError('shippingAdd.fax')
+                        </label>
+                    #end
+                </div>
+
+                <div class="button-bar">
+                    <button type="submit" onclick="$('.validation-error').hide();"><span class="ok">#label('submit.registration')</span></button>
+                </div>
+                <div>
+                    #label('anonymous.checkout.bottom.text')
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="clear: both"></div>
+</div>

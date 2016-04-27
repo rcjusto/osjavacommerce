@@ -1,0 +1,44 @@
+#set($_productList = $_parameters.get('_prodList'))
+#set($_productTemplate = "$!_parameters.get('_prodTemplate')")
+#if($util.isEmpty($_productTemplate)) #set($_productTemplate = 'slide_product') #end
+#set($_blockTitle = $_parameters.get('_blockTitle'))
+#set($_linkLabel = $_parameters.get('_linkLabel'))
+#set($_linkUrl = $_parameters.get('_linkUrl'))
+#set($_numItems = $_parameters.get('_items'))
+#if($_productList && !$_productList.isEmpty())
+    #set($_productRows = $util.getRows($_productList, $math.toInteger($_numItems)))
+    #set($itPerc = $!util.formatNumber($math.div(100,$_numItems), '0.0'))
+    #set($_id = $util.getId('slider'))
+<div id="$_id" class="slider-wrapper slider_$_productTemplate">
+    #if($_blockTitle)
+        <div id="title_${_id}" class="title clearfix">
+            <h4>#label($_blockTitle) </h4>
+            #if($_linkUrl && $_linkLabel) #linklabel($!_linkLabel $!_linkUrl) #end
+        </div>
+    #end
+    <div id="slider_${_id}" class="my-slider">
+        <div class="slider">
+            #foreach($_row in $_productRows)
+                <div class="slide">
+                    <div class="slide-html">
+                        #foreach($p in $_row)
+                            <div style="float:left;width: $!{itPerc}%;margin: 0;padding: 0;">
+                                #parse("/WEB-INF/views/${template}/front/$!{_productTemplate}.vm")
+                            </div>
+                        #end
+                    </div>
+                </div>
+            #end
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#slider_${_id}").rcSlider({autoPlay:false,width:522,height:250,effect:'slideLeft',controlsOpacity:1,controlsInParent:true,hideControlsInAnimation:false})
+    });
+</script>
+#end
+#set($_productList = $util.null)
+#set($_productTemplate = $util.null)
+#set($_blockTitle = $util.null)
+#set($_parameters = $util.null)

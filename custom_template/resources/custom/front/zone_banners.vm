@@ -1,0 +1,37 @@
+#if($params)
+    #set($arrParam = $params.split('[|]'))
+    #set( $bannerData = $util.map.add('_bannerZone',$list.get($arrParam, 0)).add('_bannerCant',$list.get($arrParam, 1)) )
+#end
+
+#if($bannerData.get('_bannerCant') && $bannerData.get('_bannerCant')>0)
+    #set($_cant = $bannerData.get('_bannerCant'))
+#else
+    #set($_cant = $action.getTemplateBannerZone($bannerData.get('_bannerZone')).bannersNumber)
+#end
+#if($category)
+    #set($banners = $action.getRandomBanners($bannerData.get('_bannerZone'), $_cant, $category.idCategory))
+#else
+    #set($banners = $action.getRandomBanners($bannerData.get('_bannerZone'), $_cant))
+#end
+#if($util.isNotEmpty($banners) )
+<div class="banners block clearfix $!bannerData.get('_bannerZone') template-block">
+    <ul class="clearfix">
+        #foreach($ban in $banners)
+            #surl('id=urlBanner' "action=banner" "idBanner=$ban.id")
+            #set( $imgUrl = $util.findImage($action.storeFile("images/b/$!{ban.id}_${locale.language}")))
+            <li>
+                #if($imgUrl.endsWith('.swf'))
+                    <div id="flash_$ban.id"></div>
+                    <script type="text/javascript">
+                        $("#flash_$ban.id").flash({swf:"$imgUrl",height:$!ban.bannerHeight,width:$!ban.bannerWidth});
+                    </script>
+                #else
+                    <a href="$!ban.bannerUrl" target="$!ban.bannerTarget" onclick="jQuery.get('$!urlBanner');return true;"><img src="$imgUrl" alt="$!ban.bannerText" style=" #if($ban.bannerWidth)width:${ban.bannerWidth}px;#end #if($ban.bannerHeight)height:${ban.bannerHeight}px;#end "/></a>
+                #end
+            </li>
+        #end
+    </ul>
+</div>
+#end
+
+#set( $bannerData = $util.null )

@@ -1,0 +1,2 @@
+#set( $contentPage = "requestquote" )
+#parse("/WEB-INF/views/${template}/mails/layout_mail.vm")

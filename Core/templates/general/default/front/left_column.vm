@@ -1,0 +1,8 @@
+#control('menu_categories')
+#if($category)
+    #control('menu_category_filters')
+#else
+    #control('menu_manufacturers')
+#end
+#banners('left-column')
+

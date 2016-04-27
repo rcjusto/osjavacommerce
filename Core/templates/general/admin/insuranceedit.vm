@@ -1,0 +1,57 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($insurance.id)
+        #label('admin.insurance.modify') ID: $!insurance.id
+    #else
+        #label('admin.insurance.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveinsurance")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=idInsurance' "value=$!insurance.id")
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.mintotal')</th>
+        <td>
+            #stextfield('name=insurance.minTotal' "value=$!util.formatNumber($insurance.minTotal,'decimal2')" 'cssClass=field required decimal')
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.maxtotal')</th>
+        <td>
+            #stextfield('name=insurance.maxTotal' "value=$!util.formatNumber($insurance.maxTotal,'decimal2')" 'cssClass=field required decimal')
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.value')</th>
+        <td>
+            #stextfield('name=insurance.insuranceValue' "value=$!util.formatNumber($insurance.insuranceValue,'decimal2')" 'cssClass=field required decimal')
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.text')</th>
+        <td>
+           <textarea name="vis_insuranceText" class="multilang field string-large"></textarea>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="insuranceText" value="$!insurance.getText($l)"/>
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.active')</th>
+        <td>#scheckbox('name=insurance.active')</td>
+    </tr>
+</table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listinsurance" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

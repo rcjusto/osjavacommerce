@@ -1,0 +1,14 @@
+#set($page = 'category')
+#set($templateName = $action.getParentProperty($category, 'template') )
+#if($util.isNotEmpty($templateName))
+    #set( $contentPage = "/WEB-INF/views/${template}/front/${templateName}.vm" )
+#else
+    #set( $contentPage = "/WEB-INF/views/${template}/front/category.vm" )
+#end
+#set($pageTitle = $action.getCategoryMeta($category,'title',$locale.language))
+#set($metaDescription = $action.getCategoryMeta($category,'description',$locale.language))
+#set($metaKeywords = $action.getCategoryMeta($category,'keywords',$locale.language))
+#set($metaAbstract = $action.getCategoryMeta($category,'abstract',$locale.language))
+
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")
+

@@ -1,0 +1,247 @@
+</form>
+<script type="text/javascript">
+    $(function(){
+        $('#pagetabs').tabs();
+    });
+</script>
+<h1>#label('plugin.publications.configuration')</h1>
+
+<div class="formulario">
+    <h2 class="block-title">#label('plugin.publications.categories.configuration')</h2>
+    <form action="$!action.url('savepluginproperty','admin')" method="post">
+        <input type="hidden" name="plugin" value="publications"/>
+        <input type="hidden" name="supplier" value="CATEGORIES"/>
+    <table class="formulario" cellpadding="0" cellspacing="0" style="margin-left: 10px;">
+        <tr>
+            <th>#label('digital.books.root.category')</th>
+            <td>
+                <select name="category_digital" class="field string-short">
+                    <option value=""></option>
+                    #foreach($c in $action.getSubCategories($util.null, false))
+                        <option value="$!c.idCategory" #if($!{config.category_digital}==$c.idCategory.toString()) selected="selected" #end >$!c.name</option>
+                    #end
+                </select>
+            </td>
+            <th style="padding-left: 20px;">#label('paper.books.root.category')</th>
+            <td>
+                <select name="category_paper" class="field string-short">
+                    <option value=""></option>
+                    #foreach($c in $action.getSubCategories($util.null, false))
+                        <option value="$!c.idCategory" #if($!{config.category_paper}==$c.idCategory.toString()) selected="selected" #end >$!c.name</option>
+                    #end
+                </select>
+            </td>
+            <td style="padding-left: 20px;">
+                <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <p>#label('plugin.publications.bic.categories') #linklabel('plugin.publications.configure.bic' $!action.url('biclistaction','admin'))</p>
+            </td>
+        </tr>
+    </table>
+        </form>
+</div>
+
+<div id="pagetabs">
+    <ul>
+        <li><a href="#tabLibranda">LIBRANDA</a></li>
+        <li><a href="#tabDigitalBooks">DIGITAL BOOKS</a></li>
+        <li><a href="#tabPublidisa">PUBLIDISA</a></li>
+    </ul>
+
+    <div id="tabLibranda" class="formulario tabpanel">
+        <h2 class="block-title">#label('libranda.section.configuration')</h2>
+        <div class="formulario" style="width: 800px;">
+            <form action="$!action.url('savepluginproperty','admin')" method="post">
+                <input type="hidden" name="plugin" value="publications"/>
+                <input type="hidden" name="supplier" value="LIBRANDA"/>
+                <table class="formulario">
+                    <tr>
+                        <th>#label('libranda.gencode')</th>
+                        <td><input type="text" name="libranda_gencode" value="$!{config.libranda_gencode}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('libranda.password')</th>
+                        <td><input type="text" name="libranda_password" value="$!{config.libranda_password}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('libranda.outletName')</th>
+                        <td><input type="text" name="libranda_outletName" value="$!{config.libranda_outletName}" class="field string-medium"></td>
+                    </tr>
+                </table>
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </div>
+            </form>
+        </div>
+
+        #if($libranda_files)
+        <form id="formDelFile" action="$!urlDelFile" method="post">
+            <h2 class="block-title">#label('libranda.section.onix')</h2>
+            <div class="listado" style="width: 800px;">
+                <input id="delFile" type="hidden" name="filename" value=""/>
+                <div>#label('libranda.label.select.file')</div>
+                <table class="listado" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>#label('file.name')</th>
+                        <th>#label('last.modified')</th>
+                        <th>#label('file.size')</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    #foreach($of in $libranda_files)
+                        <tr>
+                            <td style="width: 1%;"><input type="radio" class="onix_l" value="$!of.name" /></td>
+                            <td>$!of.name</td>
+                            <td>$!date.format($of.lastModified())</td>
+                            <td>$!util.formatFileSize($of.length())</td>
+                            <td width="2%" nowrap="nowrap"><a class="remove deletefile_l" href="#" rel="$!of.name"></a></td>
+                        </tr>
+                    #end
+                </table>
+                <table>
+                    <tr>
+                        <th>#label('libranda.onix.date')</th>
+                        <td><input type="text" id="onixDate_l" value="" class="field date" /></td>
+                    </tr>
+                </table>
+                <div id="jobState_l" class="box" style="display:none;">
+                    <div id="taskMsg_l" style="margin:4px;"></div>
+                    <div id="taskPercent_l"></div>
+                </div>
+                <div class="button-bar">
+                    <button type="button" id="processFile_l"><span>#label('process.file')</span></button>
+                </div>
+
+            </div>
+            </form>
+        #end
+
+    </div>
+
+    <div id="tabDigitalBooks" class="formulario tabpanel">
+        <h2 class="block-title">#label('digitalbooks.section.configuration')</h2>
+        <div class="formulario" style="width: 800px;">
+            <form action="$!action.url('savepluginproperty','admin')" method="post">
+                <input type="hidden" name="plugin" value="publications"/>
+                <input type="hidden" name="supplier" value="DIGITALBOOKS"/>
+                <table class="formulario">
+                    <tr>
+                        <th>#label('digitalbooks.user')</th>
+                        <td><input type="text" name="digitalbooks_user" value="$!{config.digitalbooks_user}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('digitalbooks.password')</th>
+                        <td><input type="text" name="digitalbooks_password" value="$!{config.digitalbooks_password}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('digitalbooks.elibrary')</th>
+                        <td><input type="text" name="digitalbooks_elibrary" value="$!{config.digitalbooks_elibrary}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('digitalbooks.country')</th>
+                        <td><input type="text" name="digitalbooks_country" value="$!{config.digitalbooks_country}" class="field string-medium"></td>
+                    </tr>
+                </table>
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div id="tabPublidisa" class="formulario tabpanel">
+        <h2 class="block-title">#label('publidisa.section.configuration')</h2>
+        <div class="formulario" style="width: 800px;">
+            <form action="$!action.url('savepluginproperty','admin')" method="post">
+                <input type="hidden" name="plugin" value="publications"/>
+                <input type="hidden" name="supplier" value="PUBLIDISA"/>
+                <table class="formulario">
+                    <tr>
+                        <th>#label('publidisa.login')</th>
+                        <td><input type="text" name="publidisa_login" value="$!{config.publidisa_login}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('publidisa.password')</th>
+                        <td><input type="text" name="publidisa_password" value="$!{config.publidisa_password}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('publidisa.usercode')</th>
+                        <td><input type="text" name="publidisa_userCode" value="$!{config.publidisa_userCode}" class="field string-medium"></td>
+                    </tr>
+                    <tr>
+                        <th>#label('publidisa.download.preview')</th>
+                        <td><input type="checkbox" name="publidisa_downloadPreview" value="Y" #if($!{config.publidisa_downloadPreview}=='Y') checked="checked" #end ></td>
+                    </tr>
+                    <!--tr>
+                        <th>#label('publidisa.process.paper-books')</th>
+                        <td><input type="checkbox" name="publidisa_processPaper" value="Y" #if($!{config.publidisa_processPaper}=='Y') checked="checked" #end ></td>
+                    </tr>
+                    <tr>
+                        <th>#label('publidisa.process.digital-books')</th>
+                        <td><input type="checkbox" name="publidisa_processDigital" value="Y" #if($!{config.publidisa_processDigital}=='Y') checked="checked" #end ></td>
+                    </tr-->
+                </table>
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<form action="#">
+
+
+
+<style type="text/css">
+    <!--
+    #taskMsg p {margin: 0;padding: 0;}
+    -->
+</style>
+<script type="text/javascript">
+    var onixThreadName_l = "onix_task_$!{action.request.session.id}";
+    function executeStatusL() {
+        jQuery.getJSON("$!action.url('threadexecutestate','admin')",{threadName:onixThreadName_l}, function(data){
+            if (data.result == 'error') {
+                $('#jobState_l').hide();
+            } else {
+                $('#jobState_l').show();
+                if (data.msg == 'FINISHED') {
+                    if (data.textmsg!=null && data.textmsg!='') $('#taskMsg_l').html( "<p>"+data.textmsg+"</p>");
+                    else $('#taskMsg_l').html( "<p>Task Complete.</p>");
+                    $("#taskPercent_l").hide();
+                } else {
+                    if (data.percent != null) {
+                        $('#taskMsg_l').html(data.percent + '%: ' + data.msg);
+                        $("#taskPercent_l").progressbar('option', 'value', data.percent).show();
+                    }
+                    setTimeout(executeStatusL, 1000);
+                }
+            }
+        })
+    }
+    $(function(){
+        $('#processFile_l').click(function(){
+            if ($('input.onix_l:checked').size()<1) {
+                alert("$!action.getText('please.select.onix.file','Please, select an onix file')");
+            } else {
+                var fn = $('input.onix_l:checked').val();
+                jQuery.post("$!urlStart",{file:fn,supplier:'LIBRANDA',onixDate:$('#onixDate_l').val()}, function(){executeStatusL();})
+            }
+        });
+        $('a.deletefile_l').click(function(){
+            var fn = $(this).attr('rel');
+            if (confirm("$!action.getText('remove.file', 'Remove file')" + ' ' +fn + '?')) {
+                $('#delFile').val($(this).attr('rel'));
+                $('#formDelFile').submit();
+            }
+        });
+        $("#taskPercent_l").progressbar({ value: 0 });
+        executeStatusL();
+    });
+</script>

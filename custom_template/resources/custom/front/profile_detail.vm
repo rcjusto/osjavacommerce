@@ -1,0 +1,105 @@
+<div class="profile-form">
+    <h1>#label('profile.page.title')</h1>
+    <form action="$!action.url('saveprofile')" id="formProfile" method="post">
+        <div id="userData" class="form profile-form-date">
+            #if($rewardsEnabled && $rewardsRate)
+                #set( $rewardMoney = $math.mul($rewardsRate,$user.rewardPoints) )
+                <label>
+                    <span class="label">#label('reward.label.profile')</span>
+                    #set($rewardText = "$!user.rewardPoints $!action.getText('reward.label.points')
+                        = $!action.formatActualCurrency($rewardMoney)" )
+                    <input type="text" readonly="readonly" class="field string-200 readonly" value="$!rewardText"/>
+                </label>
+            #end
+            <h2>#label('profile.page.subtitle.id-password')</h2>
+            <p>#label('profile.page.text.id-password')</p>
+            #if($action.getStoreProperty('use.email.as.login','Y')=='Y')
+                <label>
+                    <span class="label required">#label('email.address')</span>
+                    #stextfield('name=email' "value=$!user.email" 'cssClass=field email required string-200' 'cssErrorClass=invalid')
+                    #fieldError('email')
+                </label>
+            #else
+                <label>
+                    <span class="label required">#label('user.id')</span>
+                    #stextfield('name=userId' "value=$!user.userId" 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                    #fieldError('userId')
+                </label>
+            #end
+            <label>
+                <span class="label">#label('change.password')</span>
+                #spassword('name=password' 'cssClass=field string-200' 'cssErrorClass=invalid')
+                #fieldError('password')
+            </label>
+            <label>
+                <span class="label">#label('new.password.repeat')</span>
+                #spassword('name=passwordRepeat' 'cssClass=field string-200' 'cssErrorClass=invalid')
+                #fieldError('passwordRepeat')
+            </label>
+            #if($action.getStoreProperty('show.user.level','Y')=='Y')
+                <label>
+                    <span class="label">#label('user.type.current')</span>
+                    <input type="text" readonly="readonly" class="field string-200" value="$!user.level.getName($locale.language)">
+                </label>
+                <label>
+                    <span class="label">#label('user.type.requested')</span>
+                    <select name="levelRequested" class="field string-200">
+                        #foreach($l in $userLevelList)
+                            <option #if($user.levelRequested==$l.code) selected="selected" #end value="$l.code">$!{l.getName($locale.language)}</option> #end
+                    </select>
+                    #fieldError('levelRequested')
+                </label>
+            #end
+            #if($action.getStoreProperty('use.email.as.login','Y')!='Y')
+                <label>
+                    <span class="label required">#label('email.address')</span>
+                    #stextfield('name=email' "
+                        value=$!user.email" 'cssClass=field email required string-200' 'cssErrorClass=invalid')
+                    #fieldError('email')
+                </label>
+            #end
+        </div>
+
+
+        #set($questions = $dao.getInquiresForRegister())
+        #if($util.isNotEmpty($questions))
+            <div id="optionsData" class="form profile-form-options">
+                <h2>#label('register.page.subtitle.optional')</h2>
+                <p>#label('register.page.text.optional')</p>
+                #foreach($question in $questions)
+                    <label>
+                        <span class="label">$!question.getQuestion($locale.language)</span>
+                        <input type="hidden" name="preferenceCode" value="$!{question.id}">
+                        <select name="preferenceValue" class="field string-200">
+                            <option value=""></option>
+                            #foreach($answer in $question.answers)
+                                <option value="$answer.id">$!answer.getAnswer($locale.language)</option>
+                            #end
+                        </select>
+                    </label>
+                #end
+            </div>
+        #end
+
+            <div id="subscriptionData" class="form profile-form-subscription">
+                #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+                <h2>#label('register.page.subtitle.subscription')</h2>
+                <label class="clearfix">
+                    <input type="checkbox" name="registerSubscription" value="yes" #if($user.getPreference('register.subscriptions')=='yes') checked="checked" #end style="float:left;margin:2px 8px 8px 0;"/>
+                    <span>#label('register.subscriptions')</span>
+                </label>
+                #end
+                <div class="button-bar">
+                    <button type="submit" onclick="$('.validation-error').hide();"><span class="ok">#label('submit.changes')</span></button>
+                </div>
+            </div>
+
+    </form>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#formProfile').submit(function() {
+            return $(this).validForm();
+        });
+    });
+</script>

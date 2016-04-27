@@ -1,0 +1,25 @@
+#if($action.hasActionErrors())
+    <div class="home-warnings" style="background-color:#ffffe0;padding:4px;">
+        <h2 style="margin:3px 0 0 6px;padding:0;font-size:12pt;">#label('admin.warnings')</h2>
+        <ul>
+            #if($action.actionErrors.contains("payment"))
+            <li>
+                #label('payment.not.configured')
+                <a href="$!action.url('listmerchant','admin')" target="_blank">#label('click.to.configure')</a>
+            </li>
+            #end
+            #if($action.actionErrors.contains("shipping"))
+            <li>
+                #label('shipping.not.configured')
+                <a href="$!action.url('listshipping','admin')" target="_blank">#label('click.to.configure')</a>
+            </li>
+            #end
+            #if($action.actionErrors.contains("rmatypes"))
+            <li>
+                #label('rmatypes.not.configured')
+                <a href="$!action.url('listrmatype','admin')" target="_blank">#label('click.to.configure')</a>
+            </li>
+            #end
+        </ul>
+    </div>
+#end

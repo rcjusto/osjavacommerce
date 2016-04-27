@@ -1,0 +1,422 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=urlEditAddress' "action=addressmodaledit")
+#surl('id=urlSaveAddress' "action=addressmodalsave")
+#surl('id=urlAddGroups' "action=usergroupsadd")
+#surl('id=urlDelGroups' "action=usergroupsdel")
+#surl('id=urlAddNote' "action=usernoteadd")
+<script type="text/javascript">
+    $(function() {
+        $('#customerTabs').tabs();
+    });
+    var idUser = "$!user.idUser";
+    function editAddress(aId) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.address')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlEditAddress", {idAddress:aId,idUser:idUser,rnd:Math.random()}, function() {
+            $('#dialogContent').find('#dialogBtnOk').click(function() {
+                if ($('#dialog_editaddress').validForm()) {
+                    $('#div_addresses').loading("$!action.getText('admin.updating.address')", "$!action.getText('admin.please.wait')");
+                    $('#div_addresses').load("$urlSaveAddress", $('#dialog_editaddress').serialize());
+                    $('#dialogo').dialog('close')
+                }
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function groupsAdd() {
+        var data = $('#formgroups').serialize();
+        $('#mailgroups').loading("$!action.getText('admin.updating.groups')", "$!action.getText('admin.please.wait')");
+        $('#mailgroups').load("$urlAddGroups", data);
+        return false;
+    }
+    function groupsDel(gId) {
+        $('#mailgroups').loading("$!action.getText('admin.updating.groups')", "$!action.getText('admin.please.wait')");
+        $('#mailgroups').load("$urlDelGroups", {idUser:idUser,groups:gId});
+        return false;
+    }
+    function noteAdd() {
+        var data = $('#formnotes').serialize();
+        $('#notes').loading("$!action.getText('admin.updating.notes')", "$!action.getText('admin.please.wait')");
+        $('#notes').load("$urlAddNote", data);
+    }
+</script>
+<h1>
+    #if ($user.idUser)
+        #label('admin.user.modify') ID: $!user.idUser
+    #else
+        #label('admin.user.new')
+    #end
+</h1>
+
+<!-- Tabs -->
+<div id="customerTabs">
+    #if($user.idUser)
+    <ul class="tabs">
+        <li><a href="#tabGeneral">#label('admin.general')</a></li>
+        <li><a href="#tabAddress">#label('admin.addresses')</a></li>
+        <li><a href="#tabOrders">#label('admin.orders')</a></li>
+        <li><a href="#tabNotes"#label('admin.admin.notes')</a></li>
+    </ul>
+    #end
+
+
+<div id="tabGeneral" class="formulario #if($user.idUser)tabpanel#end">
+<div style="float:left;width:460px;">
+
+    #surl('id=urlForm' "action=customersave")
+    <form action="$urlForm" method="post" class="validable">
+    #shidden('name=user.idUser')
+    #shidden('name=idUser' "value=$!user.idUser")
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.title')</th>
+            <td>
+                #stextfield('name=user.title' 'cssClass=field string-short')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.firstname')</th>
+            <td>
+                #stextfield('name=user.firstname' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.lastname')</th>
+            <td>
+                #stextfield('name=user.lastname' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.email')</th>
+            <td>
+                #stextfield('name=user.email' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.phone')</th>
+            <td>
+                #stextfield('name=user.phone' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.website')</th>
+            <td>
+                #stextfield('name=user.website' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.company')</th>
+            <td>
+                #stextfield('name=user.companyName' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.login')</th>
+            <td>
+                #stextfield('name=user.userId' 'cssClass=field string-short')
+            </td>
+        </tr>
+        <tr>
+            <th>
+                #if($user.idUser)
+                    #label('admin.change.password')
+                #else
+                    #label('admin.set.password')
+                #end
+            </th>
+            <td>
+                #spassword('name=password' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.password.hint')</th>
+            <td>
+                #stextfield('name=user.passwordHint' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.visits')</th>
+            <td><input type="text" readonly="readonly" value="$!user.visits" class="field integer readonly"/></td>
+        </tr>
+        <tr>
+            <th>#label('admin.credits')</th>
+            <td>
+                #stextfield('name=user.credits' 'cssClass=field decimal')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.reward.points')</th>
+            <td><input type="text" readonly="readonly" value="$!user.rewardPoints" class="field integer readonly"/></td>
+        </tr>
+        <tr>
+            <th>#label('admin.birthday')</th>
+            <td>
+                <input type="text" class="field date" name="user.birthday"
+                       value="$!util.formatDate($user.birthday)"/>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.registered')</th>
+            <td>
+                <input type="text" readonly="readonly" class="field date readonly"
+                       value="$!util.formatDate($user.registerDate)"/>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.sex')</th>
+            <td>
+                #sradio('name=user.sex' "list=#{'F':'Female', 'M':'Male'}" )
+            </td>
+        </tr>
+        #if($user.requestLevelPending())
+            <tr class="remark">
+                <th>#label('admin.level.requested')</th>
+                <td><input type="text" readonly="readonly" value="$!{user.levelRequested}" class="field readonly string-medium"/>&nbsp;<span
+                        class="remark">(#label('admin.pending.approval'))</span></td>
+            </tr>
+        #end
+        <tr>
+            <th>#label('admin.user.level')</th>
+            <td>
+                <select name="idLevel" class="field string-medium">
+                    #foreach($opt in $userLevelList)
+                        <option value="${opt.id}" #if($opt==${user.level}) selected="selected" #end >${opt.getName($defaultLanguage)}</option>
+                    #end
+                </select>
+        </tr>
+        <tr>
+            <th>#label('admin.blocked')</th>
+            <td>
+                #scheckbox('name=user.blocked' )
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.administrator')</th>
+            <td>
+                #scheckbox('name=user.admin' )
+            </td>
+        </tr>
+        #if($user.affiliate)
+            <tr class="block-title">
+                <th colspan="2">#label('admin.only.for.affiliates')</th>
+            </tr>
+            <tr>
+                <th>#label('admin.affiliate.percent')</th>
+                <td>
+                    #stextfield('name=user.affiliatePercent' 'cssClass=field decimal')
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.affiliate.skin')</th>
+                <td>
+                    #stextfield('name=user.affiliateSkin' 'cssClass=field string-short')
+                </td>
+            </tr>
+        #end
+        #if($xml_plugin)
+            <tr>
+                <th>#label('can.access.xmltool')</th>
+                <td>
+                    #scheckbox('name=xmlAccess' )
+                </td>
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=customerlist" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</form>
+
+</div>
+    #if($user.idUser)
+    <div style="float:left;width:400px;margin-left:30px;">
+        <h2 class="block-title">#label('admin.additional.information')</h2>
+        <ul style="margin:0;padding:0;list-style:none;">
+            #foreach($pref in $userPreferenceList)
+                #if($pref.preferenceCode!='STOCK_ALERT' && $pref.preferenceCode!='TAX_EXEMPTION' && $pref.preferenceCode!='FEE_EXEMPTION' && $util.isNotEmpty($pref.preferenceValue))
+                    <li style="padding-bottom:8px;">
+                        <span>#label($pref.preferenceCode):</span>
+                        <span style="font-weight:bold;">$!pref.preferenceValue</span>
+                    </li>
+                #end
+            #end
+        </ul>
+
+        #set( $stockAlerts = $user.getStockAlerts() )
+        #if($stockAlerts && $stockAlerts.size()>0)
+            <h2 class="block-title">#label('admin.stock.alerts')</h2>
+            <ul style="margin:0;padding:0;list-style:none;">
+                #foreach($pref in $stockAlerts)
+                    #set($prod = $action.getProduct($math.toNumber($pref.preferenceValue).longValue()))
+                    <li style="padding-bottom:8px;">
+                        <span>#label('admin.product'):</span>
+                        <span style="font-weight:bold;">$!prod.getProductName($defaultLanguage)</span>
+                    </li>
+                #end
+            </ul>
+        #end
+
+        #set( $feeExemption = $user.getFeeExemption() )
+        <h2 class="block-title">#label('admin.fee.exemptions')</h2>
+        #if($feeExemption && $feeExemption.size()>0)
+            #surl('id=delFeeExemption' "action=customerdelfee")
+            <form id="formDelFee" action="$delFeeExemption" method="post" class="validable">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <input type="hidden" name="idFee" id="delFee" value=""/>
+                <ul style="margin:5px;padding:0;list-style:none;">
+                    #foreach($pref in $feeExemption)
+                        #set($fee = $action.getFee($math.toNumber($pref.preferenceValue).longValue()))
+                        <li style="padding-bottom:8px;">
+                            <span>#label('admin.fee'):</span>
+                            <span style="font-weight:bold;">$!fee.getFeeName()</span>
+                            <a href="#"
+                               onclick="$('#delFee').val($!fee.id);$('#formDelFee').submit(); return false;">(#label('admin.remove'))</a>
+                        </li>
+                    #end
+                </ul>
+            </form>
+        #end
+        #surl('id=addFeeExemption' "action=customeraddfee")
+        <form action="$addFeeExemption" method="post" class="validable">
+            #formErrors()
+            <div class="button-bar">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <select name="idFee" class="field required" style="width:200px;">
+                    <option value="">$!action.getText('admin.select.a.fee')</option>
+                    #foreach($f in $fees)}
+                        <option value="$!f.id">$!f.getFeeName()</option>
+                    #end
+
+                </select>
+                <button type="submit"><span class="ok">#label('admin.add')</span></button>
+            </div>
+        </form>
+
+        #set( $taxExemption = $user.getTaxExemption() )
+        <h2 class="block-title">#label('admin.tax.exemptions')</h2>
+        #if($taxExemption && $taxExemption.size()>0)
+            #surl('id=delTaxExemption' "action=customerdeltax")
+            <form id="formDelTax" action="$delTaxExemption" method="post" class="validable">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <input type="hidden" name="idTax" id="delTax" value=""/>
+                <ul style="margin:5px;padding:0;list-style:none;">
+                    #foreach($pref in $taxExemption)
+                        #set($tax = $action.getTax($math.toNumber($pref.preferenceValue).longValue()))
+                        <li style="padding-bottom:8px;">
+                            <span>#label('admin.tax'):</span>
+                            <span style="font-weight:bold;">$!tax.getTaxName()</span>
+                            <a href="#"
+                               onclick="$('#delTax').val($!tax.id);$('#formDelTax').submit(); return false;">(#label('admin.remove'))</a>
+                        </li>
+                    #end
+                </ul>
+            </form>
+        #end
+        #surl('id=addTaxExemption' "action=customeraddtax")
+        <form action="$addTaxExemption" method="post" class="validable">
+            #formErrors()
+            <div class="button-bar">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <select name="idTax" class="field required" style="width:200px;">
+                    <option value="">$!action.getText('admin.select.a.tax')</option>
+                    #foreach($t in $taxes)}
+                        <option value="$!t.id">$!t.getTaxName()</option>
+                    #end
+                </select>
+                <button type="submit"><span class="ok">#label('admin.add')</span></button>
+            </div>
+        </form>
+
+        #set( $userRoles = $user.getRoles())
+        <h2 class="block-title">#label('admin.administration.roles')</h2>
+        #if($userRoles && $userRoles.size()>0)
+            #surl('id=delRole' "action=customerdelrole")
+            <form id="formDelRole" action="$delRole" method="post" class="validable">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <input type="hidden" name="idRole" id="delRole" value=""/>
+                <ul style="margin:5px;padding:0;list-style:none;">
+                    #foreach($role in $userRoles)
+                        <li style="padding-bottom:8px;">
+                            <span>#label('admin.role'):</span>
+                            <span style="font-weight:bold;">$!role.roleCode</span>
+                            <a href="#" onclick="$('#delRole').val($!role.id);$('#formDelRole').submit(); return false;">(#label('admin.remove'))</a>
+                        </li>
+                    #end
+                </ul>
+            </form>
+        #end
+        #surl('id=addRoles' "action=customeraddrole")
+        <form action="$addRoles" method="post" class="validable">
+            #formErrors()
+            <div class="button-bar">
+                <input type="hidden" name="idUser" value="$!user.idUser"/>
+                <select name="idRole" class="field required" style="width:200px;">
+                    <option value="">$!action.getText('admin.select.role')</option>
+                    #foreach($r in $roles)
+                        <option value="$!r.id">$!r.roleCode</option>
+                    #end
+                </select>
+                <button type="submit"><span class="ok">#label('admin.add')</span></button>
+            </div>
+        </form>
+
+    </div>
+    #end
+<div style="clear:both;"></div>
+</div>
+
+    #if($user.idUser)
+    <div id="tabAddress" class="formulario tabpanel">
+        <div id="div_addresses" class="listado">
+            #parse('/WEB-INF/views/admin/customerdata_address.vm')
+        </div>
+    </div>
+
+    <div id="tabOrders" class="listado tabpanel">
+        <div id="orders">
+            #set($orders = $dao.getOrdersByUser($util.null,$user))
+            #if($util.isNotEmpty($orders))
+                <table class="listado" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('admin.order.id')</th>
+                        <th>#label('admin.status')</th>
+                        <th>#label('admin.date')</th>
+                        <th style="text-align:right;" >#label('admin.amount')</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    #foreach($o in $orders)
+                        #surl('id=urlOrder' "action=orderdata" "idOrder=$o.idOrder")
+                        <tr>
+                            <td>$!o.idOrder</td>
+                            <td>$!o.status.getStatusName($defaultLanguage)</td>
+                            <td>$!util.formatDate($o.createdDate)</td>
+                            <td style="text-align:right;" nowrap="nowrap">$!util.formatNumber($o.total, 'money') $!order.currency.code</td>
+                            <td><a href="$urlOrder">#label('admin.view.order')</a></td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.user.orders')</h2>
+
+                    <p>#label('admin.user.orders.not.found')</p>
+                </div>
+            #end
+        </div>
+    </div>
+
+    <div id="tabNotes" class="formulario tabpanel">
+        <div id="notes">
+            #parse('/WEB-INF/views/admin/customerdata_notes.vm')
+        </div>
+    </div>
+
+
+    #end
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

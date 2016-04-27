@@ -1,0 +1,62 @@
+<div class="listado">
+    #if($util.isNotEmpty($complementGroups))
+        <table class="listado" cellpadding="0" cellspacing="0">
+            #if($util.isNotEmpty($categoryComplementParent))
+                <tr class="nohover block-title">
+                    <th colspan="4">#label('admin.complements.groups.inherited')</th>
+                </tr>
+                <tr>
+                    <th style="text-align:left;">#label('admin.group.name')</th>
+                    <th style="text-align:left;">&nbsp;</th>
+                </tr>
+                #foreach($p in $categoryComplementParent)
+                    <tr>
+                        <td style="padding-right:20px;">$!p.getGroupName($defaultLanguage)</td>
+                        <td><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+                    </tr>
+                #end
+            #end
+            #if($util.isNotEmpty($category.relatedGroups))
+                <tr class="nohover block-title">
+                    <th colspan="4">#label('admin.complements.groups.configured')</th>
+                </tr>
+                <tr>
+                    <th style="text-align:left;">#label('admin.group.name')</th>
+                    <th style="text-align:left;">&nbsp;</th>
+                </tr>
+                #foreach($p in $category.relatedGroups)
+                    <tr>
+                        <td>$!p.getGroupName($defaultLanguage)</td>
+                        <td><a class="delete-row" href="#" onclick="return dialogConfirm('Category Complement Groups','Are you sure you want to remove this group?',function(){delComplement($p.idGroup);});" title="Delete Complement Group"></a></td>
+                    </tr>
+                #end
+            #end
+        </table>
+        <div class="formulario">
+            <form id="formAddComplement">
+                <input type="hidden" name="idCategory" value="$!category.idCategory">
+            <h3>#label('admin.add.complement.group')</h3>
+            <table class="formulario" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.select.group'):</th>
+                    <td>
+                        <select name="idGroup" class="field string-medium">
+                            #foreach($g in $complementGroups)
+                                <option value="$!g.idGroup">$!g.getGroupName($defaultLanguage)</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="button-bar">
+                <button type="button" onclick="addComplement();"><span class="add">#label('admin.add.complement')</span></button>
+            </div>
+            </form>    
+        </div>
+    #else
+        <div class="info">
+            <h2>#label('admin.complement.groups.not.found')</h2>
+            <p>#label('admin.complement.groups.not.found.text')</p>
+        </div>
+    #end
+</div>

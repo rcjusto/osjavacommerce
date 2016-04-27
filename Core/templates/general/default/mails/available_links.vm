@@ -1,0 +1,5 @@
+$!{action.mailGlobalTop}
+<p><br/></p>
+<p>$!{action.getText('you.have.new.download.available')}</p>
+<p>$!{action.getText('order.id')} $!{order.code}</p>
+$!{links}

@@ -1,0 +1,35 @@
+#if($states && $util.isNotEmpty($states))
+    #if($states.size()==1 && "*"==$states.get(0).stateCode)
+        <input type="hidden" name="idState" value="$states.get(0).idState"/>
+        <input type="text" name="newStateName" value="$!request.getParameter('stateName')" size="40" maxlength="250" class="field string-medium"/>
+    #else
+        <div id="selState">
+            <div style="float:left;width:200px;">
+                <select id="idState" name="idState" class="myselect field string-short">
+                    #if($includeEmpty && $util.isNotEmpty($includeEmpty))
+                        <option value="">$!includeEmpty</option>
+                    #end
+                    #foreach($st in $states)
+                        #if($st.idState==$request.getParameter('idState'))
+                            <option selected="selected" value="$!{st.idState}">$!{st.stateName}</option>
+                        #else
+                            <option value="$!{st.idState}">$!{st.stateName}</option>
+                        #end
+                    #end
+                </select>
+            </div>
+            <a href="#" class="field-button" onclick="$('#selState').hide();$('#addState').show();$('#idState').attr('disabled',true);return false;">#label('admin.add.new')</a>
+        </div>
+        <div id="addState" style="display:none;">
+            <input type="text" name="newState" value="" size="40" maxlength="250" class="field string-short" />
+            <a href="#" class="field-button" onclick="$('#addState').hide();$('#selState').show();$('#idState').attr('disabled',false);return false;">#label('admin.cancel')</a>
+        </div>
+    #end
+#else
+    <input type="text" name="newState" value="$!request.getParameter('idState')" size="40" maxlength="250" class="field string-medium"/>
+#end
+<script type="text/javascript">
+    $(function(){
+    //    $('select.myselect').myselect();
+    });
+</script>

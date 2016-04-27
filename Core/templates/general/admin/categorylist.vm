@@ -1,0 +1,160 @@
+#* @vtlvariable name="categories" type="java.util.List<org.store.core.beans.Category>" *#
+#surl('id=urlcatexportedlist' "action=categoryexportedlist")
+#surl('id=urlcatexport' "action=categoryexport")
+#surl('id=urlCatNew' "action=categorydata" "idParent=$!dao.getRootCategory().idCategory")
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+
+    $(function () {
+        $('.more-data').live('click', function () {
+            var _self = $(this);
+            var _li = $(this).closest('li');
+            if (_li.find('.children').length < 1) {
+                _self.addClass('loading-data');
+                $.get("$!action.url('categorychildren')", {idParent: _self.attr('data-id')}, function (data) {
+                    var _div = $('<div></div>').hide().addClass('children').appendTo(_li);
+                    _self.removeClass('loading-data');
+                    if (data == null || data.trim() == '') _self.addClass('empty'); else {
+                        _div.html(data).slideDown();
+                        _self.addClass('opened');
+                    }
+                });
+            } else {
+                if (_li.find('.children').is(':visible')) {
+                    _li.find('.children').hide();
+                    _self.removeClass('opened');
+                } else {
+                    _li.find('.children').slideDown();
+                    _self.addClass('opened');
+                }
+            }
+            return false;
+        });
+
+        $('#allActive').change(function () {
+            if ($(this).is(':checked')) {
+                $('.chk_categoryActive').attr('checked', true);
+                $('.categoryActive').val('Y');
+            } else {
+                $('.chk_categoryActive').attr('checked', false);
+                $('.categoryActive').val('N');
+            }
+        });
+        $('#allVisible').change(function () {
+            if ($(this).is(':checked')) {
+                $('.chk_categoryVisible').attr('checked', true);
+                $('.categoryVisible').val('Y');
+            } else {
+                $('.chk_categoryVisible').attr('checked', false);
+                $('.categoryVisible').val('N');
+            }
+        });
+    });
+    function deleteCategory(idC) {
+        if (idC) {
+            deleteConfirm(function () {
+                $('#idCategory').val(idC);
+                $('#formList').submit();
+            }, 'Category ' + idC);
+        }
+        return false;
+    }
+</script>
+<style>
+    #tree, #tree ul, #tree li { list-style: none; padding: 0; margin: 0; }
+    #tree .data .more-data { background: url(/struts/css/images/toggle-expand-dark.png) no-repeat 0 50%; display: block; padding-left: 18px; line-height: 24px; color: #333333 }
+    #tree .data .more-data.opened { background-image: url(/struts/css/images/toggle-collapse-dark.png); }
+    #tree .data .more-data.loading-data { background-image: url(/struts/css/images/ui-anim_basic_16x16.gif); }
+    #tree .data .more-data.empty { background-image: none; }
+    #tree .data { min-width: 1200px; border-bottom: 1px dotted #ccc; background-color: #f0f0f0; }
+    #tree .data.header { background-color: #FCE5A9; color: #406DB8; font-weight: bold; line-height: normal }
+    #tree .data.header div { line-height: normal }
+    #tree li ul .data { background-color: #f4f4f4; }
+    #tree li ul li ul .data { background-color: #f8f8f8; }
+    #tree li ul li ul li ul .data { background-color: #fcfcfc; }
+    #tree li ul li ul li ul li ul .data { background-color: #ffffff; }
+    #tree .data div { float: left; width: 200px; padding: 3px; text-align: center; min-height: 24px; line-height: 24px; }
+    #tree .data div.title { width: 400px; overflow: hidden; text-align: left }
+    #tree .data div.check-cell { width: 30px; }
+    #tree .data div.cell-active { width: 80px; }
+    #tree .data div.cell-shipping { width: 110px; }
+    #tree .data div.cell-markup { width: 90px; }
+    #tree .data div.link-bar { width: 240px; }
+    #tree .data div.link-bar a { margin-right: 15px; display: inline-block; }
+    #tree li ul .data div.title a { margin-left: 20px; display: inline-block }
+    #tree li ul li ul .data div.title a { margin-left: 40px; display: inline-block }
+    #tree li ul li ul li ul .data div.title a { margin-left: 60px; display: inline-block }
+    #tree li ul li ul li ul li ul .data div.title a { margin-left: 80px; display: inline-block }
+    #tree li ul li ul li ul li ul li ul .data div.title a { margin-left: 100px; display: inline-block }
+
+</style>
+<h1>#label('admin.category.list')</h1>
+<div class="listado">
+    <form action="$!action.url('categorylist')" method="post">
+        <input type="hidden" id="categoryUpdate" name="categoryUpdate" value=""/>
+        #formErrors()
+
+        <div id="tree">
+
+            <div class="data header clearfix">
+                <div class="check-cell"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></div>
+                <div class="title">#label('admin.category.name')</div>
+                <div class="cell-active"><input type="checkbox" id="allActive"> #label('admin.active')</div>
+                <div class="cell-active"><input type="checkbox" id="allVisible"> #label('admin.visible')</div>
+                <div class="cell-shipping">#label('admin.need.shipping')</div>
+                <div class="cell-markup">#label('admin.markup.factor')</div>
+                <div class="cell-markup">#label('admin.exchange.rate.markup.factor')</div>
+                <div class="cell-markup">#label('admin.position')</div>
+                <div class="link-bar"></div>
+            </div>
+
+            #if($cat)
+                <div class="data clearfix">
+                    <div class="check-cell"><input type="checkbox" class="selecteds" name="selecteds" value="$!cat.idCategory"/></div>
+                    <div class="title" style="font-weight: bold;">$!cat.getCategoryName($action.defaultLanguage)<input type="hidden" name="categoryId" value="$!cat.idCategory"/></div>
+                    <div class="cell-active">#checkbox('categoryActive' $cat.active)</div>
+                    <div class="cell-active">#checkbox('categoryVisible' $cat.visible)</div>
+                    <div class="cell-shipping">
+                        <select name="categoryNeedShipping" style="float:none;" class="field string-50">
+                            <option value=""></option>
+                            <option value="Y" #if($cat.needShipping=='Y') selected="selected" #end >Yes</option>
+                            <option value="N" #if($cat.needShipping=='N') selected="selected" #end >No</option>
+                        </select>
+                    </div>
+                    <div class="cell-markup"><input type="text" style="float:none;" name="categoryMarkup" value="$!util.formatNumber($cat.markupFactor,'decimal4')" class="field decimal"/></div>
+                    <div class="cell-markup"><input type="text" style="float:none;" name="categoryERMarkup" value="$!util.formatNumber($cat.erMarkupFactor,'decimal4')" class="field decimal"/></div>
+                    <div class="cell-markup"><input type="text" style="float:none;display: none;" name="categoryPosition" value="$!cat.defaultPosition" class="field integer"/></div>
+                    <div class="link-bar">
+                        #surl('id=urldata' "action=categorydata" "idCategory=$cat.idCategory" )
+                        <a href="$!urldata"><span class="edit">#label('admin.modify')</span></a>
+                        #surl('id=urladd' "action=categorydata" "idParent=$cat.idCategory" )
+                        <a href="$!urladd"><span class="add">Add Child</span></a>
+                    </div>
+                </div>
+            #end
+
+            #if($util.isNotEmpty($categories))
+                #parse('/WEB-INF/views/admin/categorychildren.vm')
+            #else
+                <div class="info">
+                    <h2>#label('admin.categories')</h2>
+
+                    <p>#label('admin.categories.not.found')</p>
+                </div>
+            #end
+
+        </div>
+
+
+        <div class="button-bar">
+            <button type="submit" onclick="$('#categoryUpdate').val('Y')"><span class="ok">#label('admin.update')</span></button>
+            <button type="button" href="$urlCatNew"><span class="add">#label('admin.category.new')</span></button>
+
+            #if($can_export)
+                <button type="button" href="$!action.url('export_categories','admin')"><span class="exportcsv">#label('admin.export.categories')</span></button>
+            #end
+        </div>
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

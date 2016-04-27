@@ -1,0 +1,50 @@
+<div class="top-cart-wrapper #if(!$!userSession.items.isEmpty()) hoverable #end">
+<div class="top-cart-title top-cart-header clearfix">
+    <div>
+        <span class="top-shopcart-label">#linklabel('top.cart' "$!action.url('shopcart')")</span>
+        #if($!userSession.items.isEmpty())
+            <span class="top-cart-empty">#label('top.cart.empty')</span>
+        #else
+            <span class="top-cart-items"><a href="$!action.url('shopcart')">$!userSession.items.size() #label('top.cart.items')</a></span>
+            <span class="top-cart-total"> <a href="$!action.url('shopcart')">#label('top.cart.total') $!action.formatActualCurrency($userSession.total)</a></span>
+        #end
+    </div>
+</div>
+<div class="top-cart-detail">
+    <div class="top-cart-message #if($util.isNotEmpty($errors)) cart-error #end">
+        #foreach($m in $messages) <div>$!m</div> #end
+        #foreach($e in $errors) <div>$!e</div> #end
+    </div>
+    #if(!$!userSession.items.isEmpty())
+    <ul>
+        #foreach($item in $util.reverse($userSession.items))
+            #set($_image = "$imageResolver.getImageForProduct($item.beanProd1,'list/')")
+            <li class="clearfix">
+                #if($util.isNotEmpty($_image))
+                    <div class="product_image"><a href="$!action.urlProduct($item.beanProd1)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($_image)" alt="$!pName"/></a></div>
+                #else
+                    <div class="product_image"><a href="$!action.urlProduct($item.beanProd1)"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a></div>
+                #end
+                <div class="product_name"><a href="$!action.urlProduct($item.beanProd1)">$!item.quantity $!item.fullName</a></div>
+                <div class="product_price">$!action.formatActualCurrency($item.subtotal)</div>
+            </li>
+        #end
+        <li class="buttons clearfix">
+            <div class="total">
+                <span class="label">#label('top.cart.total')</span>
+                <span class="value">$!action.formatActualCurrency($userSession.total)</span>
+            </div>
+            <div class="button">
+            #if(!$userSession.shoppingCart.needQuote() && $action.canCheckout)
+                #if($action.getStoreProperty('onepage.checkout','Y')=='Y')
+                    <button class="checkout" type="button" href="$!action.url('checkout')"><span>#label('shopcart.checkout')</span></button>
+                #else
+                    <button class="checkout" type="button" href="$!action.url('paystepAddress')"><span>#label('shopcart.checkout')</span></button>
+                #end
+            #end
+            </div>
+        </li>
+    </ul>
+#end
+</div>
+</div>

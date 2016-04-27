@@ -1,0 +1,9 @@
+.flash-overlay {position: absolute;left: 0; top: 0;width: 100%; display: block;background-color: #000000;z-index: 9990}
+.flash-dialog{display: block;position: fixed;z-index: 9999;background-color: #ffffff;color:#000000;padding: 4px;text-align: left;border: 1px solid #666666;box-shadow: 0px 0px 10px #000000;}
+.flash-content {margin: 10px;overflow: hidden;}
+.flash-close{position: absolute;top:-15px; right:-12px;display:block;height:36px;width:36px;background:url("img/close.png") no-repeat;z-index: 999999;}
+.flash-subscription {margin-top:8px;padding:8px;background-color:#eeeeee;color:#000000;}
+.flash-subscription div {display:inline-block}
+.flash-subscription-input {width:80%;}
+.flash-subscription-input input {width:94%;padding:4px;}
+.flash-subscription-button {margin:4px 4px 0 0;text-align:right}

@@ -1,0 +1,9 @@
+#if($template)
+#set( $contentPage = "/WEB-INF/views/${template}/front/home.vm" )
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")
+#else
+    <html>
+    
+    </html>
+#end
+

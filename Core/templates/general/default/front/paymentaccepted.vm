@@ -1,0 +1,12 @@
+<div id="blockContent" class="clearfix">
+
+    <div>
+        <h2>Your order has been accepted</h2>
+    </div>
+
+    <div>
+        #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+    </div>
+
+
+</div>

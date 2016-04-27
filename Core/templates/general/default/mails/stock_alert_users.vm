@@ -1,0 +1,8 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<p>$!{action.getText('mail.product.available')}</p>
+<ul>
+    <li>$!{product.name}</li>
+</ul>

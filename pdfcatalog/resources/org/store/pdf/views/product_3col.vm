@@ -1,0 +1,13 @@
+    #if($util.isNotEmpty($product.imageNormal))
+        <div class="image"><img src="$!{urlSite}/$!{storeCode}/images/products/$!util.encodeUrl($product.imageNormal)" style="width:180px;"/></div>
+    #else
+        <div class="image"><img src="$!{urlSite}/$!{storeCode}/skins/$!{skin}/images/$!{lang}/not-available.gif" style="width:180px;"/></div>
+    #end
+    <div class="data">
+    <div class="name">$!esc.xml($product.name)</div>
+    <div class="code">$!dao.getText('part.number', $lang) $!product.code</div>
+    <div class="manufacturer">$!esc.xml($product.manufacturer)</div>
+    <div class="desc">$!esc.xml($util.abbreviate($product.description,200))</div>
+    </div>
+    <div class="price" style="">$!currency.formatValue($product.price)</div>
+

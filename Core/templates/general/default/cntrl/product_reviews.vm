@@ -1,0 +1,50 @@
+<div class="reviews-navigator">
+    #if($reviews.isPrevPage() && $output!='print')
+        <a href="#" onclick="return getReviews($reviews.getPrevPage());">#label('product.reviews.previous')</a>
+        <span>|</span>
+    #end
+    #label('navigator.showing') $!reviews.firstRow - $!reviews.lastRow #label('navigator.of') $!reviews.totalRows
+    #if($reviews.isNextPage() && $output!='print')
+        <span>|</span>
+        <a href="#" onclick="return getReviews($reviews.getNextPage());">#label('product.reviews.next')</a>
+    #end
+</div>
+<ul>
+    #foreach($rev in $reviews.listado)
+        <li class="clearfix">
+            <div class="review-title">$!rev.title</div>
+            <div class="review-info">
+                <div class="review-customer">#label('product.reviewer') $!rev.userName #label('on') $!util.formatDate($rev.created, $locale.language)</div>
+                #if($util.isNotEmpty($rev.detailedScoreValues.values()))
+                    <div class="review-rating">#label('product.customer.rating') $!rev.averageScore</div>
+                    <div class="review-rating-detail">
+                        <table>
+                            #foreach($svEntry in $rev.detailedScoreValues.entrySet())
+                                <tr>
+                                    <th class="label">$!svEntry.key</th>
+                                    <td class="starts" style="padding:0;">
+                                        #control('review_stars' $!svEntry.value)
+                                    </td>
+                                    <th class="value">$!svEntry.value</th>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+                #else
+                    <div class="review-rating-detail">
+                        <table>
+                            <tr>
+                                <th class="label" style="vertical-align:middle;" >#label('product.customer.rating')</th>
+                                <td class="starts" style="vertical-align:middle;" >
+                                    #control('review_stars_small' $!rev.averageScore)
+                                </td>
+                                <th class="value" style="vertical-align:middle;">$!rev.averageScore</th>
+                            </tr>
+                        </table>
+                    </div>
+                #end
+            </div>
+            <div class="review-opinion">$!rev.opinion</div>
+        </li>
+    #end
+</ul>

@@ -1,0 +1,23 @@
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+
+<div class="product-detail template-block">
+    <div class="clearfix #foreach($lab in $product.labels) label-$!{lab.code} #end">
+        #control('product_images')
+        <div class="product-detail-data" class="#if(!$list.isEmpty($images)) data-to-right #end">
+            #control('product_data')
+        #control('product_labels')
+        #control('product_prices')
+        #control('product_form')
+        #control('product_actions')
+        </div>
+    </div>
+    <div>
+        #block('product.more.info')
+    #control('product_tabs')
+    #control('product_texts')
+    #set($listRelated = $action.getProductsRelated($product))
+    #control('product_combined_sales')
+    #control('product_related')
+    </div>
+</div>

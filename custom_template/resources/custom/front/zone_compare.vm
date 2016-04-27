@@ -1,0 +1,57 @@
+<div class="compare-table">
+    #set($tableWidth = $math.div(80,$products.size()))
+    #set($rowClass = $alternator.auto(['odd','even']))
+    <table style="font-size: 8pt;" width="100%">
+        <tr>
+            <td class="att-name name" style="width: 20%;" rowspan="3">&nbsp;</td>
+            #foreach($product in $products)
+                #set( $urlDetail = $action.urlProduct($product) )
+                <td class="att-value name" style="width:$!{tableWidth}%;"><a href="$urlDetail">$!product.getProductName($locale.language)</a></td>
+            #end
+        </tr>
+        <tr>
+            #foreach($product in $products)
+                #set($image = "$imageResolver.getImageForProduct($product,'/list')")
+                <td class="att-value image">
+                    #set( $urlDetail = $action.urlProduct($product) )
+                    #if($util.isNotEmpty($image))
+                        <a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a>
+                    #else
+                        <a href="$urlDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a>
+                    #end
+                </td>
+            #end
+        </tr>
+        <tr>
+            #foreach($product in $products)
+                <td class="att-value remove" style="width:$!{tableWidth}%;"><a href="$!action.url('compare')?removeId=$!{product.idProduct}">#label('remove')</a></td>
+            #end
+        </tr>
+        <tr class="$!rowClass">
+            <td class="att-name">#label('manufacturer')</td>
+            #foreach($product in $products)
+                <td class="att-value">$!product.manufacturer.manufacturerName</td>
+            #end
+        </tr>
+        <tr class="$!rowClass">
+            <td class="att-name">#label('rating')</td>
+            #foreach($product in $products)
+                <td class="att-value">#control('review_stars_small' $!product.ratingBy)</td>
+            #end
+        </tr>
+        <tr class="$!rowClass">
+            <td class="att-name">#label('price')</td>
+            #foreach($product in $products)
+                <td class="att-value">$!action.formatActualCurrency($product.getFinalPrice($frontUserLevel,1))</td>
+            #end
+        </tr>
+        #foreach($att in $attributes)
+            <tr class="$!rowClass">
+                <td class="att-name">$!att.getAttributeName($locale.language)</td>
+                #foreach($product in $products)
+                    <td class="att-value">$!product.getProperty("att_$!{att.id}")</td>
+                #end
+            </tr>
+        #end
+    </table>
+</div>

@@ -1,0 +1,56 @@
+<form id="formgroups">
+#shidden('name=idUser' "value=$!user.idUser")
+    #formErrors()
+#if($util.isNotEmpty($userGroups))
+    <div>
+        <div id="groupsIn" class="listado" style="float:left;width:300px;margin-right:50px;">
+            <h3>#label('admin.user.belong.to.this.groups')</h3>
+            <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                #foreach($g in $userGroups)
+                    #if($user.inGroup($g))
+                    <tr>
+                        <td>$g.groupName</td>
+                        <td style="text-align:right;"><a class="delete-row" href="#" onclick="return groupsDel($g.idGroup);" title="$!action.getText('admin.user.remove.from.this.group')"></a></td>
+                    </tr>
+                    #end
+                #end
+            </table>
+        </div>
+        <div id="groupsOut" class="listado" style="float:left;">
+            <h3>#label('admin.user.add.to.this.group')</h3>
+            <ul style="list-style:none;margin:0; padding:0;width:500px;">
+                #foreach($g in $userGroups)
+                    #if(!$user.inGroup($g))
+                    <li style="float:left;width:240px;">
+                        <label>
+                            #if($user.inGroup($g))
+                                <input type="checkbox" name="groups" value="$g.idGroup" checked="checked" />
+                            #else
+                                <input type="checkbox" name="groups" value="$g.idGroup" />
+                            #end
+                            $!g.groupName
+                        </label>
+                    </li>
+                    #end
+                #end
+                <li style="clear:both;"/>
+            </ul>
+            <div class="button-bar">
+                <button type="button" onclick="groupsAdd();"><span class="ok">#label('admin.save')</span></button>
+            </div>
+        </div>
+        <br style="clear:both;"/>
+    </div>
+#else
+    <div class="info">
+        <h2>#label('admin.user.groups')</h2>
+        <p>#label('admin.user.groups.not.found')</p>
+    </div>
+#end
+</form>
+<script type="text/javascript">
+    $(function(){
+        if ($('#groupsIn').find('tr').size()<1) $('#groupsIn').hide();
+        if ($('#groupsOut').find('li').size()<2) $('#groupsOut').hide();
+    });
+</script>

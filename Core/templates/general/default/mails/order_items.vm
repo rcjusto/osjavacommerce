@@ -1,0 +1,118 @@
+<table width="100%" class="with-border" cellpadding="0" cellspacing="0">
+    <tr>
+        <th class="name">#label('shopcart.code')</th>
+        <th class="name">#label('shopcart.product')</th>
+        <th class="quantity">#label('shopcart.quantity')</th>
+        <th class="price">#label('shopcart.unitary.price')</th>
+        <th class="price">#label('shopcart.line.price')</th>
+    </tr>
+    #foreach($detail in $order.data.orderDetails)
+        <tr class="product">
+            <td class="name">
+                #foreach($odp in $detail.orderDetailProducts)
+                    <span>$!odp.product.partNumber</span>
+                #end
+            </td>
+            <td class="name">
+                #foreach($odp in $detail.orderDetailProducts)
+                    <div>
+                        $!odp.product.getProductName($locale.language)
+                        #if($detail.promotionCode && $util.isNotEmpty($detail.promotionCode))
+                            <div class="promo">#label('promo') $!detail.promotionCode - $!detail.promotionName</div>
+                        #end
+                    </div>
+                #end
+            </td>
+            <td class="quantity">$!detail.quantity</td>
+            <td class="price">$!action.formatActualCurrency($detail.price,$order.currency)</td>
+            <td class="price">$!action.formatActualCurrency($detail.subTotal,$order.currency)</td>
+        </tr>
+        #foreach($odp in $detail.orderDetailProducts)
+            #if($odp.feeValue)
+                <tr class="fee">
+                    <td class="name" colspan="2">#label('fee') $!odp.feeName</td>
+                    <td class="quantity">$!detail.quantity</td>
+                    <td class="price">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
+                    <td class="price">$!action.formatActualCurrency($math.mul($odp.feeValue,$detail.quantity),$order.currency)</td>
+                </tr>
+            #end
+            #if($util.isNotEmpty($odp.downloadLink))
+                <tr class="download">
+                    <td colspan="4">
+                        <a class="download" href="$!odp.downloadLink" target="_blank">#label('download')</a>
+                    </td>
+                </tr>
+            #end
+        #end
+        #if($util.isNotEmpty($detail.complementName))
+            <tr class="complement">
+                <td class="name" colspan="2">#label('complement') $!detail.complementName</td>
+                <td class="quantity">$!detail.quantity</td>
+                <td class="price">$!action.formatActualCurrency($detail.complementValue,$order.currency)</td>
+                <td class="price">$!action.formatActualCurrency($math.mul($detail.complementValue,$detail.quantity),$order.currency)</td>
+            </tr>
+        #end
+    #end
+
+    <tr class="subtotal">
+        <td colspan="4">#label('subtotal.products')</td>
+        <td class="price">$!{order.subtotalProducts}</td>
+    </tr>
+    #if($order.hasInterest())
+        <tr class="subtotal">
+            <td colspan="4">#label('interest.percent') $!{order.percentInterest}</td>
+            <td class="price">$!{order.subtotalInterest}</td>
+        </tr>
+    #end
+    #if($order.hasFees())
+        <tr class="subtotal">
+            <td colspan="4">#label('subtotal.fees')</td>
+            <td class="price">$!{order.subtotalFees}</td>
+        </tr>
+    #end
+    #foreach($prom in $order.data.getPromotions('discount-percent'))
+        <tr class="subtotal">
+            <td colspan="4" class="promo">#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+            <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+        </tr>
+    #end
+    #foreach($prom in $order.data.getPromotions('discount'))
+        <tr class="subtotal" class="promo">
+            <td colspan="4">#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+            <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+        </tr>
+    #end
+    <tr class="subtotal">
+        <td colspan="4">$!{order.shippingLabel}</td>
+        <td class="price">$!{order.subtotalShipping}</td>
+    </tr>
+    #if($order.hasInsurance())
+        <tr class="subtotal">
+            <td colspan="4">#label('subtotal.shipping.insurance')</td>
+            <td class="price">$!{order.subtotalInsurance}</td>
+        </tr>
+    #end
+
+    #set($taxesl = $order.data.getTaxes())
+    #if($taxesl && !$taxesl.isEmpty())
+        #foreach($tax in $taxesl)
+            <tr class="subtotal">
+                <td colspan="4">#label('subtotal.tax') $!tax.name
+                    #if($tax.totax)<span class="tax-detail">( $!number.format('0.##',$math.mul($tax.percent,100))% #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
+                </td>
+                <td class="price">$!action.formatActualCurrency($tax.value,$order.currency)</td>
+            </tr>
+        #end
+    #end
+
+    #if($order.hasRewards())
+        <tr class="subtotal">
+            <td colspan="4">#label('used.rewards')</td>
+            <td class="price">$!{order.subtotalRewards}</td>
+        </tr>
+    #end
+    <tr class="total">
+        <td colspan="4">#label('subtotal.total')</td>
+        <td class="price">$!{order.total}</td>
+    </tr>
+</table>

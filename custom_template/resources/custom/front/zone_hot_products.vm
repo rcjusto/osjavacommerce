@@ -1,0 +1,44 @@
+#if ($category)
+    #if($util.isNotEmpty($products_special))
+    <div class="clearfix block hot_category_products template-block">
+        <h2>#label('hot.products')</h2>
+        <ul>
+            #foreach($p in $util.subList($products_special,$!math.toInteger($!action.getStoreProperty('listing.hot.items', '3'))))
+                <li>
+                    #parse("/WEB-INF/views/${template}/front/category_hotproduct.vm")
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+#else
+    #set($lista = $action.getRandomProducts('label:hot', $!math.toInteger($!action.getStoreProperty('home.hot.items', '9'))))
+    #if($util.isNotEmpty($lista))
+    <div class="clearfix block hot_products template-block">
+        <h2>#label('hot.products')</h2>
+        <ul class="clearfix">
+            #foreach($p in $lista)
+                <li>
+                    #set($pName = "$!p.getLanguage($locale.language,$defaultLanguage).productName")
+                    #set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+                    #set($image = "$imageResolver.getImageForProduct($p,'list/')")
+                    #set($urlDetail = $action.urlProduct($p))
+                    <div class="product clearfix">
+                        <a class="name" href="$urlDetail">$!pName</a>
+                        #if($util.isNotEmpty($image))
+                            <a href="$urlDetail" class="image"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a>
+                        #else
+                            <a href="$urlDetail" class="image not-found"></a>
+                        #end
+                        <a class="desc" href="$urlDetail">$!util.left($pDesc,300)</a>
+                        #if($action.canShowPrices)
+                            <div class="price">$!action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1))</div>
+                            #control('addtocart' $util.map.add('product',$p))
+                        #end
+                    </div>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+#end

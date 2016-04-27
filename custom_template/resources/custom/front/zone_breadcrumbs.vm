@@ -1,0 +1,36 @@
+#if($action.breadCrumbs || $filtersBreadcrumb)
+<div class="breadcrumbs template-block" style="overflow:hidden;" class="clearfix">
+    <ul class="clearfix normal">
+        <li class="clearfix home"><a href="$!action.url('home')">Home</a></li>
+        #foreach($bc in $action.breadCrumbs)
+            <li class="$!bc.type">
+                #if($util.isNotEmpty($bc.link))
+                    <a href="$!bc.link">$!bc.name</a>
+                #else
+                    <span>
+                    $!bc.name
+                        #if($util.isNotEmpty($bc.close))<a href="#" class="closefilter-$!{bc.type}" data="$!bc.close"></a>#end
+                </span>
+                #end
+            </li>
+        #end
+    </ul>
+    #if($util.isNotEmpty($filtersBreadcrumb))
+        <ul class="clearfix filters">
+            #foreach($bc in $filtersBreadcrumb)
+                <li class="$!bc.type">
+                    #if($util.isNotEmpty($bc.link))
+                        <a href="$!bc.link">$!bc.name</a>
+                    #else
+                        <span>
+                        $!bc.name
+                            #if($util.isNotEmpty($bc.close))<a href="#" class="closefilter-$!{bc.type}" data="$!bc.close"></a>#end
+                    </span>
+                    #end
+                </li>
+            #end
+        </ul>
+    #end
+</div>
+#end
+

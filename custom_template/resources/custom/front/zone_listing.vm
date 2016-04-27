@@ -1,0 +1,4 @@
+#control('compareProducts')
+<div id="categoryForm" class="template-block">
+    #parse("/WEB-INF/views/custom/front/category_ajax.vm")
+</div>

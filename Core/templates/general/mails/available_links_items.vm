@@ -1,0 +1,1 @@
+#parse("/WEB-INF/views/${template}/mails/available_links_items.vm")

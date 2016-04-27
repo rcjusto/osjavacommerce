@@ -1,0 +1,55 @@
+#if($util.isNotEmpty($contentPage))
+<html>
+<head>
+    #if($output=='pdf')
+        <style type="text/css">
+            <!--
+            body {font: 10pt Arial, Helvetica, serif;padding:0;}
+            h1,h2,h3,p {margin:0;}
+            table {border-collapse: separate;border-spacing:0;empty-cells:show;}
+            td, th {text-align: left;}
+            table.with-border {border-right:1px solid #666666;border-bottom:1px solid #666666;color:#333333;font-size:11pt;}
+            table.with-border td, table.with-border th {border-left:1px solid #666666;border-top:1px solid #666666;padding:3px 6px;text-align:left;}
+            table.with-border th {background-color:#eeeeee;font-weight:bold;font-size:10pt;}
+            table.with-border tr.subtotal th,table.with-border tr.subtotal td {background-color:#fbfbfb;}
+            table.with-border tr.total th,table.with-border tr.total td {background-color:#fbfbfb;font-weight:bold;border-top:3px solid #666666;font-size:12pt;}
+            table.with-border .price {text-align:right}
+            table.with-border .quantity {text-align:center}
+            -->
+        </style>
+    #else
+        <style type="text/css">
+            <!--
+            body {font: 10pt Arial, Helvetica, serif;background-color:#ffffff;padding:0;}
+            h1,h2,h3,p {margin:0;}
+            table {border-collapse: separate;border-spacing:0;empty-cells:show;}
+            td, th {text-align: left;}
+            table.with-border {border-right:1px solid #666666;border-bottom:1px solid #666666;color:#333333;font-size:11pt;}
+            table.with-border td, table.with-border th {border-left:1px solid #666666;border-top:1px solid #666666;padding:3px 6px;text-align:left;}
+            table.with-border th {background-color:#eeeeee;font-weight:bold;font-size:10pt;}
+            table.with-border tr.subtotal th,table.with-border tr.subtotal td {background-color:#fbfbfb;}
+            table.with-border tr.total th,table.with-border tr.total td {background-color:#fbfbfb;font-weight:bold;border-top:3px solid #666666;font-size:12pt;}
+            table.with-border .price {text-align:right}
+            table.with-border .quantity {text-align:center}
+            #parse("/WEB-INF/views/${template}/mails/global_css.vm")
+            -->
+        </style>
+    #end
+</head>
+<body>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" >
+    <tr>
+        <td>
+            <table cellpadding="0" cellspacing="0" border="0" #if($output=='pdf') style="width:100%;"  #else style="width:800px;" #end>
+                <tr>
+                    <td style="text-align: left;">
+                        #parse("/WEB-INF/views/${template}/mails/${contentPage}.vm")
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+#end

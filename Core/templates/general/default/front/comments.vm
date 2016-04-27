@@ -1,0 +1,45 @@
+<div id="blockContent" class="comments-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        <div class="comment-list">
+            <h1>#label('comments')</h1>
+
+            #if($comments)
+
+                <ul>
+                    #foreach($c in $comments.listado)
+                        <li>
+                            <h4>$!c.title</h4>
+                            #if($c.created)<div class="date">$!util.formatDate($c.created)</div>#end
+                            <div class="content">$!c.comment</div>
+                            <div class="user">$!c.userName</div>
+                        </li>
+                    #end
+                </ul>
+
+                <form action="$!action.url('comments')" method="post">
+                    #set($fnpr = "$!{comments.name}_pagerows")
+                    #set($fncp = "$!{comments.name}_currentpage")
+                    #if($comments.totalRows>0 && $comments.needPagination())
+                        <div class="navigator clearfix">
+                            <input type="hidden" id="$!fnpr" name="$!{comments.name}.pagerows" value="$!comments.pageRows">
+                            <input type="hidden" id="$!fncp" name="$!{comments.name}.currentpage" value="$!comments.currentPage">
+                            <ul class="pages clearfix">
+                                #if($comments.isPrevPage())
+                                    <li><a href="#" onclick="$('#${fncp}').val($comments.prevPage);$('#${fncp}').parents('form:first').submit();return false;">$!p</a></li>
+                                #end
+                                #if($comments.isNextPage())
+                                    <li><a href="#" onclick="$('#${fncp}').val($comments.nextPage);$('#${fncp}').parents('form:first').submit();return false;">$!p</a></li>
+                                #end
+                            </ul>
+                        </div>
+                    #else
+                        <input type="hidden" id="$!fnpr" name="$!{comments.name}.pagerows" value="$!comments.pageRows">
+                    #end
+                </form>
+            #end
+        </div>
+    </div>
+</div>

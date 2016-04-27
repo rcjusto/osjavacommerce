@@ -1,0 +1,359 @@
+/**
+ * TrackEvent.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
+
+package com.fedex.track.stub;
+
+
+/**
+ * FedEx scanning information about a package.
+ */
+public class TrackEvent  implements java.io.Serializable {
+    /* The time this event occurred. */
+    private java.util.Calendar timestamp;
+
+    /* Carrier's scan code. Pairs with EventDescription. */
+    private java.lang.String eventType;
+
+    /* Literal description that pairs with the EventType. */
+    private java.lang.String eventDescription;
+
+    /* Further defines the Scan Type code's specific type (e.g., DEX08
+     * business closed). Pairs with StatusExceptionDescription. */
+    private java.lang.String statusExceptionCode;
+
+    /* Literal description that pairs with the StatusExceptionCode. */
+    private java.lang.String statusExceptionDescription;
+
+    /* Address information of the station that is responsible for
+     * the scan. */
+    private com.fedex.track.stub.Address address;
+
+    /* Indicates where the arrival actually occurred. */
+    private com.fedex.track.stub.ArrivalLocationType arrivalLocation;
+
+    public TrackEvent() {
+    }
+
+    public TrackEvent(
+           java.util.Calendar timestamp,
+           java.lang.String eventType,
+           java.lang.String eventDescription,
+           java.lang.String statusExceptionCode,
+           java.lang.String statusExceptionDescription,
+           com.fedex.track.stub.Address address,
+           com.fedex.track.stub.ArrivalLocationType arrivalLocation) {
+           this.timestamp = timestamp;
+           this.eventType = eventType;
+           this.eventDescription = eventDescription;
+           this.statusExceptionCode = statusExceptionCode;
+           this.statusExceptionDescription = statusExceptionDescription;
+           this.address = address;
+           this.arrivalLocation = arrivalLocation;
+    }
+
+
+    /**
+     * Gets the timestamp value for this TrackEvent.
+     * 
+     * @return timestamp   * The time this event occurred.
+     */
+    public java.util.Calendar getTimestamp() {
+        return timestamp;
+    }
+
+
+    /**
+     * Sets the timestamp value for this TrackEvent.
+     * 
+     * @param timestamp   * The time this event occurred.
+     */
+    public void setTimestamp(java.util.Calendar timestamp) {
+        this.timestamp = timestamp;
+    }
+
+
+    /**
+     * Gets the eventType value for this TrackEvent.
+     * 
+     * @return eventType   * Carrier's scan code. Pairs with EventDescription.
+     */
+    public java.lang.String getEventType() {
+        return eventType;
+    }
+
+
+    /**
+     * Sets the eventType value for this TrackEvent.
+     * 
+     * @param eventType   * Carrier's scan code. Pairs with EventDescription.
+     */
+    public void setEventType(java.lang.String eventType) {
+        this.eventType = eventType;
+    }
+
+
+    /**
+     * Gets the eventDescription value for this TrackEvent.
+     * 
+     * @return eventDescription   * Literal description that pairs with the EventType.
+     */
+    public java.lang.String getEventDescription() {
+        return eventDescription;
+    }
+
+
+    /**
+     * Sets the eventDescription value for this TrackEvent.
+     * 
+     * @param eventDescription   * Literal description that pairs with the EventType.
+     */
+    public void setEventDescription(java.lang.String eventDescription) {
+        this.eventDescription = eventDescription;
+    }
+
+
+    /**
+     * Gets the statusExceptionCode value for this TrackEvent.
+     * 
+     * @return statusExceptionCode   * Further defines the Scan Type code's specific type (e.g., DEX08
+     * business closed). Pairs with StatusExceptionDescription.
+     */
+    public java.lang.String getStatusExceptionCode() {
+        return statusExceptionCode;
+    }
+
+
+    /**
+     * Sets the statusExceptionCode value for this TrackEvent.
+     * 
+     * @param statusExceptionCode   * Further defines the Scan Type code's specific type (e.g., DEX08
+     * business closed). Pairs with StatusExceptionDescription.
+     */
+    public void setStatusExceptionCode(java.lang.String statusExceptionCode) {
+        this.statusExceptionCode = statusExceptionCode;
+    }
+
+
+    /**
+     * Gets the statusExceptionDescription value for this TrackEvent.
+     * 
+     * @return statusExceptionDescription   * Literal description that pairs with the StatusExceptionCode.
+     */
+    public java.lang.String getStatusExceptionDescription() {
+        return statusExceptionDescription;
+    }
+
+
+    /**
+     * Sets the statusExceptionDescription value for this TrackEvent.
+     * 
+     * @param statusExceptionDescription   * Literal description that pairs with the StatusExceptionCode.
+     */
+    public void setStatusExceptionDescription(java.lang.String statusExceptionDescription) {
+        this.statusExceptionDescription = statusExceptionDescription;
+    }
+
+
+    /**
+     * Gets the address value for this TrackEvent.
+     * 
+     * @return address   * Address information of the station that is responsible for
+     * the scan.
+     */
+    public com.fedex.track.stub.Address getAddress() {
+        return address;
+    }
+
+
+    /**
+     * Sets the address value for this TrackEvent.
+     * 
+     * @param address   * Address information of the station that is responsible for
+     * the scan.
+     */
+    public void setAddress(com.fedex.track.stub.Address address) {
+        this.address = address;
+    }
+
+
+    /**
+     * Gets the arrivalLocation value for this TrackEvent.
+     * 
+     * @return arrivalLocation   * Indicates where the arrival actually occurred.
+     */
+    public com.fedex.track.stub.ArrivalLocationType getArrivalLocation() {
+        return arrivalLocation;
+    }
+
+
+    /**
+     * Sets the arrivalLocation value for this TrackEvent.
+     * 
+     * @param arrivalLocation   * Indicates where the arrival actually occurred.
+     */
+    public void setArrivalLocation(com.fedex.track.stub.ArrivalLocationType arrivalLocation) {
+        this.arrivalLocation = arrivalLocation;
+    }
+
+    private java.lang.Object __equalsCalc = null;
+    public synchronized boolean equals(java.lang.Object obj) {
+        if (!(obj instanceof TrackEvent)) return false;
+        TrackEvent other = (TrackEvent) obj;
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (__equalsCalc != null) {
+            return (__equalsCalc == obj);
+        }
+        __equalsCalc = obj;
+        boolean _equals;
+        _equals = true && 
+            ((this.timestamp==null && other.getTimestamp()==null) || 
+             (this.timestamp!=null &&
+              this.timestamp.equals(other.getTimestamp()))) &&
+            ((this.eventType==null && other.getEventType()==null) || 
+             (this.eventType!=null &&
+              this.eventType.equals(other.getEventType()))) &&
+            ((this.eventDescription==null && other.getEventDescription()==null) || 
+             (this.eventDescription!=null &&
+              this.eventDescription.equals(other.getEventDescription()))) &&
+            ((this.statusExceptionCode==null && other.getStatusExceptionCode()==null) || 
+             (this.statusExceptionCode!=null &&
+              this.statusExceptionCode.equals(other.getStatusExceptionCode()))) &&
+            ((this.statusExceptionDescription==null && other.getStatusExceptionDescription()==null) || 
+             (this.statusExceptionDescription!=null &&
+              this.statusExceptionDescription.equals(other.getStatusExceptionDescription()))) &&
+            ((this.address==null && other.getAddress()==null) || 
+             (this.address!=null &&
+              this.address.equals(other.getAddress()))) &&
+            ((this.arrivalLocation==null && other.getArrivalLocation()==null) || 
+             (this.arrivalLocation!=null &&
+              this.arrivalLocation.equals(other.getArrivalLocation())));
+        __equalsCalc = null;
+        return _equals;
+    }
+
+    private boolean __hashCodeCalc = false;
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        if (getTimestamp() != null) {
+            _hashCode += getTimestamp().hashCode();
+        }
+        if (getEventType() != null) {
+            _hashCode += getEventType().hashCode();
+        }
+        if (getEventDescription() != null) {
+            _hashCode += getEventDescription().hashCode();
+        }
+        if (getStatusExceptionCode() != null) {
+            _hashCode += getStatusExceptionCode().hashCode();
+        }
+        if (getStatusExceptionDescription() != null) {
+            _hashCode += getStatusExceptionDescription().hashCode();
+        }
+        if (getAddress() != null) {
+            _hashCode += getAddress().hashCode();
+        }
+        if (getArrivalLocation() != null) {
+            _hashCode += getArrivalLocation().hashCode();
+        }
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+
+    // Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(TrackEvent.class, true);
+
+    static {
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "TrackEvent"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("timestamp");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "Timestamp"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("eventType");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "EventType"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("eventDescription");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "EventDescription"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("statusExceptionCode");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "StatusExceptionCode"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("statusExceptionDescription");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "StatusExceptionDescription"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("address");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "Address"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "Address"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("arrivalLocation");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "ArrivalLocation"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://fedex.com/ws/track/v5", "ArrivalLocationType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+}

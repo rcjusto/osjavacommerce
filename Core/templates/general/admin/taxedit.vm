@@ -1,0 +1,79 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=loadStates' "action=countrystates")
+<script type="text/javascript">
+    $(function() {
+        $('#countryCode').change(function() {
+            if ($(this).val() != '0') {
+                $('#statesContainer').load("$loadStates", {countryCode:$(this).val(),idState:"$!{tax.state.idState}",includeEmpty:"$!action.getText('admin.all.states')"});
+            } else {
+                $('#statesContainer').html('Select a country.')
+            }
+        }).trigger('change');
+    });
+</script>
+<h1>
+    #if ($tax.id)
+        #label('admin.tax.modify') ID: $!tax.id
+    #else
+        #label('admin.tax.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savetax")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=idTax' "value=$!tax.id")
+<div class="formulario">
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.tax.name')</th>
+        <td>
+            #stextfield('name=tax.taxName' 'cssClass=field required string-medium')
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.country')</th>
+        <td>
+            <select id="countryCode" name="tax.country" class="field string-medium">
+                #foreach($c in $action.getCountries(false))
+                <option value="$c.code" #if($c.code==$tax.country) selected="selected" #end >$c.name</option>
+                #end
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.state')</th>
+        <td id="statesContainer">
+            #label('admin.select.a.country')
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.tax.percent')</th>
+        <td>
+            #stextfield('name=tax.value' "value=$!util.formatNumber($tax.value,'decimal4')" 'cssClass=field required decimal')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.order.to.apply')</th>
+        <td>
+            #stextfield('name=tax.taxOrder' 'cssClass=field integer')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.include.shipping')</th>
+        <td>#scheckbox('name=tax.includeShippping')</td>
+    </tr>
+    <tr>
+        <th>#label('admin.include.previous.taxes')</th>
+        <td>#scheckbox('name=tax.includeTaxes')</td>
+    </tr>
+</table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listtax" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VoidShipmentRequest>
+    <Request>
+        <TransactionReference>
+            <CustomerContext>$!bean.customerContext</CustomerContext>
+            <XpciVersion>$!bean.xpciVersion</XpciVersion>
+        </TransactionReference>
+        <RequestAction>$!bean.requestAction</RequestAction>
+        <RequestOption>$!bean.requestOption</RequestOption>
+    </Request>
+    <ShipmentIdentificationNumber>$!bean.shipmentIdentificationNumber</ShipmentIdentificationNumber>
+</VoidShipmentRequest>

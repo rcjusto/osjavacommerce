@@ -1,0 +1,487 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=urlcatsel' "action=categoryselector")
+#surl('id=urlcattreeadd' "action=categorytreeadd")
+#surl('id=urlcattreedel' "action=categorytreedel")
+#surl('id=urlcatprice' "action=categorypricesave")
+#surl('id=urlcatpromotion' "action=categorypromotionsave")
+#surl('id=urlcatproperties' "action=categorypropertiessave")
+#surl('id=urlattproduct' "action=listproductatt")
+#surl('id=urlcatpropertiesadd' "action=categorypropertiesadd" "idCategory=$category.idCategory")
+#surl('id=urlstatictexts' "action=liststaticpage")
+#surl('id=urlcatstatictextsadd' "action=categorystatictextsadd" "idCategory=$category.idCategory")
+#surl('id=urlcatstatictexts' "action=categorystatictextssave")
+#surl('id=urlcomplementadd' "action=categorycomplementadd")
+#surl('id=urlcomplementdel' "action=categorycomplementdel")
+
+<script type="text/javascript">
+    var idCategory = "$!{category.idCategory}";
+    $(function() {
+        $('#treecat').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20 + 4;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        $('#categoryTabs').tabs();
+    });
+    function addCategoryTree(type) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.category.tree')", "$!action.getText('please.wait')");
+        $('#dialogContent').load("$urlcatsel", {rnd:Math.random()}, function() {
+            $('#dialogContent').find('h2').html((type == 'p') ? "$!action.getText('admin.add.parent.category')" : "$!action.getText('admin.add.child.category')");
+            $('#dialogo').find('input.buttonOk:first').click(function() {
+                var selNode = $('#treecat1').dynatree("getActiveNode");
+                if (selNode) {
+                    var cId = selNode.data.key.substr(4);
+                    $('#dialogo').dialog('close');
+                    if (type == 'p') {
+                        $('#idParent').val(cId);
+                        var data = $('#formCategoryTree').serialize();
+                        $('#categoryTree').loading("$!action.getText('admin.adding.parent.category')", "$!action.getText('admin.please.wait')");
+                        $('#categoryTree').load("$urlcattreeadd", data);
+                    } else {
+                        $('#idChild').val(cId);
+                        var data = $('#formCategoryTree').serialize();
+                        $('#categoryTree').loading("$!action.getText('admin.adding.child.category')", "$!action.getText('admin.please.wait')");
+                        $('#categoryTree').load("$urlcattreeadd", data);
+                    }
+                }
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function updateTreeChild() {
+        var data = $('#formCategoryTree').serialize();
+        jQuery.get("$urlcattreeadd", data);
+    }
+    function delCategoryTree(type, cId) {
+        if (type == 'p') {
+            $('#categoryTree').loading("$!action.getText('admin.deleting.parent.category')", "$!action.getText('admin.please.wait')");
+            $('#categoryTree').load("$urlcattreedel", {idCategory:idCategory,idParent:cId});
+        } else {
+            $('#categoryTree').loading("$!action.getText('admin.deleting.child.category')", "$!action.getText('admin.please.wait')");
+            $('#categoryTree').load("$urlcattreedel", {idCategory:idCategory,idChild:cId});
+        }
+        return false;
+    }
+    function savePrices() {
+        if ($('#formprice').validForm()) {
+            var data = $('#formprice').serialize();
+            $('#categoryPrices').loading("$!action.getText('admin.updating.prices')", "$!action.getText('admin.please.wait')");
+            $('#categoryPrices').load("$urlcatprice", data);
+        }
+        return false;
+    }
+    function deleteVolume(index) {
+        $("input[name='volumen']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='volumenPercent']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='volumenDescription']:eq(" + index + ")").val('').trigger('change');
+        return savePrices();
+    }
+    function deletePromotion(index) {
+        $("input[name='promotionFrom']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='promotionTo']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='promotionValue']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='promotionPercent']:eq(" + index + ")").val('').trigger('change');
+        return savePrices();
+    }
+    function deleteShipping(index) {
+        $("input[name='shippingValue']:eq(" + index + ")").val('').trigger('change');
+        return savePrices();
+    }
+    function saveProperties() {
+        if ($('#formProperties').validForm()) {
+            var data = $('#formProperties').serialize();
+            $('#categoryProperties').loading("$!action.getText('admin.updating.product.attributes')", "$!action.getText('admin.please.wait')");
+            $('#categoryProperties').load("$urlcatproperties", data);
+        }
+        return false;
+    }
+    function configureAttributes() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.product.attributes')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlattproduct", {modal:true,rnd:Math.random()}, function() {
+            // Marcar los attributos
+            $('input.product_attribute').each(function() {
+                modalAttributes_selectId($(this).val());
+            });
+            $('#dialogo').find('#dialogBtnOk').click(function() {
+                var data = modalAttributes_serialize('selectedProductAttribute');
+                $('#categoryProperties').loading("$!action.getText('admin.updating.product.properties')", "$!action.getText('admin.please.wait')");
+                $('#categoryProperties').load("$urlcatpropertiesadd", data);
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function configureStaticTexts() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.static.texts')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlstatictexts", {modal:true,rnd:Math.random()}, function() {
+            // Marcar los attributos
+            $('input.contentStaticTextId').each(function() {
+                modalStaticText_selectId($(this).val());
+            });
+            $('#dialogo').find('#dialogBtnOk').click(function() {
+                var data = modalStaticText_serialize('selectedStaticText');
+                $('#categoryStaticText').loading("$!action.getText('admin.updating.product.static.texts')", "$!action.getText('admin.please.wait')");
+                $('#categoryStaticText').load("$urlcatstatictextsadd", data);
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function saveStaticTexts() {
+        if ($('#formStaticText').validForm()) {
+            var data = $('#formStaticText').serialize();
+            $('#categoryStaticText').loading("$!action.getText('admin.updating.product.static.texts')", "$!action.getText('admin.please.wait')");
+            $('#categoryStaticText').load("$urlcatstatictexts", data);
+        }
+        return false;
+    }
+    function addComplement() {
+        if ($('#formAddComplement').validForm()) {
+            var data = $('#formAddComplement').serialize();
+            $('#categoryComplements').loading("$!action.getText('admin.adding.complement')", "$!action.getText('admin.please.wait')");
+            $('#categoryComplements').load("$urlcomplementadd", data);
+        }
+        return false;
+    }
+    function delComplement(idG) {
+        $('#categoryComplements').loading("$!action.getText('admin.removing.complement')", "$!action.getText('admin.please.wait')");
+        $('#categoryComplements').load("$urlcomplementdel", {idCategory:"$!category.idCategory",idGroup:idG});
+        return false;
+    }
+</script>
+
+<div style="margin:4px">
+    <ul class="breadcrumb">
+        #foreach($c in $action.getCategoryHierarchy($parent))
+            #surl( 'id=urlBC' "action=categorydata" "idCategory=$c.idCategory" )
+            <li class="link"><a href="$urlBC">$!c.getLanguage($defaultLanguage).categoryName</a></li>
+        #end
+        <li>
+            #if($category.idCategory)
+                <span>$!category.getLanguage($defaultLanguage).categoryName</span>
+            #else
+                <span>#label('admin.category.new')</span>
+            #end
+        </li>
+    </ul>
+    <br style="clear:both;"/>
+</div>
+<!-- Tabs -->
+<div id="categoryTabs">
+    #if($category.idCategory)
+    <ul class="tabs">
+        <li><a href="#tabGeneral">#label('admin.general')</a></li>
+        #if(!$category.isRootCategory())
+        <li><a href="#tabTree">#label('admin.parents.and.children')</a></li>
+        #end
+        <li><a href="#tabPrices">#label('admin.product.prices')</a></li>
+        <li><a href="#tabAttributes">#label('admin.product.attributes')</a></li>
+        <li><a href="#tabStatic">#label('admin.product.static.texts')</a></li>
+        <li><a href="#tabComplements">#label('admin.product.complements')</a></li>
+        <li><a href="#tabLabels">#label('admin.category.labels')</a></li>
+        <li><a href="#tabPR">#label('admin.filter.price.ranges')</a></li>
+    </ul>
+    #end
+
+    #surl('id=urlForm' "action=categorysave")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=category.idCategory')
+    #shidden('name=idCategory' "value=$!category.idCategory")
+
+<div id="tabGeneral" class="formulario #if($category.idCategory)tabpanel#end">
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.name')</th>
+        <td colspan="3">
+            #langinput('categoryName' $category 'categoryName' 'field required string-large' )
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.description')</th>
+        <td colspan="3">
+            #langtextarea('description' $category 'description' 'field string-large' )
+        </td>
+    </tr>
+    #if(!$category.isRootCategory())
+    <tr>
+        <th>#label('admin.url.code')</th>
+        <td colspan="3">
+            #stextfield('name=category.urlCode' 'cssClass=field string-large')
+        </td>
+    </tr>
+    #end
+    <tr>
+        <th>#label('admin.active')</th>
+        <td>
+            #scheckbox('name=category.active' )
+        </td>
+        <th>#label('admin.visible')</th>
+        <td>
+            #scheckbox('name=category.visible' )
+        </td>
+    </tr>
+    <tr>
+        #if(!$category.isRootCategory())
+        <th class="required">#label('admin.inherit.from')</th>
+        <td>
+            #if($category.idCategory) #set($idcat = $category.idParent ) #else #set( $idcat = $idParent) #end
+            #if($categoryFilter)
+                #set($catTree = $dao.getCategoryTree(false))
+                <select id="treecat" name="category.idParent" class="field myselect string-medium">
+                    #categoryOption($catTree 0 $idcat)
+                </select>
+            #else
+                <input type="hidden" id="idParent" name="category.idParent" value="$idcat">
+                <input type="text" id="nameParent" readonly="readonly" value="$!action.getCategory($idcat).getCategoryName($defaultLanguage)" class="field required string-medium readonly" />
+                <a href="#" class="ellipsis" onclick="return selectCategory('#idParent','#nameParent');"></a>
+                #parse('/WEB-INF/views/admin/selectcategory.vm')
+            #end
+        </td>
+        #end
+        <th>#label('admin.category.template')</th>
+        <td>
+            #parentValue($category $parent 'template' 'string-short')
+            #sselect('name=category.template' "list=#{'':'Inherited'}" 'cssClass=myselect field string-medium' )
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.items.per.page')</th>
+        <td>
+            #parentValue($category $parent 'numItems' 'integer')
+                #stextfield('name=category.numItems' 'cssClass=field integer')
+        </td>
+    </tr>
+
+    <tr class="block-title">
+        <th colspan="4">#label('admin.seo.properties')</th>
+    </tr>
+    <tr>
+        <th>#label('admin.seo.title')</th>
+        <td colspan="3">
+            <input type="text" name="vis_metaTitle" value="" class="multilang field string-large"/>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="metaTitle" value="$!category.getLanguage($l).getMeta('title').metaValue"/>
+            #end
+            <label>
+                #scheckbox('name=metaTitleAppend' "value=$!category.getLanguage($defaultLanguage).getMeta('title').appendParent")
+                #label('admin.append.to.parent')
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.seo.description')</th>
+        <td colspan="3">
+            <textarea name="vis_metaDescription" class="multilang field string-large" rows="3"></textarea>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="metaDescription" value="$!category.getLanguage($l).getMeta('description').metaValue"/>
+            #end
+            <label>
+                #scheckbox('name=metaDescriptionAppend' "value=$!category.getLanguage($defaultLanguage).getMeta('description').appendParent")
+                #label('admin.append.to.parent')
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.seo.keywords')</th>
+        <td colspan="3">
+            <textarea name="vis_metaKeywords" class="multilang field string-large" rows="3"></textarea>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="metaKeywords" value="$!category.getLanguage($l).getMeta('keywords').metaValue"/>
+            #end
+            <label>
+                #scheckbox('name=metaKeywordsAppend' "value=$!category.getLanguage($defaultLanguage).getMeta('keywords').appendParent")
+                #label('admin.append.to.parent')
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.seo.abstract')</th>
+        <td colspan="3">
+            <textarea name="vis_metaAbstract" class="multilang field string-large" rows="3"></textarea>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="metaAbstract" value="$!category.getLanguage($l).getMeta('abstract').metaValue"/>
+            #end
+            <label>
+                #scheckbox('name=metaAbstractAppend' "value=$!category.getLanguage($defaultLanguage).getMeta('abstract').appendParent")
+                #label('admin.append.to.parent')
+            </label>
+        </td>
+    </tr>
+
+
+    <tr class="block-title">
+        <th colspan="4">#label('admin.products.properties')</th>
+    </tr>
+    <tr>
+        <th>#label('admin.minimum.stock.alert')</th>
+        <td>
+            #parentValue($category $parent 'stockMin' 'integer')
+                #stextfield('name=category.stockMin' 'cssClass=field integer')
+        </td>
+        <th>#label('admin.delivery.time')</th>
+        <td>
+            #parentValue($category $parent 'deliveryTime' 'string-short')
+                #stextfield('name=category.deliveryTime' 'cssClass=field string-medium')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.length')</th>
+        <td>
+            #parentValue($category $parent 'dimentionLength' 'decimal')
+            #stextfield('name=category.dimentionLength' "value=$!util.formatNumber($category.dimentionLength,'decimal2')" 'cssClass=field decimal')
+            <span style="float:left;margin:4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+        </td>
+        <th>#label('admin.width')</th>
+        <td>
+            #parentValue($category $parent 'dimentionWidth' 'decimal')
+            #stextfield('name=category.dimentionWidth' "value=$!util.formatNumber($category.dimentionWidth,'decimal2')" 'cssClass=field decimal')
+            <span style="float:left;margin:4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.height')</th>
+        <td>
+            #parentValue($category $parent 'dimentionHeight' 'decimal')
+            #stextfield('name=category.dimentionHeight' "value=$!util.formatNumber($category.dimentionHeight,'decimal2')" 'cssClass=field decimal')
+            <span style="float:left;margin:4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+        </td>
+        <th>#label('admin.weight')</th>
+        <td>
+            #parentValue($category $parent 'weight' 'decimal' 'decimal2')
+            #stextfield('name=category.weight' "value=$!util.formatNumber($category.weight,'decimal2')" 'cssClass=field decimal')
+            <span style="float:left;margin:4px;">#label("weight.unit.$!{weightUnit}")</span>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.enable.compare')</th>
+        <td>
+            #parentValue($category $parent 'compare' 'string-char')
+            #sradio('name=category.compare' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+        </td>
+        <th>#label('admin.product.template')</th>
+        <td>
+            #parentValue($category $parent 'productTemplate' 'string-short')
+            #sselect('name=category.productTemplate' "list=#{'':'Inherited'}" 'cssClass=field myselect string-medium' )
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.need.date.selection')</th>
+        <td>
+            #parentValue($category $parent 'dateSelection' 'string-char' '')
+            #sradio('name=category.dateSelection' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+        </td>
+        <th rowspan="8">#label('admin.review.categories')</th>
+        <td rowspan="8">
+            #parentValue($category $parent 'reviewCategories' 'string-medium' '')
+            #foreach($c in $category.reviewCategoryList)
+                <input type="text" name="category.reviewCategoryList" value="$!c" style="margin:2px 0;display:block;float:none;" class="field string-short"/>
+            #end
+            #foreach($c in [1..5])
+                <input type="text" name="category.reviewCategoryList" value="" style="margin:2px 0;display:block;float:none;" class="field string-short"/>
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.need.time.selection')</th>
+        <td>
+            #parentValue($category $parent 'timeSelection' 'string-char')
+            #sradio('name=category.timeSelection' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.need.shipping')</th>
+        <td>
+            #parentValue($category $parent 'needShipping' 'string-char')
+            #sradio('name=category.needShipping' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.markup.factor')</th>
+        <td>
+            #parentValue($category $parent 'markupFactor' 'decimal' 'decimal2')
+            #stextfield('name=category.markupFactor' "value=$!util.formatNumber($category.markupFactor,'money')" 'cssClass=field decimal')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.exchange.rate.markup.factor')</th>
+        <td>
+            #parentValue($category $parent 'erMarkupFactor' 'decimal' 'decimal2')
+            #stextfield('name=category.erMarkupFactor' "value=$!util.formatNumber($category.erMarkupFactor,'money')" 'cssClass=field decimal')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.validate.ip-address.for.add-to-cart')</th>
+        <td colspan="3">
+            #foreach($c in $action.getCountries(true))
+                <label style="margin-right:20px;">
+                    <input type="checkbox" name="buyFromCountries" value="${c.code}" #if($list.contains($category.getCountriesCanBuyList(), $c.code)) checked="checked" #end >
+                    $!c.name
+                </label>
+            #end
+            <span style="margin-left:20px;">(#label('select.none.allow.everywhere'))</span>
+        </td>
+    </tr>
+</table>
+
+<div class="button-bar">
+    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    #surl('id=urlCancel' "action=categorylist" )
+    <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+</div>
+</div>
+</form>
+
+    #if($category.idCategory)
+        #if(!$category.isRootCategory())
+        <div id="tabTree" class="listado tabpanel">
+            <div id="categoryTree">
+                #parse('/WEB-INF/views/admin/categorydata_tree.vm')
+            </div>
+        </div>
+        #end
+    <div id="tabPrices" class="formulario tabpanel">
+        <div id="categoryPrices">
+            #parse('/WEB-INF/views/admin/categorydata_price.vm')
+        </div>
+    </div>
+
+    <div id="tabAttributes" class="formulario tabpanel">
+        <div id="categoryProperties">
+            #parse('/WEB-INF/views/admin/categorydata_properties.vm')
+        </div>
+    </div>
+
+    <div id="tabStatic" class="formulario tabpanel">
+        <div id="categoryStaticText">
+            #parse('/WEB-INF/views/admin/categorydata_statictexts.vm')
+        </div>
+    </div>
+
+    <div id="tabComplements" class="formulario tabpanel">
+        <div id="categoryComplements">
+            #parse('/WEB-INF/views/admin/categorydata_complements.vm')
+        </div>
+    </div>
+
+    <div id="tabLabels" class="formulario tabpanel">
+        <div id="divLabels">
+            #parse('/WEB-INF/views/admin/categorydata_labels.vm')
+        </div>
+    </div>
+
+    <div id="tabPR" class="formulario tabpanel">
+        <div id="categoryPriceRange">
+            #parse('/WEB-INF/views/admin/categorydata_pricerange.vm')
+        </div>
+    </div>
+
+    #end
+</div>
+
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

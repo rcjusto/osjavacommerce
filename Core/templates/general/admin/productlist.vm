@@ -1,0 +1,284 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    tr.to-delete td {background-color: #ff3333 !important;}
+</style>
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text() == "$!action.getText('admin.hide.filters')") {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+            jQuery.cookie('filters.visible', 'false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text("$!action.getText('admin.hide.filters')");
+            jQuery.cookie('filters.visible', 'true');
+        }
+    }
+    function setFieldsToShow() {
+        $('#fieldConfig').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+    }
+    $(function() {
+        $('#form_filter').submit(function() {
+            $('#updateFilters').val('Y');
+            var n = $('input.selecteds:checked').size();
+            if ($('#productUpdate').val()=='Y' && n>0) {
+                if (!confirm("$!action.getText('admin.confirm.delete.products','You select some products to remove permanently. Are you sure?')")) {
+                    $('#productUpdate').val('');
+                    return false;
+                }
+            }
+            return true;
+        });
+        $('#treecat,select.tree-category').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20 + 4;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        if (jQuery.cookie('filters.visible') == 'false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+        }
+        $('#tab_listado').sortedTable('prodSortField', 'prodSortDirection', function() {
+            $('#form_filter').submit();
+        });
+        $('input.selecteds').change(function(){
+            var tr = $(this).closest('tr');
+            if ($(this).is(':checked')) tr.addClass('to-delete'); else tr.removeClass('to-delete');
+        }).trigger('change');
+    });
+    function updateColumns() {
+        $('#fieldDefinition').find('input').each(function() {
+            $(this).hide().appendTo('#form_filter');
+        });
+        $('#form_filter').submit();
+    }
+    function deleteProduct(idP) {
+        if (idP) {
+            deleteConfirm(function() {
+                $('#idProduct').val(idP);
+                $('#form_filter').submit();
+
+            }, 'Product ' + idP);
+        }
+        return false;
+    }
+</script>
+
+#set($catTree = $dao.getCategoryTree(false))
+
+<h1 style="float:left;">#label('admin.product.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">$!action.getText('admin.hide.filters')</a></span>
+<br style="clear:both;"/>
+<div class="listado">
+    #surl('id=urlFormFilter' "action=productlist")
+    <form id="form_filter" action="$urlFormFilter" method="post" class="validable">
+        <input type="hidden" id="productUpdate" name="productUpdate" value=""/>
+        <input type="hidden" id="updateFilters" name="updateFilters" value=""/>
+        #shidden('name=productFilter.sortedField' 'id=prodSortField')
+        #shidden('name=productFilter.sortedDirection' 'id=prodSortDirection')
+        <input type="hidden" id="idProduct" name="idProduct" value=""/>
+
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="960">
+                <tr>
+                    <th>#label('admin.part.number')</th>
+                    <td>#stextfield('name=productFilter.filterCode' 'cssClass=field string-medium')</td>
+                    <th>#label('admin.product.name')</th>
+                    <td>#stextfield('name=productFilter.filterName' 'cssClass=field string-medium')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.category')</th>
+                    <td>
+                        #if($categoryFilter)
+                            <select id="treecat" name="productFilter.filterCategories" class="field myselect string-medium">
+                                <option value="" level="0">#label('admin.not.filter')</option>
+                                #categoryOption($catTree 0 $!productFilter.filterCategories)
+                            </select>
+                        #else
+                            <input type="hidden" id="idCategory" name="productFilter.filterCategories" value="$!productFilter.filterCategories">
+                            <input type="text" id="nameCategory" readonly="readonly" value="$!action.getCategory($productFilter.filterCategories).getCategoryName($defaultLanguage)" class="field string-medium readonly" />
+                            <a href="#" class="ellipsis" onclick="return selectCategory('#idCategory','#nameCategory');"></a>
+                            <a href="#" class="clear" onclick="$('#idCategory').val('');$('#nameCategory').val(''); return false;"></a>
+                            #parse('/WEB-INF/views/admin/selectcategory.vm')
+                        #end
+                    </td>
+                    <th>#label('admin.label')</th>
+                    <td>
+                        <select name="productFilter.filterLabel" class="field myselect string-medium">
+                            <option value="">#label('admin.not.filter')</option>
+                            #foreach($opt in $labelList)
+                                <option value="$opt.code" #if($productFilter.filterLabel==$opt.code) selected="selected" #end >$!action.getText("label.$opt.code")</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.manufacturer')</th>
+                    <td>
+                        #if($manufacturerFilter)
+                            <select name="productFilter.filterManufacturer" class="field myselect string-medium">
+                                <option value="">#label('admin.not.filter')</option>
+                                #foreach($opt in $manufacturerList)
+                                    <option value="$opt.idManufacturer" #if($productFilter.filterManufacturer==$opt.idManufacturer) selected="selected" #end >$!{opt.manufacturerName}</option>
+                                #end
+                            </select>
+                        #else
+                            <input type="hidden" id="idManufacturer" name="productFilter.filterManufacturer" value="$!productFilter.filterManufacturer" />
+                            <input type="text" id="nameManufacturer" readonly="readonly" value="$!action.getManufacturer($productFilter.filterManufacturer).manufacturerName" class="field string-medium readonly" />
+                            <a href="#" class="ellipsis" onclick="return selectManufacturer('#idManufacturer','#nameManufacturer');"></a>
+                            <a href="#" class="clear" onclick="$('#idManufacturer').val('');$('#nameManufacturer').val(''); return false;"></a>
+                            #parse('/WEB-INF/views/admin/selectmanufacturer.vm')
+                        #end
+                    </td>
+                    <th>#label('admin.stock')</th>
+                    <td style="line-height:22px;">
+                        <span style="float:left;margin-right:10px;">#label('admin.between')</span>
+                        #stextfield('name=productFilter.filterMinStock' 'cssClass=field integer')
+                        <span style="float:left;margin:0 10px;"> #label('admin.and') </span>
+                        #stextfield('name=productFilter.filterMaxStock' 'cssClass=field integer')
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.active')</th>
+                    <td>#sradio('name=productFilter.filterEnabled' "list=#{'':'(No filter)', 'Y':'Only Active', 'N':'Only Inactive'}" )</td>
+                    <th>#label('admin.price')</th>
+                    <td>
+                        <span style="float:left;margin-right:10px;">#label('admin.between'):</span>
+                        #stextfield('name=productFilter.filterMinPrice' "value=$!{util.formatNumber(${productFilter.filterMinPrice}, 'money')}" 'cssClass=field decimal')
+                        <span style="float:left;margin:0 10px;"> #label('admin.and') </span>
+                        #stextfield('name=productFilter.filterMaxPrice' "value=$!{util.formatNumber(${productFilter.filterMaxPrice}, 'money')}" 'cssClass=field decimal')
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.days.without.stock')</th>
+                    <td>#stextfield('name=productFilter.filterDayWithoutStock' 'cssClass=field integer')</td>
+                    <th>#label('admin.archived')</th>
+                    <td>#sradio('name=productFilter.showArchived' "list=#{ 'N':'Only Not Archived', '':'All products', 'Y':'Only Archived'}" )</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.webid')</th>
+                    <td>#stextfield('name=productFilter.filterId' 'cssClass=field integer')</td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td nowrap="nowrap">
+                        <select onchange="$('#$!{productlist.name}_pagerows').val($(this).val());" class="field">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$productlist.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                        <div style="float:right;">
+                        <button type="submit" onclick="$('#productUpdate').val('');$('#updateFilters').val('Y');"><span class="search">#label('admin.update')</span></button>
+                        <button type="button" onclick="return setFieldsToShow();"><span class="settings">#label('admin.set.fields')</span></button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div>
+            </div>
+        </div>
+        <div id="fieldConfig" class="dialogo">
+            <div class="dialogContent">
+                <div class="dialog-header">
+                    <h2>#label('admin.product.list')</h2>
+                    <h4>#label('admin.configure.fields.to.show')</h4>
+                </div>
+                <div class="dialog-data">
+                    <div style="padding:10px 20px;" id="fieldDefinition">
+                        <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <th>#label('admin.field')</th>
+                                <th style="text-align:center;">#label('admin.show')</th>
+                                <th style="text-align:center;">#label('admin.edit')</th>
+                            </tr>
+                            #foreach($fieldInfo in $fieldList)
+                                <tr>
+                                    <td style="padding:4px;border-top:1px dotted silver;">$!fieldInfo.name<input type="hidden" name="fieldNames" value="$!fieldInfo.name"></td>
+                                    <td style="text-align:center;border-top:1px dotted silver;">#checkbox('showField' $fieldInfo.show)</td>
+                                    <td style="text-align:center;border-top:1px dotted silver;">#checkbox('editField' $fieldInfo.edit)</td>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+                </div>
+                <div class="button-bar">
+                    <button type="submit" onclick="updateColumns();"><span class="ok">#label('admin.update')</span></button>
+                    <button type="button" onclick="$('#fieldConfig').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+                </div>
+            </div>
+        </div>
+        #set($nav=$productlist)
+        #parse('/WEB-INF/views/admin/navigator.vm')
+        #if($util.isNotEmpty($productlist.listado))
+            <table id="tab_listado" class="listado sheet" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th class="sort" sortby="idProduct">Id</th>
+                    #foreach($fieldInfo in $fieldList)
+                        #productTableHeader($fieldInfo)
+                    #end
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($p in $productlist.listado)
+                    #surl('id=urlEdit' "action=productedit" "idProduct=$!p.idProduct")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!p.idProduct"/></td>
+                        <td>$!p.idProduct<input type="hidden" name="productId" value="$!p.idProduct"/></td>
+                        #foreach($fieldInfo in $fieldList)
+                            #productTableData($fieldInfo $p)
+                        #end
+                        <td class="link-bar" nowrap="nowrap">
+                            <a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a>
+                        </td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.produts.not.found')</h2>
+
+                <p>#label('admin.produts.not.found.text')</p>
+            </div>
+        #end
+
+        <div class="button-bar">
+            <div style="float:left;">
+                <button type="submit" onclick="$('#productUpdate').val('Y');"><span class="ok">#label('admin.update')</span></button>
+            </div>
+            #if($can_export)
+            <div style="float:left;margin-left:100px;">
+                <button type="button" onclick="$('#formExport').submit();"><span class="exportcsv">#label('admin.export.products')</span></button>
+                <button type="button" href="$!action.url('import_products','admin')"><span class="exportcsv">#label('admin.import.products')</span></button>
+            </div>
+            #end
+            <div style="float:right;">
+                #surl('id=urlNew' "action=productedit")
+                <button type="button" href="$urlNew"><span class="add">#label('admin.product.new')</span></button>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+    </form>
+
+#if($can_export)
+    <form id="formExport" action="$!action.url('export_products','admin')" method="post">
+    #shidden('name=productFilter.sortedField' )
+    #shidden('name=productFilter.sortedDirection')
+    #shidden('name=productFilter.filterCode')
+    #shidden('name=productFilter.filterName')
+    #shidden('name=productFilter.filterCategories')
+    #shidden('name=productFilter.filterLabel')
+    #shidden('name=productFilter.filterManufacturer')
+    #shidden('name=productFilter.filterMinStock')
+    #shidden('name=productFilter.filterMaxStock')
+    #shidden('name=productFilter.filterEnabled')
+    #shidden('name=productFilter.filterMinPrice')
+    #shidden('name=productFilter.filterMaxPrice')
+    #shidden('name=productFilter.showArchived')
+    #shidden('name=productFilter.filterDayWithoutStock')
+    </form>
+#end
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

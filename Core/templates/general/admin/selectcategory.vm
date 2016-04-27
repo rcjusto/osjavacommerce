@@ -1,0 +1,49 @@
+<style type="text/css">
+    #categorySearchResult li{border-bottom: 1px solid #eee;display: block; }
+    #categorySearchResult li a {display: block; padding: 6px; text-decoration: none}
+    #categorySearchResult li a:hover { background-color: #666; color: white; }
+</style>
+<div id="selectCategory" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.categories')</h2>
+            <h4>#label('admin.select.category')</h4>
+        </div>
+        <div class="dialog-data">
+            <div class="clearfix" style="padding: 5px; border-bottom: 1px solid #cccccc; ">
+                <input type="text" id="selectCategoryFilter" class="field " style="width: 430px;"/>
+            </div>
+            <ul id="categorySearchResult" style="height: 240px;overflow-y: auto;list-style: none;margin: 0; padding: 0">
+
+            </ul>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#selectCategory').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var fieldId, fieldName;
+    $(function(){
+        $('#selectCategoryFilter').keyup(function(){
+            $('#categorySearchResult').find('li').remove();
+            jQuery.getJSON("$!action.url('autocompleteCategories','admin')",{term:$('#selectCategoryFilter').val()}, function(data){
+                $('#categorySearchResult').find('li').remove();
+                jQuery.each(data, function(){
+                    $('<a>').addClass('select-category').attr('href','#').attr('rel',this.value).html(this.label).appendTo($('<li>').appendTo('#categorySearchResult'));
+                })
+            });
+        });
+        $('a.select-category').live('click', function(){
+            $(fieldId).val($(this).attr('rel'));
+            $(fieldName).val($(this).html());
+            $('#selectCategory').dialog('close');
+            return false;
+        });
+    });
+    function selectCategory(id, name) {
+        fieldId = id;
+        fieldName = name;
+        $('#selectCategory').dialog({width:500,modal:true,resizable:false,position:['center',50]});
+    }
+</script>

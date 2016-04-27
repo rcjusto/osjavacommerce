@@ -1,0 +1,3 @@
+#set( $contentPage = "/WEB-INF/views/${template}/front/shopcartdata_print.vm" )
+#set($pageTitle = "$!action.getText('shopping.cart')")
+#parse("/WEB-INF/views/${template}/front/layout_print.vm")

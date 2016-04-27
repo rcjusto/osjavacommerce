@@ -1,0 +1,45 @@
+<div class="right-customer">
+    <h3>#label('my.account')</h3>
+    #if($frontUser && !$frontUser.anonymousCheckout)
+        <p>$!frontUser.fullName</p>
+    #end
+    <ul>
+    #if($frontUser && !$frontUser.anonymousCheckout)
+        <li>#linklabel('my.profile' $!action.url('profile'))</li>
+        <li>#linklabel('my.wish.list' $!action.url('wishlist')) #if($frontUser.wishList)($frontUser.wishList.size())#end</li>
+        <li>#linklabel('my.orders' $!action.url('orders'))</li>
+    #else
+        <li>#linklabel('login.register' $!action.url('profile'))</li>
+    #end
+    </ul>
+</div>
+<div class="right-shopcart">
+    <h3>#label('my.shop.cart')</h3>
+    <ul>
+        <li>#linklabel('view.cart' $!action.url('shopcart') 'carticon')</li>
+        <li class="items">$userSession.items.size() #label('shopcart.items')</li>
+        <li class="total">#label('shopcart.total') $!action.formatActualCurrency($userSession.total)</li>
+        <li class="checkout">#linklabel('checkout' $!action.url('paystepAddress') 'checkout')</li>
+        #if($allowAnonymousCheckout)
+        <li class="checkout">#linklabel('anonymous.checkout' $!action.url('payanonymousform') 'checkout')</li>
+        #end
+    </ul>
+</div>
+#if($products_hot && $util.isNotEmpty($products_hot))
+<div class="right-hotproducts">
+    <h3>Hot Products</h3>
+    <ul>
+        #foreach($p in $products_hot)
+            #if($velocityCount<12)
+            <li><a href="$!action.urlProduct($p)">$p.getProductName($locale.language)</a></li>
+            #end
+        #end
+    </ul>
+</div>
+#end
+<div class="right-banners">
+    <h3></h3>
+    #banners('right-column',6)
+    <p></p>
+</div>
+<div class="clear"></div>

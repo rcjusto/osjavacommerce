@@ -1,0 +1,8 @@
+#if($productStaticTexts.get('[no-place]') && $util.isNotEmpty($productStaticTexts.get('[no-place]')))
+    #foreach($st in $productStaticTexts.get('[no-place]'))
+    <div class="product-text">
+        <div class="title">$!st.staticText.getLanguage($locale.language, $defaultLanguage).title</div>
+        <div>$!st.staticText.getLanguage($locale.language, $defaultLanguage).value</div>
+    </div>
+    #end
+#end

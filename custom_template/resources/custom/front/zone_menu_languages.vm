@@ -1,0 +1,14 @@
+#if($list.size($languages)>1)
+<div class="menu-languages clearfix block template-block">
+    <h2><span class="language-title">#label('language.menu')</span><span class="language-selected">#label("lang.$!{locale.language}")</span></h2>
+    <ul class="clearfix">
+        #foreach($l in $languages)
+            #if($locale.language!=$l)
+                <li class="$!l hoverable">#linklabel("lang.$!l" $!action.url('home','',$util.toMap(['set_lang',${l}])))</li>
+            #else
+                <li class="selected $!l hoverable">#label("lang.$!l")</li>
+            #end
+        #end
+    </ul>
+</div>
+#end

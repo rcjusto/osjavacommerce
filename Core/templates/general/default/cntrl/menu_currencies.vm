@@ -1,0 +1,14 @@
+#if($list.size($action.currencyList)>1)
+<div class="menu-currencies clearfix hoverable">
+    <div>#label("currency.$!{action.actualCurrency.code}")</div>
+    <ul class="clearfix">
+        #foreach($curr in $action.currencyList)
+            #if($action.actualCurrency!=$curr)
+                <li class="${curr.code} hoverable">#linklabel("currency.${curr.code}" $!action.url('home','',$util.toMap(['set_curr',${curr.code}])))</li>
+            #else
+                <li class="selected ${curr.code} hoverable">#label("currency.$!curr.code")</li>
+            #end
+        #end
+    </ul>
+</div>
+#end

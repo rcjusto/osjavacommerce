@@ -1,0 +1,192 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    .mode_detail {
+        margin-left: 30px;
+    }
+</style>
+<script type="text/javascript">
+    $(function() {
+        $("input[name='mode']").change(function() {
+            $('.mode_detail').hide();
+            if ($("input[name='mode']:checked").size()<1) $("input[name='mode']:first").attr('checked',true);
+            var sel = $("input[name='mode']:checked").val();
+            $('#detail_' + sel).show();
+        }).trigger('change');
+        $('.tree-select').treeSelect();
+        $('#btnHtml').click(function(){
+            var data = $('#formPdf').serialize();
+            $('#blockResult').loading("",loadingText);
+            $('#blockResult').load("$!action.url('pdf_generate_html','admin')", data);
+        });
+        $('#btnPdf').click(function(){
+            if ($('#formPdf').validForm()) {
+                var data = $('#formPdf').serialize();
+                $('#blockResult').loading("",loadingText);
+                $('#blockResult').load("$!action.url('pdf_generate_pdf','admin')", data);
+                $('#pdfName').val('');
+            }
+        });
+        $(".remove.pdf").click(function(){
+            var fn = $(this).attr('data');
+            dialogConfirm("$!action.getText('remove.file')","$!action.getText('remove.file') <strong>" + fn + "</strong>. $!action.getText('are.you.sure','Are you sure?')",function(){
+                $('#filename').val(fn);
+                $('#formRemove').submit();
+            });
+            return false;
+        });
+    });
+</script>
+<h1>#label('plugin.pdf.generator')</h1>
+<div class="clearfix">
+    <div style="width: 450px;float: left;margin:8px 10px;">
+        <form id="formPdf" method="post">
+        <h2 class="block-title">#label('generate.new.pdf')</h2>
+            #if($layouts && !$layouts.isEmpty())
+                #formErrors()
+                <h4>1. #label('include.in.pdf')</h4>
+                <div style="margin-top: 8px;">
+                    <label>
+                        <input type="radio" name="mode" value="all" #if($mode=='all') checked="checked" #end />
+                        <span>#label('full.catalog')</span>
+                    </label>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label>
+                        <input type="radio" name="mode" value="category" #if($mode=='category') checked="checked" #end/>
+                        <span>#label('admin.category')</span>
+                    </label>
+                    <table style="display: none;" id="detail_category" class="mode_detail">
+                        <tr>
+                            <th>#label('admin.select')</th>
+                            <td>
+                                <select name="category" class="field tree-select string-medium">
+                                    $!action.dao.getCategoryOptionsForSelect(true, "es")
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label>
+                        <input type="radio" name="mode" value="products" #if($mode=='products') checked="checked" #end/>
+                        <span>#label('admin.selected.products')</span>
+                    </label>
+                    <table style="display: none;" id="detail_products" class="mode_detail">
+                        <tr>
+                            <td>
+                                #if($numProducts && $numProducts>0)
+                                    #label('# Products'): $!numProducts
+                                #else
+                                    #label('# Products'): 0
+                                #end
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href="$!action.url('pdf_product_sel','admin')">#label('click.to.select.products')</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label>
+                        <input type="radio" name="mode" value="custom" #if($mode=='custom') checked="checked" #end/>
+                        <span>#label('custom.url')</span>
+                    </label>
+                    <table style="display: none;" id="detail_custom" class="mode_detail">
+                        <tr>
+                            <th>#label('admin.url')</th>
+                            <td>
+                                <input type="text" name="url" value="" class="field string-medium"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <h4 style="margin-bottom: 0;">2. #label('pdf.product.prices')</h4>
+                    <table>
+                        <tr>
+                            <th>#label('admin.user.level')</th>
+                            <td>
+                                <select name="userLevel" class="field string-medium">
+                                    #foreach($level in $action.userLevelList)
+                                    <option value="$!level.id">$!level.getName($action.defaultLanguage)</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <h4 style="margin-bottom: 0;">3. #label('pdf.layout')</h4>
+                    <table>
+                        <tr>
+                            <td>
+                                <select name="layout" class="field string-medium">
+                                    #foreach($l in $layouts)
+                                    <option value="$!l">$!l</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <h4 style="margin-bottom: 0;">4. #label('pdf.name')</h4>
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="text" id="pdfName" name="filename" value="" class="field string-medium required"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="btnBar" class="button-bar" style="margin-top: 20px;">
+                    <button id="btnPdf" type="button"><span>#label('admin.generate.pdf')</span></button>
+                    <!--button id="btnHtml" type="button"><span>#label('admin.generate.html')</span></button-->
+                </div>
+                <div id="blockResult">
+                    #parse('/WEB-INF/views/org/store/pdf/views/result_thread.vm')
+                </div>
+            #else
+                <div class="error">
+                    <h2>#label('admin.errors')</h2>
+                    <p>#label('pdf.layouts.not.found')</p>
+                </div>
+            #end
+        </form>
+    </div>
+    <div style="width: 450px;float: left;margin:8px 10px;">
+        <h2 class="block-title">#label('generated.pdfs')</h2>
+        <div class="listado">
+            <form id="formRemove" action="$!action.url('pdf_remove_pdf','admin')" method="post">
+                <input type="hidden" name="filename" id="filename" value=""/>
+            </form>
+            <table class="listado" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.filename')</th>
+                    <th style="text-align: right;">#label('file.size')</th>
+                    <th style="text-align: center;">#label('admin.modified')</th>
+                    <th style="text-align: center;">&nbsp;</th>
+                </tr>
+                #foreach($pdf in $pdfs)
+                    #if($pdf.length()>0)
+                    <tr>
+                        <td><a href="/stores/$!{storeCode}/pdf/$!{pdf.name}" class="ext_pdf">$!pdf.name</a></td>
+                        <td style="text-align: right;">$!util.formatFileSize($!pdf.length())</td>
+                        <td style="text-align: center;">$!date.format('yyyy-MM-dd HH:mm', $pdf.lastModified())</td>
+                        <td style="text-align: center;"><a href="#" class="remove pdf" data="$!pdf.name" title="$!action.getText('admin.remove')" ></a></td>
+                    </tr>
+                    #end
+                #end
+            </table>
+        </div>
+    </div>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

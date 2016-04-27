@@ -1,0 +1,138 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=loadStates' "action=countrystates")
+<script type="text/javascript">
+    $(function() {
+        $('#countryCode').change(function() {
+            if ($(this).val() != '0') {
+                $('#statesContainer').load("$loadStates", {countryCode:$(this).val(),idState:"$!{provider.state.idState}"});
+            } else {
+                $('#statesContainer').html("$!action.getText('admin.select.a.country')")
+            }
+        }).trigger('change');
+    });
+</script>
+<h1>
+    #if ($provider.idProvider)
+        #label('admin.provider.modify') - ID: $!provider.idProvider
+    #else
+        #label('admin.provider.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveprovider")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=provider.idProvider')
+#shidden('name=idProvider' "value=$!provider.idProvider")
+<div class="formulario">
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td colspan="3">
+                #stextfield('name=provider.providerName' 'cssClass=field string-large required')
+            </td>
+        </tr>
+        <tr>
+            <th class="required" style="width:140px;">#label('admin.contact')</th>
+            <td style="width:280px;">
+                #stextfield('name=provider.contact' 'size=40' 'cssClass=field string-medium required')
+            </td>
+            <th class="required" style="width:120px;">#label('admin.email')</th>
+            <td style="width:280px;">
+                #stextfield('name=provider.email' 'size=40' 'cssClass=field string-medium required email')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.country')</th>
+            <td>
+                #sselect('id=countryCode' 'name=provider.countryCode' "list=countries" 'listKey=code' 'listValue=name' "headerKey=0" "headerValue=$!action.getText('admin.select.a.country')"  'cssClass=myselect field required string-medium')
+            </td>
+            <th class="required">#label('admin.state')</th>
+            <td id="statesContainer">
+               #label('admin.select.a.country')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.city')</th>
+            <td>
+                #stextfield('name=provider.city' 'cssClass=field required string-medium')
+            </td>
+            <th class="required">#label('admin.postal.code')</th>
+            <td>
+                #stextfield('name=provider.zipCode' 'cssClass=field required string-short')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.address')</th>
+            <td>
+                #stextfield('name=provider.address' 'cssClass=field required string-medium')
+            </td>
+            <th>#label('admin.phone')</th>
+            <td>
+                #stextfield('name=provider.phone' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('admin.payment.terms')</th>
+            <td colspan="3">
+                #sselect('name=idPayterm' "value=provider.payterms.idPayterms" "list=payterms" 'listKey=idPayterms' 'listValue=description' "headerKey=0" "headerValue=$!action.getText('admin.select.a.payment.term')" 'cssClass=myselect field  string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.services')</th>
+            <td>
+                <select id="serviceName" name="provider.serviceName" class="field string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #foreach($serv in $providerServices)
+                    <option value="$!serv" #if($serv==$provider.serviceName) selected="selected" #end >$serv</option>
+                    #end
+                </select>
+            </td>
+            <td id="serviceProperties" colspan="2">
+
+            </td>
+        </tr>
+        <tr class="block-title">
+            <th colspan="4">
+                #scheckbox('name=provider.ownership' 'id=ownership')
+                <label for="ownership">#label("ownership.preference")</label>
+            </th>
+        </tr>
+        <tr id="blockOwnership">
+            <th>#label('admin.username')</th>
+            <td>
+                #stextfield('name=provider.username' 'cssClass=field string-medium')
+            </td>
+            <th>#label('admin.password')</th>
+            <td>
+                #stextfield('name=provider.password' 'cssClass=field string-medium')
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listprovider" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#surl('id=urlGetServices' "action=providergetproperties")
+<script type="text/javascript">
+    $(function(){
+        $('#serviceName').change(
+                function() {
+                    if ($(this).val()!='') {
+                        $('#serviceProperties').loading("$!action.getText('admin.loading.services.properties')","$!action.getText('admin.please.wait')");
+                        $('#serviceProperties').load("$urlGetServices",{idProvider:$!provider.idProvider,serviceName: $(this).val()});
+                    } else {
+                        $('#serviceProperties').html('');
+                    }
+                }
+        ).trigger('change');
+        $('#ownership').change(function(){
+            if ($(this).is(':checked')) $('#blockOwnership').show();
+            else $('#blockOwnership').hide();
+        }).trigger('change')
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

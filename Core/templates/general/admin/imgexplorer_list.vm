@@ -1,0 +1,19 @@
+#if ($files && $files.size()>0)
+<ul id="files" class="clearfix">
+    #foreach($f in $files)
+    <li>
+        <div class="image"><a href="#" class="select" rel="$!f.name"><img src="$!{util.siteHost}$!action.storeFile('images/custom')/$!{f.name}" alt="" title="$!f.name ($!util.formatFileSize($!f.length()))"/></a></div>
+        <div class="data clearfix">
+            <div class="filename"><a href="#" class="select" rel="$!f.name">$!{f.name}</a></div>
+            <div class="filesize">$!{util.formatFileSize($f.length())}</div>
+            <a href="#" class="delete" style="float:right;" rel="$!f.name"></a>
+        </div>
+    </li>
+    #end
+</ul>
+#else
+    <div style="text-align: center;margin-top: 20%">
+        #label('admin.images.not.found')
+    </div>
+#end
+<div style="clear:both;"></div>

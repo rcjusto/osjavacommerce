@@ -1,0 +1,4 @@
+<div class="profile-page template-block">
+    #parse("/WEB-INF/views/custom/front/profile_detail.vm")
+    #parse("/WEB-INF/views/custom/front/addresses_detail.vm")
+</div>

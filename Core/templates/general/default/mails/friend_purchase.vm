@@ -1,0 +1,5 @@
+$!{action.mailGlobalTop}
+<p><br/></p>
+<p>$!{action.getText('referred.friend.purchase')}</p>
+<p>$!{action.getText('friend.email')} $!{friend.email}</p>
+<p>$!{action.getText('points.earned')} $!{points} $!{action.getText('points')}</p>

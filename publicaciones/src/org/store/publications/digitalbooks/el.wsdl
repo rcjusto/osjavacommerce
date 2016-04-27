@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:tns="digitalbooks.theme.browser.webservice.soap.DBSOAPMethods" xmlns:typens="digitalbooks.theme.browser.webservice.soap.DBSOAPMethods" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="digitalbooks.theme.browser.webservice.soap.DBSOAPMethods" name="DBSOAPMethods">
+    <types>
+        <schema targetNamespace="digitalbooks.theme.browser.webservice.soap.DBSOAPMethods" xmlns="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="LineaPedidoRespuesta" type="tns:LineaPedidoRespuesta"/>
+            <xs:complexType name="libroVendidoV2">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                    <xs:element name="ean_13" type="xs:string"/>
+                    <xs:element name="precio" type="xs:float"/>
+                    <xs:element name="divisa" type="xs:string"/>
+                    <xs:element name="id_pais_facturacion" type="xs:string"/>
+                    <xs:element name="comprobar_precio" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="devuelveEnlaceResponse">
+                <xs:sequence>
+                    <xs:element name="devuelveEnlaceResult" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="librosVendidosV2">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                    <xs:element name="array_pedidos" type="tns:LineaPedidoArray"/>
+                    <xs:element name="id_pais_facturacion" type="xs:string"/>
+                    <xs:element name="comprobar_precio" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="librosVendidosV2Response" type="tns:librosVendidosV2Response"/>
+            <xs:element name="devuelveEnlacesResponse" type="tns:devuelveEnlacesResponse"/>
+            <xs:element name="devuelveEnlaces" type="tns:devuelveEnlaces"/>
+            <xs:complexType name="solicitudCatalogoCompleto">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="cancelaPedidoResponse" type="tns:cancelaPedidoResponse"/>
+            <xs:element name="devuelveEnlaceResponse" type="tns:devuelveEnlaceResponse"/>
+            <xs:complexType name="libroVendido">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                    <xs:element name="ean_13" type="xs:string"/>
+                    <xs:element name="precio" type="xs:float"/>
+                    <xs:element name="divisa" type="xs:string"/>
+                    <xs:element name="id_pais_facturacion" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="devuelveEnlace">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                    <xs:element name="item_pedido" type="xs:string"/>
+                    <xs:element name="ean_13" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="librosVendidosV2Response">
+                <xs:sequence>
+                    <xs:element name="librosVendidosV2Result" type="tns:LineaPedidoRespuestaArray"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="LineaPedidoRespuestaArray" type="tns:LineaPedidoRespuestaArray"/>
+            <xs:element name="librosVendidosResponse" type="tns:librosVendidosResponse"/>
+            <xs:element name="devuelveEnlace" type="tns:devuelveEnlace"/>
+            <xs:complexType name="librosVendidos">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                    <xs:element name="array_pedidos" type="tns:LineaPedidoArray"/>
+                    <xs:element name="id_pais_facturacion" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="libroVendidoResponse" type="tns:libroVendidoResponse"/>
+            <xs:element name="libroVendidoV2" type="tns:libroVendidoV2"/>
+            <xs:element name="libroVendidoV2Response" type="tns:libroVendidoV2Response"/>
+            <xs:complexType name="devuelveEnlacesResponse">
+                <xs:sequence>
+                    <xs:element name="devuelveEnlacesResult" type="tns:LineaPedidoRespuestaArray"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="cancelaPedidoResponse">
+                <xs:sequence>
+                    <xs:element name="cancelaPedidoResult" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="librosVendidos" type="tns:librosVendidos"/>
+            <xs:element name="solicitudCatalogoCompleto" type="tns:solicitudCatalogoCompleto"/>
+            <xs:complexType name="LineaPedidoRespuestaArray">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" type="tns:LineaPedidoRespuesta" name="LineaPedidoRespuesta"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="libroVendidoResponse">
+                <xs:sequence>
+                    <xs:element name="libroVendidoResult" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="LineaPedidoArray" type="tns:LineaPedidoArray"/>
+            <xs:complexType name="LineaPedidoArray">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" type="tns:LineaPedido" name="LineaPedido"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="libroVendido" type="tns:libroVendido"/>
+            <xs:element name="LineaPedido" type="tns:LineaPedido"/>
+            <xs:element name="solicitudCatalogoCompletoResponse" type="tns:solicitudCatalogoCompletoResponse"/>
+            <xs:complexType name="solicitudCatalogoCompletoResponse">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="librosVendidosResponse">
+                <xs:sequence>
+                    <xs:element name="librosVendidosResult" type="tns:LineaPedidoRespuestaArray"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="cancelaPedido">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="libroVendidoV2Response">
+                <xs:sequence>
+                    <xs:element name="libroVendidoV2Result" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="LineaPedidoRespuesta">
+                <xs:sequence>
+                    <xs:element name="item_pedido" minOccurs="0" type="xs:string"/>
+                    <xs:element name="link" minOccurs="0" type="xs:string"/>
+                    <xs:element name="ean_13" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="devuelveEnlaces">
+                <xs:sequence>
+                    <xs:element name="retailer_id" type="xs:string"/>
+                    <xs:element name="id_pedido" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="LineaPedido">
+                <xs:sequence>
+                    <xs:element name="item_pedido" minOccurs="0" type="xs:string"/>
+                    <xs:element name="divisa" minOccurs="0" type="xs:string"/>
+                    <xs:element name="precio" minOccurs="0" type="xs:float"/>
+                    <xs:element name="ean_13" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="librosVendidosV2" type="tns:librosVendidosV2"/>
+            <xs:element name="cancelaPedido" type="tns:cancelaPedido"/>
+        </schema>
+    </types>
+    <message name="cancelaPedido">
+        <part name="cancelaPedido" element="tns:cancelaPedido"/>
+    </message>
+    <message name="cancelaPedidoResponse">
+        <part name="cancelaPedidoResponse" element="tns:cancelaPedidoResponse"/>
+    </message>
+    <message name="devuelveEnlace">
+        <part name="devuelveEnlace" element="tns:devuelveEnlace"/>
+    </message>
+    <message name="devuelveEnlaceResponse">
+        <part name="devuelveEnlaceResponse" element="tns:devuelveEnlaceResponse"/>
+    </message>
+    <message name="devuelveEnlaces">
+        <part name="devuelveEnlaces" element="tns:devuelveEnlaces"/>
+    </message>
+    <message name="devuelveEnlacesResponse">
+        <part name="devuelveEnlacesResponse" element="tns:devuelveEnlacesResponse"/>
+    </message>
+    <message name="libroVendido">
+        <part name="libroVendido" element="tns:libroVendido"/>
+    </message>
+    <message name="libroVendidoResponse">
+        <part name="libroVendidoResponse" element="tns:libroVendidoResponse"/>
+    </message>
+    <message name="libroVendidoV2">
+        <part name="libroVendidoV2" element="tns:libroVendidoV2"/>
+    </message>
+    <message name="libroVendidoV2Response">
+        <part name="libroVendidoV2Response" element="tns:libroVendidoV2Response"/>
+    </message>
+    <message name="librosVendidos">
+        <part name="librosVendidos" element="tns:librosVendidos"/>
+    </message>
+    <message name="librosVendidosResponse">
+        <part name="librosVendidosResponse" element="tns:librosVendidosResponse"/>
+    </message>
+    <message name="librosVendidosV2">
+        <part name="librosVendidosV2" element="tns:librosVendidosV2"/>
+    </message>
+    <message name="librosVendidosV2Response">
+        <part name="librosVendidosV2Response" element="tns:librosVendidosV2Response"/>
+    </message>
+    <message name="solicitudCatalogoCompleto">
+        <part name="solicitudCatalogoCompleto" element="tns:solicitudCatalogoCompleto"/>
+    </message>
+    <message name="solicitudCatalogoCompletoResponse"/>
+    <portType name="DBSOAPMethods">
+        <operation name="cancelaPedido" parameterOrder="cancelaPedido">
+            <documentation/>
+            <input name="cancelaPedido" message="tns:cancelaPedido"/>
+            <output name="cancelaPedidoResponse" message="tns:cancelaPedidoResponse"/>
+        </operation>
+        <operation name="devuelveEnlace" parameterOrder="devuelveEnlace">
+            <documentation/>
+            <input name="devuelveEnlace" message="tns:devuelveEnlace"/>
+            <output name="devuelveEnlaceResponse" message="tns:devuelveEnlaceResponse"/>
+        </operation>
+        <operation name="devuelveEnlaces" parameterOrder="devuelveEnlaces">
+            <documentation/>
+            <input name="devuelveEnlaces" message="tns:devuelveEnlaces"/>
+            <output name="devuelveEnlacesResponse" message="tns:devuelveEnlacesResponse"/>
+        </operation>
+        <operation name="libroVendido" parameterOrder="libroVendido">
+            <documentation/>
+            <input name="libroVendido" message="tns:libroVendido"/>
+            <output name="libroVendidoResponse" message="tns:libroVendidoResponse"/>
+        </operation>
+        <operation name="libroVendidoV2" parameterOrder="libroVendidoV2">
+            <documentation/>
+            <input name="libroVendidoV2" message="tns:libroVendidoV2"/>
+            <output name="libroVendidoV2Response" message="tns:libroVendidoV2Response"/>
+        </operation>
+        <operation name="librosVendidos" parameterOrder="librosVendidos">
+            <documentation/>
+            <input name="librosVendidos" message="tns:librosVendidos"/>
+            <output name="librosVendidosResponse" message="tns:librosVendidosResponse"/>
+        </operation>
+        <operation name="librosVendidosV2" parameterOrder="librosVendidosV2">
+            <documentation/>
+            <input name="librosVendidosV2" message="tns:librosVendidosV2"/>
+            <output name="librosVendidosV2Response" message="tns:librosVendidosV2Response"/>
+        </operation>
+        <operation name="solicitudCatalogoCompleto" parameterOrder="solicitudCatalogoCompleto">
+            <documentation/>
+            <input name="solicitudCatalogoCompleto" message="tns:solicitudCatalogoCompleto"/>
+            <output name="solicitudCatalogoCompletoResponse" message="tns:solicitudCatalogoCompletoResponse"/>
+        </operation>
+    </portType>
+    <plnk:partnerLinkType name="DBSOAPMethods">
+        <plnk:role name="DBSOAPMethods">
+            <plnk:portType name="tns:DBSOAPMethods"/>
+        </plnk:role>
+    </plnk:partnerLinkType>
+    <binding name="DBSOAPMethods" type="tns:DBSOAPMethods">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="cancelaPedido">
+            <soap:operation soapAction="cancelaPedido" style="document"/>
+            <input name="cancelaPedido">
+                <soap:body use="literal"/>
+            </input>
+            <output name="cancelaPedidoResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="devuelveEnlace">
+            <soap:operation soapAction="devuelveEnlace" style="document"/>
+            <input name="devuelveEnlace">
+                <soap:body use="literal"/>
+            </input>
+            <output name="devuelveEnlaceResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="devuelveEnlaces">
+            <soap:operation soapAction="devuelveEnlaces" style="document"/>
+            <input name="devuelveEnlaces">
+                <soap:body use="literal"/>
+            </input>
+            <output name="devuelveEnlacesResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="libroVendido">
+            <soap:operation soapAction="libroVendido" style="document"/>
+            <input name="libroVendido">
+                <soap:body use="literal"/>
+            </input>
+            <output name="libroVendidoResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="libroVendidoV2">
+            <soap:operation soapAction="libroVendidoV2" style="document"/>
+            <input name="libroVendidoV2">
+                <soap:body use="literal"/>
+            </input>
+            <output name="libroVendidoV2Response">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="librosVendidos">
+            <soap:operation soapAction="librosVendidos" style="document"/>
+            <input name="librosVendidos">
+                <soap:body use="literal"/>
+            </input>
+            <output name="librosVendidosResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="librosVendidosV2">
+            <soap:operation soapAction="librosVendidosV2" style="document"/>
+            <input name="librosVendidosV2">
+                <soap:body use="literal"/>
+            </input>
+            <output name="librosVendidosV2Response">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="solicitudCatalogoCompleto">
+            <soap:operation soapAction="solicitudCatalogoCompleto" style="document"/>
+            <input name="solicitudCatalogoCompleto">
+                <soap:body use="literal"/>
+            </input>
+            <output name="solicitudCatalogoCompletoResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="DBSOAPMethods">
+        <port name="DBSOAPMethods" binding="tns:DBSOAPMethods">
+            <soap:address location="http://www.aglutinaeditores.com"/>
+        </port>
+    </service>
+</definitions>

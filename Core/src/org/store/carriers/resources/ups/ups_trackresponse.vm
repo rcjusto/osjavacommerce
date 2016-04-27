@@ -1,0 +1,71 @@
+#set( $tr = $bean )
+   #if( $tr )
+    <h1>Tracking Information</h1>
+    <table>
+        <tr>
+            <th colspan="2">Ship To</th>
+        </tr>
+        <tr>
+            <td>Address</td>
+            <td>$!tr.addressLine1 $!tr.addressLine2</td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td>$!tr.city</td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>$!tr.stateProvinceCode</td>
+        </tr>
+        <tr>
+            <td>Postal Code</td>
+            <td>$!tr.postalCode</td>
+        </tr>
+        <tr>
+            <td>Country</td>
+            <td>$!tr.countryCode</td>
+        </tr>
+        <tr><th colspan="2"></th></tr>
+        <tr><th colspan="2">Shipment Information</th></tr>
+        <tr>
+            <td>Total Weight</td>
+            <td>$!tr.shipmentWeight $!tr.shipmentWeightUnit</td>
+        </tr>
+        <tr>
+            <td>Service</td>
+            <td>$!tr.serviceCode - $!tr.serviceDescription</td>
+        </tr>
+        <tr>
+            <td>Pickup Date</td>
+            <td>$!tr.pickupDate</td>
+        </tr>
+        <tr>
+            <td>Scheduled Delivery to</td>
+            <td>$!tr.scheduledDeliveryDate</td>
+        </tr>
+        #foreach( $p in $tr.packages )
+        <tr><th colspan="2"></th></tr>
+        <tr><th colspan="2">Package $math.add($velocityCount,1)</th></tr>
+        <tr>
+            <td>Tracking Number</td>
+            <td>$!p.trackingNumber</td>
+        </tr>
+        <tr>
+            <td>Delivery Status</td>
+            <td>$!p.activityDate: $!p.statusTypeCode - $!p.statusTypeDescription</td>
+        </tr>
+        #if( $!p.alSignedForByName )
+        <tr>
+            <td>Signed By</td>
+            <td>$!p.alSignedForByName</td>
+        </tr>
+        #end
+        <tr>
+            <td>Location</td>
+            <td>$!p.alAddressLine1 $!p.alAddressLine2 $!p.alCity  $!p.alState  $!p.alCountry</td>
+        </tr>
+        #end
+    </table>
+#else
+There is not tracking information.
+#end

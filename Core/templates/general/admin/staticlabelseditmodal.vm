@@ -1,0 +1,48 @@
+#surl('id=urlSaveLabel' "action=staticlabelsave")
+<div class="dialog-header">
+<h2>
+    #if ($localizedText.id)
+        #label('admin.label.modify')
+    #else
+        #label('admin.label.new')
+    #end
+</h2>
+<h4>#label('admin.label.update.instructions')</h4>
+</div>
+<div class="dialog-data" style="padding:20px;">
+<form id="dialog_editlabel">
+#shidden('name=localizedText.type' 'value=LABEL')
+#shidden('name=localizedText.id')
+#shidden('name=staticId')
+<div class="formulario" >
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required" style="vertical-align:top;">#label('admin.code')</th>
+            <td style="vertical-align:top;">
+                    #shidden('name=localizedText.code' "value=$!staticId")<input type="text" readonly="readonly" value="$!staticId" class="field readonly string-medium" />
+            </td>
+        </tr>
+        #foreach($l in $languages)
+            <tr>
+                <th class="required" style="vertical-align:top;">#label("lang.$l"):</th>
+                <td style="vertical-align:top;">
+                    <textarea name="localizedText_value" class="field required" style="width:400px !important;">$!esc.html($localizedText.getValueLang($l))</textarea>
+                </td>
+            </tr>
+        #end
+    </table>
+</div>
+</form>
+</div>
+<div class="button-bar">
+    <button id="dialogBtnOk" type="button" onclick="saveLabel();" ><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');" ><span class="cancel">#label('admin.close')</span></button>
+</div>
+<script type="text/javascript">
+    function saveLabel() {
+        $('#dialogBtnOk').hide();
+        var url = "$!urlSaveLabel";
+        jQuery.post(url,$('#dialog_editlabel').serialize());
+        $('#dialogo').dialog('close');
+    }
+</script>

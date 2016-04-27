@@ -1,0 +1,63 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.merchant.modify')</h1>
+#surl('id=urlForm' "action=savemerchant")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=serviceName' "value=$!service.code")
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>#label('admin.name')</th>
+                <td>$!service.code</td>
+            </tr>
+            <tr>
+                <th>#label('admin.type')</th>
+                <td>#label("payment.type.${service.type}")</td>
+            </tr>
+            <tr>
+                <th>#label('admin.active')</th>
+                <td>
+                    #if($active)
+                        #checkbox('active' true)
+                    #else
+                        #checkbox('active' false)
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.visible.name')</th>
+                <td>
+                    <input name="vis_label" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="label" value="$!label.getValueLang($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.message.when.selected')</th>
+                <td>
+                    <textarea name="vis_message" class="multilang field string-large"></textarea>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="message" value="$!message.getLanguage($l).value"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.comision.for.sales')</th>
+                <td>
+                    <input type="text" name="salesComision" class="field decimal" value="$!util.formatNumber($salesComision, '0.00')" />
+                </td>
+            </tr>
+            $!form
+        </table>
+
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listmerchant" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,33 @@
+#* @implicitly included *#
+#* @vtlvariable name="states" type="java.util.List<org.store.core.beans.State>" *#
+#* @vtlvariable name="review" type="org.store.core.beans.ProductReview" *#
+#* @vtlvariable name="dao" type="org.store.core.dao.HibernateDAO" *#
+#* @vtlvariable name="purchase" type="org.store.core.beans.PurchaseOrder" *#
+#* @vtlvariable name="scu" type="org.store.core.globals.ShopCartUtils" *#
+#* @vtlvariable name="userLevel" type="org.store.core.beans.UserLevel" *#
+#* @vtlvariable name="shopCart" type="org.store.core.beans.ShopCart" *#
+#* @vtlvariable name="alternator" type="org.apache.velocity.tools.generic.AlternatorTool" *#
+#* @vtlvariable name="esc" type="org.apache.velocity.tools.generic.EscapeTool" *#
+#* @vtlvariable name="mail" type="org.store.core.beans.Mail" *#
+#* @vtlvariable name="banner" type="org.store.core.beans.Banner" *#
+#* @vtlvariable name="staticText" type="org.store.core.beans.StaticText" *#
+#* @vtlvariable name="job" type="org.store.core.beans.Job" *#
+#* @vtlvariable name="provider" type="org.store.core.beans.Provider" *#
+#* @vtlvariable name="locale" type="java.util.Locale" *#
+#* @vtlvariable name="rma" type="org.store.core.beans.Rma" *#
+#* @vtlvariable name="user" type="org.store.core.beans.User" *#
+#* @vtlvariable name="order" type="org.store.core.beans.Order" *#
+#* @vtlvariable name="date" type="org.apache.velocity.tools.generic.DateTool" *#
+#* @vtlvariable name="frontUser" type="org.store.core.beans.User" *#
+#* @vtlvariable name="promotionalCode" type="org.store.core.beans.PromotionalCode" *#
+#* @vtlvariable name="userSession" type="org.store.core.front.UserSession" *#
+#* @vtlvariable name="manufacturer" type="org.store.core.beans.Manufacturer" *#
+#* @vtlvariable name="category" type="org.store.core.beans.Category" *#
+#* @vtlvariable name="product" type="org.store.core.beans.Product" *#
+#* @vtlvariable name="action" type="org.store.core.globals.BaseAction" *#
+#* @velocityproperties path=velocity.properties *#
+#* @vtlvariable name="render" type="org.apache.velocity.tools.generic.RenderTool" *#
+#* @vtlvariable name="list" type="org.apache.velocity.tools.generic.ListTool" *#
+#* @vtlvariable name="math" type="org.apache.velocity.tools.generic.MathTool" *#
+#* @vtlvariable name="number" type="org.apache.velocity.tools.generic.NumberTool" *#
+#* @vtlvariable name="util" type="org.store.core.velocity.VelocityUtils" *#

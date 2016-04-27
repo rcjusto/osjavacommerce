@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FDXRateAvailableServicesRequest xsi:noNamespaceSchemaLocation="FDXRateAvailableServicesRequest.xsd">
+	<RequestHeader>
+		<AccountNumber>$!bean.user.accountNumber</AccountNumber>
+		<MeterNumber>$!bean.user.meterNumber</MeterNumber>
+		<CarrierCode>$!bean.carrierCode</CarrierCode>
+	</RequestHeader>
+	<ShipDate>$!bean.shipDate</ShipDate>
+	<DropoffType>$!bean.dropoffType</DropoffType>
+	<Packaging>$!bean.packaging</Packaging>
+	<WeightUnits>$!bean.weightUnits</WeightUnits>
+	<Weight>$!tool.format($bean.pack.packageWeight, '0.0')</Weight>
+	<ListRate>$!bean.listRate</ListRate>
+	<OriginAddress>
+		<StateOrProvinceCode>$!bean.originAddress.stateProvinceCode</StateOrProvinceCode>
+		<PostalCode>$!bean.originAddress.postalCode</PostalCode>
+		<CountryCode>$!bean.originAddress.countryCode</CountryCode>
+	</OriginAddress>
+	<DestinationAddress>
+		<StateOrProvinceCode>$!bean.destinationAddress.stateProvinceCode</StateOrProvinceCode>
+		<PostalCode>$!bean.destinationAddress.postalCode</PostalCode>
+		<CountryCode>$!bean.destinationAddress.countryCode</CountryCode>
+	</DestinationAddress>
+	<Payment>
+		<PayorType>$!bean.payorType</PayorType>                                             
+	</Payment>
+	<Dimentions>
+		<Length>$!tool.roundToInt($bean.pack.dimensionsLength)</Length>
+		<Width>$!tool.roundToInt($bean.pack.dimensionsWidth)</Width>
+		<Height>$!tool.roundToInt($bean.pack.dimensionsHeight)</Height>
+		<Units>$!bean.dimentionsUnits</Units>
+	</Dimentions>
+	<DeclaredValue>
+		<Value>$!tool.format($bean.pack.insuredValueMonetaryValue, '0.00')</Value>
+		<CurrencyCode>USD</CurrencyCode>
+	</DeclaredValue>
+	<SpecialServices>
+		<HoldAtLocation>$!bean.holdAtLocation</HoldAtLocation>
+		<DryIce>$!bean.dryIce</DryIce>
+		<ResidentialDelivery>$!bean.residentialDelivery</ResidentialDelivery>
+		<InsidePickup>$!bean.insidePickup</InsidePickup>
+		<InsideDelivery>$!bean.insideDelivery</InsideDelivery>
+		<SaturdayPickup>$!bean.saturdayPickup</SaturdayPickup>
+		<SaturdayDelivery>$!bean.saturdayDelivery</SaturdayDelivery>
+	</SpecialServices>
+	<PackageCount>1</PackageCount>
+</FDXRateAvailableServicesRequest>

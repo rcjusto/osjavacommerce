@@ -1,0 +1,135 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function exportProducts() {
+        $('#exportResult').loading("$!action.getText('admin.exporting.products')", "$!action.getText('admin.please.wait')").show();
+        $('#exportResult').load("$action.url('export_products_do','admin')", $('#form_export').serialize(), function() {
+            $('#form_export').show();
+        });
+        $('#form_export').hide();
+        return false;
+    }
+    function saveNewProfile() {
+        var cad = '';
+        $(".exportField:checked").each(function() {
+            if (cad != '') cad += ',';
+            cad += $(this).val();
+        });
+        if (cad == '') {
+            return;
+        }
+        if ($('#profileName').val() == '') {
+            return;
+        }
+        $('#profiles').html("$!action.getText('admin.please.wait')");
+        $('#profiles').load("$action.url('export_products_profile_save','admin')", {profileName:$('#profileName').val(),profileField:cad});
+        $('#profileName').val('');
+    }
+    function delProfile(ff) {
+        if (ff == '' || ff == 'undefined') {
+            alert('error');
+            return;
+        }
+        $('#profiles').html("$!action.getText('admin.please.wait')");
+        $('#profiles').load("$action.url('export_products_profile_del','admin')", {profileName:ff});
+    }
+    function applyProfile(el) {
+        var fields = $(el).attr('rel');
+        if (fields != null && fields != '') {
+            var arrF = fields.split(",");
+            if (arrF.length > 0) {
+                $(".exportField").attr('checked', false);
+                for (var i = 0; i < arrF.length; i++) {
+                    $("input[value='" + arrF[i] + "']").attr('checked', true);
+                }
+            }
+        }
+    }
+</script>
+<h1>#label('admin.product.export')</h1>
+<div class="formulario" style="width:900px;">
+    <div id="exportResult"></div>
+    <form id="form_export">
+        <p style="margin:0 10px;">
+            #label('admin.product.export.instructions')
+        </p>
+        <ul style="margin:10px;padding:0;list-style:none;">
+            #foreach( $f in $action.productFields )
+                <li style="float:left;width:250px;"><label><input type="checkbox" class="exportField" name="exportField" value="$f" checked="checked"/> #label("admin.export.$f")</label></li>
+            #end
+            <br style="clear:both;"/>
+        </ul>
+        <div class="button-bar" id="profiles" style="background-color:white;">
+            #parse('/WEB-INF/views/org/store/importexport/views/export_products_profiles.vm')
+        </div>
+        <div>
+            #shidden('name=productFilter.filterId')
+            #shidden('name=productFilter.filterLabel')
+            #shidden('name=productFilter.filterHasDiscount')
+            #shidden('name=productFilter.filterEnabled')
+            #shidden('name=productFilter.filterCategories')
+            #shidden('name=productFilter.filterManufacturer')
+            #shidden('name=productFilter.filterMinStock')
+            #shidden('name=productFilter.filterMaxStock')
+            #shidden('name=productFilter.filterMinPrice')
+            #shidden('name=productFilter.filterMaxPrice')
+            #shidden('name=productFilter.filterCode')
+            #shidden('name=productFilter.filterName')
+            #shidden('name=productFilter.showArchived')
+            #shidden('name=productFilter.filterDayWithoutStock')
+            #shidden('name=productFilter.sorted')
+            #shidden('name=productFilter.sortedField')
+            #shidden('name=productFilter.sortedDirection')
+        </div>
+    </form>
+    <div class="button-bar" style="margin-top:1px;">
+        <div style="float:left;">
+            <button type="button" onclick="exportProducts();"><span class="export">#label('admin.product.export')</span></button>
+        </div>
+        <div style="float:right;margin-left:30px;">
+            <input type="text" id="profileName" class="field" style="width:110px;" value=""/>
+            <button type="button" onclick="saveNewProfile();"><span>#label('admin.save.profile')</span></button>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+
+</div>
+<div class="listado" style="width:900px;margin-top:30px;">
+    <h1>#label('admin.product.exported.previous')</h1>
+    #if($files && !$list.isEmpty($files))
+        <form action="$action.url('export_products_del','admin')" method="post" class="validable">
+            <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <th><input type="checkbox" onclick="$('input.fordelete').attr('checked',$(this).is(':checked'));"></th>
+                    <th>File Name</th>
+                    <th>Modified</th>
+                    <th style="text-align:right;">Size</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($f in $files)
+                    #set( $modified = $date.format('yyyy-MM-dd HH:ss', $f.lastModified()) )
+                    #set($classExt = "ext_$util.fileExt($f.name)")
+                    <tr>
+                        <td style="width:10px;text-align:center;"><input type="checkbox" class="fordelete" name="forDelete" value="$!{f.name}"/></td>
+                        <td class="$classExt">$f.name</td>
+                        <td>$!modified</td>
+                        <td style="text-align:right;">$!util.formatFileSize($f.length()) </td>
+                        <td class="link-bar">
+                            <a href="$!action.storeFile('export/products')/$!{f.name}"><span class="download">#label('admin.download')</span></a>
+                        </td>
+                    </tr>
+                #end
+            </table>
+            <div class="button-bar">
+                <button type="submit"><span class="delete">#label('admin.delete.selected')</span></button>
+            </div>
+        </form>
+    #else
+        <div class="info">
+            <h2>#label('admin.exported.files')</h2>
+
+            <p>#label('admin.there.is.no.exported.files')</p>
+        </div>
+    #end
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

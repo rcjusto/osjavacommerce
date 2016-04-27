@@ -1,0 +1,92 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text()=="$!action.getText('admin.hide.filters')") {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+            jQuery.cookie('filters.visible','false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text("$!action.getText('admin.hide.filters')");
+            jQuery.cookie('filters.visible','true');
+        }
+    }
+    $(function(){
+        if (jQuery.cookie('filters.visible')=='false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+        }
+    });
+</script>
+
+<h1 style="float: left;">#label('admin.manufacturer.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">#label('admin.hide.filters')</a></span>
+<br style="clear:both;"/>
+
+<div class="listado">
+    #surl('id=urlForm' "action=listmanufacturer")
+    <form action="$urlForm" method="post">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.name')</th>
+                    <td>#stextfield('name=filterName' 'cssClass=field string-medium')</td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{manufacturers.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$manufacturers.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th>
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+    #formErrors()
+    #if($util.isNotEmpty($manufacturers.listado))
+        #set($nav=$manufacturers)
+        #parse('/WEB-INF/views/admin/navigator.vm')
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.id')</th>
+            <th>#label('admin.name')</th>
+            <th>#label('admin.url.code')</th>
+            <th>#label('admin.website.url')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($m in $manufacturers.listado)
+            #surl('id=urlEdit' "action=editmanufacturer" "idManufacturer=$!m.idManufacturer")
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!m.idManufacturer"/></td>
+                <td>$!m.idManufacturer</td>
+                <td>$!m.manufacturerName</td>
+                <td>$!m.urlCode</td>
+                <td>$!m.manufacturerUrl &nbsp;</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <p>#label('admin.manufacturers.not.found')</p>
+        </div>
+    #end
+
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #surl('id=urlNew' "action=editmanufacturer")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.manufacturer.new')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

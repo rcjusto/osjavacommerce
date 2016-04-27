@@ -1,0 +1,47 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.customer.level.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=listcustomerlevel")
+    <form action="$urlForm" method="post" class="validable">
+    #formErrors()
+    #if($util.isNotEmpty($userLevelListAll))
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.code')</th>
+            <th>#label('admin.level.name')</th>
+            <th style="text-align:right;">#label('admin.global.discount.percent')</th>
+            <th style="text-align:right;">#label('admin.order.in.list')</th>
+            <th style="text-align:center;">#label('admin.volume.price')</th>
+            <th style="text-align:center;">#label('admin.need.approval')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($g in $userLevelListAll)
+            #surl('id=urlEdit' "action=editcustomerlevel" "idLevel=$!g.id")
+            <tr>
+                <td style="text-align:center;">#if($g.code!='anonymous')<input type="checkbox" class="selecteds" name="selecteds" value="$!g.id"/>#end</td>
+                <td>$!g.code</td>
+                <td>$!g.getName($defaultLanguage)</td>
+                <td style="text-align:right;padding-right:20px;">$!util.formatNumber($g.discountPercent, 'decimal4')</td>
+                <td style="text-align:right;padding-right:20px;">$!g.levelOrder</td>
+                <td style="text-align:center;" class="#if($g.disableVolume) chk_false #else chk_true #end">&nbsp;</td>
+                <td style="text-align:center;" class="#if($g.needApproval) chk_true #else chk_false #end">&nbsp;</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.customer.levels.not.found')</h2>
+            <p>#label('admin.customer.levels.not.found.text')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #surl('id=urlNew' "action=editcustomerlevel")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.customer.level.new')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

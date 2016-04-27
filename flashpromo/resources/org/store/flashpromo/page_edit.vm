@@ -1,0 +1,123 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function() {
+        $('#selPage').change(function() {
+            $('#formSelPage').submit();
+        });
+        $('#mytabs').tabs({
+            select: function(event, ui) {
+                var url = $.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+<h1>#label('fp.config.title')</h1>
+<div id="mytabs">
+    <ul class="tabs">
+        <li><a href="#pages">#label('fp.page.config.title')</a></li>
+        <li><a href="$!action.url('flash_promo_list','admin')">#label('fp.promo.config.title')</a></li>
+    </ul>
+
+    <div id="pages" class="tabpanel">
+        <div class="formulario">
+            <form id="formSelPage" action="$!action.url('flash_page_edit','admin')" method="post">
+                <table class="formulario" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>#label('fp.select.page'):</th>
+                        <td>
+                            <select id="selPage" name="page" class="field string-medium">
+                                #foreach($p in $pages)
+                                    <option value="$p" #if($page==$p) selected="selected" #end >$p</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+        #if($promotions && !$promotions.isEmpty())
+            <form id="formSave" action="$!action.url('flash_page_save','admin')" method="post">
+                <input type="hidden" name="page" value="$!page"/>
+
+                <div class="listado" style="width: 900px;margin-top: 10px;">
+                    <table class="grid" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <th>#label('fp.popup.content')</th>
+                            <th>#label('active')</th>
+                            <th>#label('fp.modal')</th>
+                            <th>#label('fp.only.once')</th>
+                            <th>#label('fp.show.after')</th>
+                            <th>#label('fp.hide.after')</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        #foreach($pc in $config)
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="id" value="$!pc.id"/>
+                                    <select name="promo" id="promo_${velocityCount}" class="field string-medium">
+                                        <option value=""></option>
+                                        #foreach($p in $promotions)
+                                            <option value="$!p.id" #if($p.id==$pc.promo.id) selected="selected" #end>$!p.name</option>
+                                        #end
+                                    </select>
+                                </td>
+                                <td style="text-align: center;">#checkbox('active' $!pc.active)</td>
+                                <td style="text-align: center;">#checkbox('ismodal' $!pc.modal)</td>
+                                <td style="text-align: center;">#checkbox('once' $!pc.onlyOnce)</td>
+                                <td><input type="text" name="showAfter" value="$!pc.showAfter" class="field integer" style="margin-right: 8pt;"><span>sec</span></td>
+                                <td><input type="text" name="hideAfter" value="$!pc.hideAfter" class="field integer" style="margin-right: 8pt;"><span>sec</span></td>
+                                <td><a href="#" onclick="$('#promo_${velocityCount}').val('');$('#formSave').submit();"><span class="del">#label('delete')</span></a></td>
+                            </tr>
+                        #end
+                        #if($config && !$config.isEmpty())
+                            <tr>
+                                <th colspan="8">
+                                    #label('fb.configure.new.popup')
+                                </th>
+                            </tr>
+                        #end
+                        <tr>
+                            <td>
+                                <input type="hidden" name="id" value=""/>
+                                <select name="promo" class="field string-medium">
+                                    <option value=""></option>
+                                    #foreach($p in $promotions)
+                                        <option value="$!p.id">$!p.name</option>
+                                    #end
+                                </select>
+                            </td>
+                            <td style="text-align: center;">#checkbox('active' false)</td>
+                            <td style="text-align: center;">#checkbox('ismodal' false)</td>
+                            <td style="text-align: center;">#checkbox('once' false)</td>
+                            <td><input type="text" name="showAfter" value="" class="field integer" style="margin-right: 8pt;"><span>sec</span></td>
+                            <td><input type="text" name="hideAfter" value="" class="field integer" style="margin-right: 8pt;"><span>sec</span></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </div>
+            </form>
+        #else
+            <div class="info">
+                <h2>#label('fp.promos.not.found')</h2>
+
+                <p>#label('fp.promos.not.found.text')</p>
+
+                <p style="padding: 10px;">
+                    <button type="button" href="$!action.url('flash_promo_edit','admin')"><span>#label('fp.configure.new.promo')</span></button>
+                </p>
+            </div>
+        #end
+    </div>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

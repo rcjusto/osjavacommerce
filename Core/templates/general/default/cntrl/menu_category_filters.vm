@@ -1,0 +1,96 @@
+<div class="left-menu filters">
+    #if($util.isNotEmpty($productFilter.filterManufacturer))
+    #else
+        #set($showManufacters = $math.toInteger($action.getStoreProperty('listing.visible.manufacturers','2')))
+        #set($manufacturers = $extras.get('MANUFACTURER'))
+        #if($util.isNotEmpty($manufacturers))
+            <div class="title"><a href="#" id="linkMenuManufacturer">#label('filter.by.manufacturers')</a></div>
+            <ul class="filterManufacturers">
+                #foreach($man in $manufacturers)
+                        <li class="#if($velocityCount>=$showManufacters) hidden #end ">
+                            <div class="clearfix hoversable">
+                                <div>
+                                    <a href="#" data="$!man.idManufacturer" class="filter-manufacturer">
+                                        <span>$man.manufacturerName</span>
+                                        <span class="num-products">($!man.getProperty('NUM_PROD'))</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                #end
+                #if($manufacturers.size()>$showManufacters)
+                    <li>
+                        <div class="clearfix hoversable">
+                            <div><a href="#" class="moreLink">#label('more.manufacturers')</a></div>
+                        </div>
+                    </li>
+                #end
+            </ul>
+        #end
+    #end
+    #if($util.isNotEmpty($productFilter.filterLabel))
+    #else
+        #set($labels = $action.sortMapByValues($extras.get('LABELS')))
+        #if($util.isNotEmpty($labels.keySet()))
+            <div class="title"><a href="#" id="linkMenuLabel">#label('filter.by.options')</a></div>
+            <ul class="filterLabels">
+                #foreach($labEntry in $labels.entrySet())
+                    <li>
+                        <div class="clearfix hoversable">
+                            <div>
+                                <a href="#" data="$labEntry.key.code" class="filter-label">
+                                    <span>$labEntry.key.getName($locale.language)</span>
+                                    <span class="num-products">($!labEntry.value)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                #end
+            </ul>
+        #end
+    #end
+
+    #set($prices = $extras.get('PRICES'))
+    #if($action.canShowPrices && $util.isNotEmpty($prices))
+        <div class="title"><a href="#" id="linkMenuPrice">#label('filter.by.price')</a></div>
+        <ul class="filterPrices">
+            #foreach($pMap in $prices)
+                #if ($pMap.count && $pMap.count>0)
+                <li>
+                    <div class="clearfix hoversable">
+                        <div>
+                            <a href="#" data-min="$!pMap.min" data-max="$!pMap.max" class="filter-price">
+                                #if($pMap.min)
+                                    #if($pMap.max)<span>$!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency()) - $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                                    #else<span>#label('over') $!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency())</span>#end
+                                #else
+                                    #if($pMap.max)<span>#label('under') $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>#end
+                                #end
+                                <span class="num-products">($!util.formatNumber($pMap.count,'0'))</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                #end
+            #end
+        </ul>
+    #end
+
+    #set($attributes = $extras.get('ATTRIBUTES'))
+    #if ($util.isNotEmpty($attributes.keySet()))
+        #foreach($cp in $attributes.keySet())
+            #if (!$list.contains($productFilter.propertyAttribute,$!cp.attribute.id))
+            <div class="title"><a href="#" id="linkMenuAttribute">$!cp.attribute.getAttributeName($locale.language)</a></div>
+            <ul class="filterAttributes">
+                #foreach($attValue in $attributes.get($cp).keySet())
+                    #if($util.isNotEmpty($attValue))
+                    <li>
+                        <a href="#" class="filter-attribute" data="$!attValue" attr="$!cp.attribute.id">$!attValue ($!attributes.get($cp).get($attValue))</a>
+                    </li>
+                    #end
+                #end
+            </ul>
+            #end
+        #end
+    #end
+</div>

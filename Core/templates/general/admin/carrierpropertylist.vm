@@ -1,0 +1,100 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.carriers.manager')</h1>
+<div class="listado">
+    <div id="tabShipping">
+        <ul class="tabs">
+            #surl('id=urlShipping' "action=listshipping")
+            #surl('id=urlCustom' "action=listcustomship")
+            <li><a href="$urlShipping">#label('admin.configure.shipping.methods')</a></li>
+            <li><a href="#tabGeneral">#label('admin.configure.live.carriers')</a></li>
+            <li><a href="$urlCustom">#label('admin.configure.custom.carrier')</a></li>
+        </ul>
+        <div id="tabGeneral">
+            #if($carriers && !$carriers.keySet().isEmpty())
+                <div class="formulario">
+                    #surl('id=urlFormList' "action=listcarrierproperty")
+                    <form id="formList" action="$urlFormList" method="post" class="validable">
+                        <h2 class="block-title">
+                            <span style="float:left;margin-right:20px;">#label('carrier.properties')</span>
+                            <select name="carrier" onchange="$('#formList').submit();" class="field string-medium" style="font-size:12pt;">
+                                <option value="">#label('admin.select.a.carrier')</option>
+                                #foreach($carr in $carriers.keySet())
+                                    #if($carr!='CUSTOM')
+                                        <option value="$!carr" #if($carr==$carrier) selected="selected" #end >$!carr</option>#end
+                                #end
+                            </select>
+
+                            <div style="clear:both;"></div>
+                        </h2>
+                    </form>
+                    #if($util.isNotEmpty($carrier))
+                        #surl('id=urlForm' "action=savecarrierproperty")
+                        <form action="$urlForm" method="post" class="validable">
+                            #formErrors()
+                            <input type="hidden" name="carrier" value="$!carrier"/>
+                            <table cellspacing="0" cellpadding="0" class="formulario">
+                                #foreach($pGroup in $carrierProperties)
+                                    <tr>
+                                        <td colspan="2"><h3>#label("carrier.$pGroup.groupName")</h3></td>
+                                    </tr>
+                                    #foreach($prop in $pGroup.propertyNames)
+                                        #set($stValue = $storeProperties.get($prop.name) )
+                                        <tr>
+                                            <th>#label("carrier.${prop.name}")</th>
+                                            <td>
+                                                #if($prop.options && !$list.isEmpty($prop.options))
+                                                    <input type="hidden" name="storeProperties_id" value="$!{prop.name}"/>
+                                                    <select name="storeProperties_value" class="field required string-medium">
+                                                        #foreach($opt in $prop.options)
+                                                            #set($arrOpt = $opt.split('[|]'))
+                                                            #if($list.size($arrOpt)>1)
+                                                                #set($optKey = $list.get($arrOpt,0))
+                                                                #set($optVal = $list.get($arrOpt,1))
+                                                            #else
+                                                                #set($optKey = $opt)
+                                                                #set($optVal = $opt)
+                                                            #end
+                                                            <option value="$!optKey" #if($!optKey==$stValue.value) selected="selected" #end >$!optVal</option>
+                                                        #end
+                                                    </select>
+                                                #else
+                                                    #storePropertyField($storeProperties $!{prop.name} 'field string-medium')
+                                                #end
+                                            </td>
+                                        </tr>
+                                    #end
+                                #end
+                            </table>
+                            <div class="button-bar">
+                                <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                            </div>
+                        </form>
+                    #end
+                </div>
+            #else
+                <div class="info">
+                    <h2>#label('admin.live.carriers.not.found')</h2>
+
+                    <p>#label('admin.live.carriers.not.found.text')</p>
+                </div>
+            #end
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('#tabShipping').tabs({selected:1,
+            select: function(event, ui) {
+                var url = jQuery.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

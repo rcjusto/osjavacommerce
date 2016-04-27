@@ -1,0 +1,199 @@
+#set($menuSelected='home')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+#actionErrors("Error")
+
+#set($hitCols = ['today','week','month','year','all'])
+<div class="listado">
+    <div id="warnings"></div>
+    <div>
+        <div style="float:left;width:700px;margin-right:20px;">
+            <h2 class="block-title">#label('admin.customer.statistics')</h2>
+            <table class="listado homeTablaHits" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>#label('admin.today')</th>
+                    <th>#label('admin.this.week')</th>
+                    <th>#label('admin.this.month')</th>
+                    <th>#label('admin.this.year')</th>
+                    <th>#label('admin.total')</th>
+                </tr>
+                <tr>
+                    <td class="title">#label('admin.total.visits')</td>
+                    #foreach($col in $hitCols)
+                        <td>$!hits.get($col)</td>
+                    #end
+                </tr>
+                <tr>
+                    <td class="title">#label('admin.loggins')</td>
+                    #foreach($col in $hitCols)
+                        <td>$!logins.get($col)</td>
+                    #end
+                </tr>
+                <tr>
+                    <td class="title">#label('admin.registrations')</td>
+                    #foreach($col in $hitCols)
+                        <td>$!registrations.get($col)</td>
+                    #end
+                </tr>
+            </table>
+
+            <h2 class="block-title">#label('admin.sales.statistics')</h2>
+            <table class="listado homeTablaHits" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>#label('admin.today')</th>
+                    <th>#label('admin.this.week')</th>
+                    <th>#label('admin.this.month')</th>
+                    <th>#label('admin.this.year')</th>
+                    <th>#label('admin.total')</th>
+                </tr>
+                #foreach($status in $orderStatusList)
+                    #surl('id=orderList' "action=orderlist" "filterStatus=$!status.id")
+                    #set($statusMap = $ordersDetail.get($status))
+                    <tr>
+                        <td class="title"><a href="$!orderList">$!status.getStatusName($defaultLanguage)</a></td>
+                        #foreach($col in $hitCols)
+                            <td style="padding:0;">
+                                #if($!statusMap.get("${col}_c")>0)
+                                    <div class="cant">$!statusMap.get("${col}_c")</div>
+                                    <div class="tarif">$$!util.formatNumber($statusMap.get("${col}_t"),'money')</div>
+                                #end
+                            </td>
+                        #end
+                    </tr>
+                #end
+                <tr class="resumen">
+                    <td class="title">#label('admin.all.orders')</td>
+                    #foreach($col in $hitCols)
+                        <td style="padding:0;">
+                            #if($!orders.get("${col}_c")>0)
+                                <div class="cant">$!orders.get("${col}_c")</div>
+                                <div class="tarif">$$!util.formatNumber($orders.get("${col}_t"),'money')</div>
+                            #end
+                        </td>
+                    #end
+                </tr>
+            </table>
+        </div>
+        <div style="float:left;width:240px;">
+            <h2 class="block-title">#label('admin.product.statistics')</h2>
+            <table class="listado homeTablaStats" cellpadding="0" cellspacing="0">
+                #if($util.isNotEmpty($reviews))
+                    <tr>
+                        #surl('id=urlReviews' "action=listreviews")
+                        <td class="title"><a href="$urlReviews">#label('admin.pending.reviews')</a></td>
+                        <td class="cant">$!reviews.size()</td>
+                    </tr>
+                #end
+                <tr>
+                    <td class="title">#label('admin.active.products')</td>
+                    <td class="cant">$!homeStats.get('prod_active')</td>
+                </tr>
+                <tr>
+                    <td class="title">#label('admin.inactive.products')</td>
+                    <td class="cant">$!homeStats.get('prod_inactive')</td>
+                </tr>
+                <tr class="resumen">
+                    <td class="title">#label('admin.total.products')</td>
+                    <td class="cant">$!homeStats.get('prod_total')</td>
+                </tr>
+            </table>
+            <h2 class="block-title">#label('admin.categories.statistics')</h2>
+            <table class="listado homeTablaStats" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="title">#label('admin.active.categories')</td>
+                    <td class="cant">$!homeStats.get('cat_active')</td>
+                </tr>
+                <tr>
+                    <td class="title">#label('admin.inactive.categories')</td>
+                    <td class="cant">$!homeStats.get('cat_inactive')</td>
+                </tr>
+                <tr class="resumen">
+                    <td class="title">#label('admin.total.categories')</td>
+                    <td class="cant">$!homeStats.get('cat_total')</td>
+                </tr>
+            </table>
+            <h2 class="block-title">#label('admin.manufacturer.statistics')</h2>
+            <table class="listado homeTablaStats" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="title">#label('admin.total.manufacturers')</td>
+                    <td class="cant">$!homeStats.get('manufacturer')</td>
+                </tr>
+            </table>
+            #if($stockAlerts && !$stockAlerts.isEmpty())
+            <h2 class="block-title">#label('admin.stock.alerts')</h2>
+            <table class="listado homeTablaStats" cellpadding="0" cellspacing="0">
+                #if($!stockAlerts.containsKey('products'))
+                <tr>
+                    <td class="title">#label('admin.products.without.stock')</td>
+                    <td class="cant">$!stockAlerts.get('products')</td>
+                </tr>
+                #end
+                #if($!stockAlerts.containsKey('pending'))
+                <tr>
+                    <td class="title">#linklabel('admin.needed.in.orders' $!action.url('purchasealerts','admin'))</td>
+                    <td class="cant">$!stockAlerts.get('pending')</td>
+                </tr>
+                #end
+            </table>
+            #end
+            #if($cartAlerts && $cartAlerts>0)
+            <h2 class="block-title">#label('admin.cart.alerts')</h2>
+            <table class="listado homeTablaStats" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="title">#label('admin.requested.quotes')</td>
+                    <td class="cant">$!cartAlerts</td>
+                </tr>
+            </table>
+            #end
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div>
+        <div style="float:left;width:470px;margin-right:20px;">
+            <h2 class="block-title">#label('admin.best.sellers')</h2>
+            <table class="listado homeTablaProducts" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.product.name')</th>
+                    <th>#label('admin.sales')</th>
+                    <th>#label('admin.stock')</th>
+                </tr>
+                #foreach($p in $!homeStats.get('prod_sales'))
+                    #surl('id=productEdit' "action=productedit" "idProduct=$!p.idProduct")
+                    <tr>
+                        <td class="title"><a href="$!productEdit">$!util.abbreviate($p.getProductName($defaultLanguage),50)</a></td>
+                        <td>$!p.sales</td>
+                        <td #if($p.stock<1) style="background-color:#c21a1a;color:white;" #end> $!p.stock</td>
+                    </tr>
+                #end
+            </table>
+        </div>
+        <div style="float:left;width:470px;">
+            <h2 class="block-title">#label('admin.top.hits')</h2>
+            <table class="listado homeTablaProducts" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.product.name')</th>
+                    <th>#label('admin.hits')</th>
+                    <th>#label('admin.stock')</th>
+                </tr>
+                #foreach($p in $!homeStats.get('prod_hits'))
+                    #surl('id=productEdit' "action=productedit" "idProduct=$!p.idProduct")
+                    <tr>
+                        <td class="title"><a href="$!productEdit">$!util.abbreviate($p.getProductName($defaultLanguage),50)</a></td>
+                        <td>$!p.hits</td>
+                        <td #if($p.stock<1) style="background-color:#c21a1a;color:white;" #end>$!p.stock</td>
+                    </tr>
+                #end
+            </table>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+
+</div>
+<script type="text/javascript">
+$(function(){
+    $('#warnings').load("$action.url('adminWarnings','admin')");
+});
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

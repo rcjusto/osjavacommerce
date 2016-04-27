@@ -1,0 +1,75 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.plugins.manager')</h1>
+<div class="listado">
+    #if($util.isNotEmpty($plugins))
+        <div class="formulario">
+            #surl('id=urlformList' "action=listpluginproperty")
+            <form id="formList" action="$urlformList" class="validable" method="post">
+                <h2 class="block-title">
+                    <span style="float:left;margin-right:20px;">#label('carrier.properties')</span>
+                    <select name="plugin" onchange="$('#formList').submit();" class="field string-medium" style="font-size:12pt;">
+                        <option value="">#label('admin.select.a.plugin')</option>
+                        #foreach($plug in $plugins)
+                            <option value="$!plug" #if($plug==$plugin) selected="selected" #end >$!plug</option>
+                        #end
+                    </select>
+
+                    <div style="clear:both;"></div>
+                </h2>
+            </form>
+            #if($util.isNotEmpty($plugin))
+                #surl('id=urlForm' "action=savepluginproperty")
+                <form action="$urlForm" method="post" class="validable">
+                    #formErrors()
+                    <input type="hidden" name="carrier" value="$!carrier"/>
+                    <table cellspacing="0" cellpadding="0" class="formulario">
+                        #foreach($pGroup in $pluginProperties)
+                            <tr>
+                                <td colspan="2"><h3>#label("plugin.$pGroup.groupName")</h3></td>
+                            </tr>
+                            #foreach($prop in $pGroup.propertyNames)
+                                #set($stValue = $storeProperties.get($prop.name) )
+                                <tr>
+                                    <th>#label("plugin.${prop.name}")</th>
+                                    <td>
+                                        #if($prop.options && !$list.isEmpty($prop.options))
+                                            <input type="hidden" name="storeProperties_id" value="$!{prop.name}"/>
+                                            <select name="storeProperties_value" class="field required string-medium">
+                                                #foreach($opt in $prop.options)
+                                                    #set($arrOpt = $opt.split('[|]'))
+                                                    #if($list.size($arrOpt)>1)
+                                                        #set($optKey = $list.get($arrOpt,0))
+                                                        #set($optVal = $list.get($arrOpt,1))
+                                                    #else
+                                                        #set($optKey = $opt)
+                                                        #set($optVal = $opt)
+                                                    #end
+                                                    <option value="$!optKey" #if($!optKey==$stValue) selected="selected" #end >$!optVal</option>
+                                                #end
+                                            </select>
+                                        #else
+                                            #storePropertyField($storeProperties $!{prop.name} 'field string-medium')
+                                        #end
+                                    </td>
+                                </tr>
+                            #end
+                        #end
+                    </table>
+                    <div class="button-bar">
+                        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                    </div>
+                </form>
+            #end
+        </div>
+    #else
+        <div class="info">
+            <h2>#label('admin.plugin.not.found')</h2>
+
+            <p>#label('admin.plugin.not.found.text')</p>
+        </div>
+    #end
+</div>
+
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

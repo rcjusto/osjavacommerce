@@ -1,0 +1,65 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<div class="clearfix">
+    <h1 style="float: left;">#label('admin.label.list')</h1>
+    <button style="float: right;margin: 10px 10px 4px 0;" type="button" href="$action.url('staticlabeledit','admin')"><span class="add">#label('admin.label.new')</span></button>
+</div>
+<div class="listado">
+    <form action="$!action.url('staticlabels','admin')" method="post">
+
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.text')</th>
+                    <td>#stextfield('name=filterText' 'cssClass=field string-medium')</td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{localizedTexts.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$localizedTexts.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th>
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        #if($util.isNotEmpty($localizedTexts.listado))
+            #set($nav=$localizedTexts)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>#label('admin.label')</th>
+                    #foreach($l in $languages)
+                        <th>$l</th>
+                    #end
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($st in $localizedTexts.listado)
+                    #surl('id=urlEdit' "action=staticlabeledit" "staticId=$!st.code")
+                    <tr>
+                        <td><input type="checkbox" class="selecteds" name="selecteds" value="$!st.id"/></td>
+                        <td class="filtered">$!st.code</td>
+                        #foreach($l in $languages)
+                            <td>$!st.getValueLang($l)</td>
+                        #end
+                        <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                    </tr>
+                #end
+            </table>
+            <div class="button-bar">
+                <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+            </div>
+        #end
+    </form>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

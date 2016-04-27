@@ -1,0 +1,5 @@
+<div id="mailLogo">
+    <img alt="$!action.getStoreProperty('site.name','[Name of Store]')" src="$!{util.siteHost}$!action.storeFile('images/custom/print_logo.gif')"/>
+    <p>[your address]</p>
+    <p>$!action.getStoreProperty('site.url','[your web site]')</p>
+</div>

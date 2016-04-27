@@ -1,0 +1,142 @@
+#surl('id=urlAddImg' "action=imgupload")
+#surl('id=urlListImg' "action=imglist")
+#surl('id=urlDelImg' "action=imgdelete")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/struts/css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="/struts/css/clear.css"/>
+    <style type="text/css">
+
+        body {
+            background-color: #f8f8f8;
+            font-family: sans-serif;
+            font-size: 10pt;
+        }
+
+        #topBar {
+            background-color: #ddd;
+            padding: 3px 12px;
+        }
+
+        #imageList {
+            background-color: #fff;
+        }
+
+
+        #files {
+            list-style: none;
+        }
+
+        #files li {
+            float: left;
+            margin: 5px;
+            zoom: 1;
+            border: 1px solid #ccc;
+            background-color: #fafafa;
+            width: 110px;
+            height: 120px;
+            overflow: hidden;
+            position:relative;
+        }
+
+        #files li.hover {
+            border: 1px solid #00008b;
+        }
+
+        #files li div.image {width: 100px;height: 80px;overflow: hidden;text-align: center;margin: 5px;}
+        #files li img {max-width: 100px;max-height: 80px;}
+
+        #files li div.data {height: 30px;margin: 5px;overflow: hidden;}
+
+        a.delete {position: absolute;right: 4px;bottom: 4px;display: block;background: url("/struts/css/images/delete.png") no-repeat 0 0;width: 16px;height: 16px;}
+
+        .filename {margin-bottom:5px;height: 10px;overflow: hidden;line-height: 10px;}
+        .filename a {font-size:6pt;color:#333;text-decoration: none;}
+        .filesize {font-size:8pt;margin-bottom:5px;color:#333;line-height: 10px;}
+
+        #rightBar {background:#f6f6f6;border-left:1px solid #ddd;width: 300px;}
+
+    </style>
+    <script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/struts/js/jquery.simplelayout.js"></script>
+    <script type="text/javascript" src="/struts/js/swfobject.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $(window).bind('resize',
+            function() {
+                $('body').simpleLayout({padding: 0, position: 'vertical'});
+                $('#bottomBlock').simpleLayout({padding: 0, position: 'horizontal'});
+            }).trigger('resize');
+            $('li').hover(function() {
+                $(this).addClass('hover')
+            }, function() {
+                $(this).removeClass('hover')
+            });
+
+            $('.delete').live('click', function(e) {
+                var fn = $(this).attr('rel');
+                if (confirm('Delete file ' + fn + '?')) {
+                    $('#imageList').load("$urlDelImg", {resourceFileFileName:fn});
+                }
+                e.preventDefault();
+            });
+
+            $('.select').live('click', function(e) {
+                var fn = $(this).attr('rel');
+                var selFile = "$!{util.siteHost}$!action.storeFile('images/custom')/" + fn;
+                #if($util.isNotEmpty($request.getParameter('CKEditorFuncNum')))
+                if (window.parent.opener.CKEDITOR)
+                    window.parent.opener.CKEDITOR.tools.callFunction( $!request.getParameter('CKEditorFuncNum'), selFile);
+                #end
+                if (window.parent.opener.onSelectImage)
+                    window.parent.opener.onSelectImage(selFile);
+                window.top.close();
+                e.preventDefault();
+            });
+
+
+            $(document).bind('uploadImg', function(e) {
+                $('#imageList').load("$urlListImg")
+            });
+
+        });
+        function reloadImages() {
+            alert(3);
+            $('#imageList').load("$urlListImg")
+        }
+    </script>
+</head>
+<body style="overflow:hidden;">
+<div id="topBar" class="clearfix layout-fixed">
+        <div style="float:left;line-height:22px;">
+            Haga click en la imagen para seleccionarla.
+        </div>
+        <div style="float:right;width:270px;line-height:22px;">
+            Subir Imagenes
+        </div>
+</div>
+<div id="bottomBlock" class="layout-resize">
+    <div id="imageList" class="layout-resize" style="overflow:auto;background: #ffffff;">
+        #parse('/WEB-INF/views/admin/imgexplorer_list.vm')
+    </div>
+    <div id="rightBar" class="layout-fixed" >
+        <div style="margin:10px;">
+            <!--
+            <div style="height:200px;overflow:auto;border:1px solid #ccc;background-color:#fff;">
+                <table id="filelist"></table>
+            </div>
+            <div class="clearfix" style="text-align:center;padding:5px;">
+                <a id="pickfile" href="#">$!action.getText('admin.add.file','Add File')</a>&nbsp;
+                <a id="uploadfiles" href="#">$!action.getText('admin.upload.all','Upload All')</a>
+            </div>
+            -->
+            <iframe src="$!action.url('imguploadform','admin')" style="height: 200px;">
+
+            </iframe>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

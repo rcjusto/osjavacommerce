@@ -1,0 +1,3 @@
+<div id="topAjaxShopCart" class="top-cart ajax-shopcart">
+    #parse('/WEB-INF/views/front/ajax_cart.vm')
+</div>

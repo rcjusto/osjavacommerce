@@ -1,0 +1,486 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+#surl('id=urlReload' "action=productedit" "idProduct=$!product.idProduct")
+#surl('id=urlSavePrices' "action=productsaveprice")
+#surl('id=urlProcessSupliers' "action=productproccessproviders")
+#surl('id=urlDelProvider' "action=productdelprovider")
+#surl('id=urlstatictexts' "action=liststaticpage")
+#surl('id=urlprodstatictextsadd' "action=productstatictextsadd" "idProduct=$product.idProduct")
+#surl('id=urlresources' "action=listresource")
+#surl('id=urlprodresourceadd' "action=productresourceadd" "idProduct=$product.idProduct")
+#surl('id=urlprodstatictexts' "action=productstatictextssave")
+#surl('id=urlcomplementadd' "action=productcomplementadd")
+#surl('id=urlcomplementdel' "action=productcomplementdel")
+#if($openTab && $product.idProduct) #set($showTab = $openTab) #else #set($showTab = 0) #end
+<script type="text/javascript">
+    var uploader;
+    var idProduct = "$!{product.idProduct}";
+    $(function() {
+        $('#treecat').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20 + 4;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        $('#productTabs').tabs({selected:$!showTab});
+    });
+    function savePrices() {
+        if ($('#formprices').validForm()) {
+            var data = $('#formprices').serialize();
+            $('#divPrices').loading("$!action.getText('admin.updating.prices')", "$!action.getText('admin.please.wait')");
+            $('#divPrices').load("$urlSavePrices", data);
+            return true;
+        }
+        return false;
+    }
+    function refreshPrices() {                            
+        document.location.href="$!urlReload" + '&openTab=1'
+    }
+    function deleteVolume(index) {
+        $("input[name='volumen']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='volumenPercent']:eq(" + index + ")").val('').trigger('change');
+        $("input[name='volumenDescription']:eq(" + index + ")").val('').trigger('change');
+        return savePrices();
+    }
+    function deleteShipping(index) {
+        $("input[name='shippingValue']:eq(" + index + ")").val('').trigger('change');
+        return savePrices();
+    }
+    function deleteProvider(idP) {
+        $('#divPrices').loading("$!action.getText('admin.removing.suplier')", "$!action.getText('admin.please.wait')");
+        $('#divPrices').load("$urlDelProvider", {idProduct:idProduct, providerId:idP});
+    }
+    function deletePromotion(idP) {
+        $('#divPrices').loading("$!action.getText('admin.removing.promotion')", "$!action.getText('admin.please.wait')");
+        $('#divPrices').load("$urlDelPromotion", {idProduct:idProduct, providerId:idP});
+    }
+    function configureStaticTexts() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.static.texts')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlstatictexts", {modal:true,rnd:Math.random()}, function() {
+            // Marcar los attributos
+            $('input.contentStaticTextId').each(function() {modalStaticText_selectId($(this).val());});
+            $('#dialogo').find('#dialogBtnOk').click(function() {
+                var data = modalStaticText_serialize('selectedStaticText');
+                $('#divStaticTexts').loading("$!action.getText('admin.updating.static.texts')", "$!action.getText('admin.please.wait')");
+                $('#divStaticTexts').load("$urlprodstatictextsadd", data);
+                $('#dialogo').dialog('close')
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function configureResources() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.resources')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlresources", {modal:true,rnd:Math.random()}, function() {
+            // Marcar los attributos
+            $('input.contentResourceId').each(function() {modalResource_selectId($(this).val());});
+            $('#dialogo').find('#dialogBtnOk').click(function() {
+                var data = modalResource_serialize('selectedResource');
+                $('#divStaticTexts').loading("$!action.getText('admin.updating.resources')", "$!action.getText('admin.please.wait')");
+                $('#divStaticTexts').load("$urlprodresourceadd", data);
+                $('#dialogo').dialog('close')
+            });
+        });
+        $('#dialogo').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function saveStaticTexts() {
+        if ($('#formStaticText').validForm()) {
+            var data = $('#formStaticText').serialize();
+            $('#divStaticTexts').loading("$!action.getText('admin.updating.static.texts')", "$!action.getText('admin.please.wait')");
+            $('#divStaticTexts').load("$urlprodstatictexts", data);
+        }
+        return false;
+    }
+    function addComplement() {
+        if ($('#formAddComplement').validForm()) {
+            var data = $('#formAddComplement').serialize();
+            $('#divComplements').loading("$!action.getText('admin.adding.complement')", "$!action.getText('admin.please.wait')");
+            $('#divComplements').load("$urlcomplementadd", data);
+        }
+        return false;
+    }
+    function delComplement(idG) {
+        $('#divComplements').loading("$!action.getText('admin.removing.complement')", "$!action.getText('admin.please.wait')");
+        $('#divComplements').load("$urlcomplementdel", {idProduct:"$!product.idProduct",groupId:idG});
+        return false;
+    }
+    function addUserLevel() {
+        if ($('#formAddUserLevel').validForm()) {
+            var data = $('#formAddUserLevel').serialize();
+            $('#divComplements').loading("$!action.getText('admin.setting.user.access')", "$!action.getText('admin.please.wait')");
+            $('#divComplements').load("$action.url('productcomplementadd','admin')", data);
+        }
+        return false;
+    }
+    function delUserLevel(id) {
+        $('#divComplements').loading("$!action.getText('admin.removing.user.access')", "$!action.getText('admin.please.wait')");
+        $('#divComplements').load("$action.url('productcomplementdel','admin')", {idProduct:"$!product.idProduct",levelId:id});
+        return false;
+    }
+</script>
+<div style="margin:4px;">
+    <ul class="breadcrumb">
+        #foreach($c in $action.getCategoryHierarchy($product.category))
+            #surl( 'id=urlBC' "action=categorydata" "idCategory=$c.idCategory" )
+            <li class="link"><a href="$urlBC">$!c.getLanguage($defaultLanguage).categoryName</a></li>
+        #end
+        <li>
+            #if($product.idProduct)
+                <span>$!product.getLanguage($defaultLanguage).productName</span>
+            #else
+                <span>#label('admin.product.new')</span>
+            #end
+        </li>
+    </ul>
+    #if($product.idProduct)
+        <span style="float:right;"><a href="$!{action.url('product','')}?code=$!{product.urlCode}" target="_blank">#label('admin.front.view')</a></span>
+    #end
+    <br style="clear:both;"/>
+</div>
+<!-- Tabs -->
+<div id="productTabs">
+    #if($product.idProduct)
+    <ul class="tabs">
+        <li><a href="#tabMainData" style="font-size:8pt;">#label('admin.main.data')</a></li>
+        <li><a href="#tabPrice" style="font-size:8pt;">#label('admin.prices.and.supliers')</a></li>
+        <li><a href="#tabAttributes" style="font-size:8pt;">#label('admin.attributes')</a></li>
+        <li><a href="#tabImages" style="font-size:8pt;">#label('admin.images')</a></li>
+        <li><a href="#tabLabels" style="font-size:8pt;">#label('admin.labels.and.categories')</a></li>
+        <li><a href="#tabRelated" style="font-size:8pt;">#label('admin.related.products')</a></li>
+        <li><a href="#tabReviews" style="font-size:8pt;">#label('admin.reviews')</a></li>
+        <li><a href="#tabResources" style="font-size:8pt;">#label('admin.texts.and.resources')</a></li>
+        <li><a href="#tabComplements" style="font-size:8pt;">#label('admin.complements')</a></li>
+    </ul>
+    #end
+
+    #set($manufacturers = $dao.manufacturerList)
+    #set($catTree = $dao.getCategoryTree(false))
+
+
+<div id="tabMainData" class="formulario #if($product.idProduct)tabpanel#end">
+    #surl('id=formMain' "action=productsave")
+<form action="$formMain" method="post" class="validable">
+    #shidden('name=product.idProduct')
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    #shidden('name=reedit' 'id=reedit')
+
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+<tr>
+    <th>#label('admin.type')</th>
+    <td>#sselect('name=product.productType' "list=#{'physical':'Physical Product', 'digital':'Digital Product','service':'Service'}" 'cssClass=field myselect string-medium' )</td>
+    <th>#label('admin.active')</th>
+    <td>#scheckbox('name=product.active' )</td>
+</tr>
+<tr>
+    <th class="required">#label('admin.part.number')</th>
+    <td>
+        #stextfield('name=product.partNumber' 'cssClass=field string-short')
+    </td>
+    <th class="required">#label('admin.category')</th>
+    <td>
+        #if($categoryFilter)
+            <select id="treecat" name="idCategory" class="field myselect string-medium">
+                #categoryOption($catTree 0 $!product.category.idCategory)
+            </select>
+        #else
+            <input type="hidden" id="idCategory" name="idCategory" value="$!product.category.idCategory">
+            <input type="text" id="nameCategory" readonly="readonly" value="$!product.category.getCategoryName($defaultLanguage)" class="field required string-medium readonly" />
+            <a href="#" class="ellipsis" onclick="return selectCategory('#idCategory','#nameCategory');"></a>
+            #parse('/WEB-INF/views/admin/selectcategory.vm')
+        #end
+    </td>
+</tr>
+<tr>
+    <th class="required">#label('admin.mfg.part.number')</th>
+    <td>
+        #stextfield('name=product.mfgPartnumber' 'cssClass=field string-short')
+    </td>
+    <th class="required">#label('admin.manufacturer')</th>
+    <td>
+        #if($manufacturerFilter)
+            <select name="idManufacturer" class="field string-medium">
+                <option value="">#label('admin.none')</option>
+                #foreach($m in $manufacturerList)
+                    #if($product.manufacturer.idManufacturer==$m.idManufacturer)
+                        <option value="$!m.idManufacturer" selected="selected">$!m.manufacturerName</option>
+                    #else
+                        <option value="$!m.idManufacturer">$!m.manufacturerName</option>
+                    #end
+                #end
+            </select>
+        #else
+            <input type="hidden" id="idManufacturer" name="idManufacturer" value="$!product.manufacturer.idManufacturer">
+            <input type="text" id="nameManufacturer" readonly="readonly" value="$!product.manufacturer.manufacturerName" class="field string-medium readonly" />
+            <a href="#" class="ellipsis" onclick="return selectManufacturer('#idManufacturer','#nameManufacturer');"></a>
+            <a href="#" class="clear" onclick="$('#idManufacturer').val('');$('#nameManufacturer').val(''); return false;"></a>
+            #parse('/WEB-INF/views/admin/selectmanufacturer.vm')
+        #end
+    </td>
+</tr>
+<tr>
+    <th class="required">#label('admin.name')</th>
+    <td colspan="3">
+        #langinput('productName' $product 'productName' 'field required string-large' )
+    </td>
+</tr>
+<tr>
+    <th class="required">#label('admin.description')</th>
+    <td colspan="3">
+        #langtextarea('description' $product 'description' 'field string-large' )
+        <a href="#" class="textarea-ckeditor"></a>
+    </td>
+</tr>
+<tr>
+    <th class="required">#label('admin.features')</th>
+    <td colspan="3">
+        #langtextarea('features' $product 'features' 'field string-large' )
+        <a href="#" class="textarea-ckeditor"></a>
+    </td>
+</tr>
+<tr>
+    <th class="required">#label('admin.additional.information')</th>
+    <td colspan="3">
+        #langtextarea('information' $product 'information' 'field string-large' )
+        <a href="#" class="textarea-ckeditor"></a>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.variants.fields')</th>
+    <td colspan="3">
+        #langinput('caract1' $product 'caract1' 'field string-short' )
+        <span style="float:left;">&nbsp;</span>
+        #langinput('caract2' $product 'caract2' 'field string-short' )
+        <span style="float:left;">&nbsp;</span>
+        #langinput('caract3' $product 'caract3' 'field string-short' )
+    </td>
+</tr>
+<tr class="block-title">
+    <th colspan="4">#label('admin.seo.information')</th>
+</tr>
+<tr>
+    <th>#label('admin.seo.title')</th>
+    <td colspan="3">
+        <input type="text" name="vis_metaTitle" value="" class="multilang field string-large"/>
+        #foreach($l in $languages )
+            <input type="hidden" class="$l" name="metaTitle" value="$!product.getLanguage($l).getMeta('title').metaValue"/>
+        #end
+        <label>
+            #scheckbox('name=metaTitleAppend' "value=$!product.getLanguage($defaultLanguage).getMeta('title').appendParent")
+            #label('admin.append.to.parent')
+        </label>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.seo.description')</th>
+    <td colspan="3">
+        <textarea name="vis_metaDescription" class="multilang field string-large" rows="3"></textarea>
+        #foreach($l in $languages )
+            <input type="hidden" class="$l" name="metaDescription" value="$!product.getLanguage($l).getMeta('description').metaValue"/>
+        #end
+        <label>
+            #scheckbox('name=metaDescriptionAppend' "value=$!product.getLanguage($defaultLanguage).getMeta('description').appendParent")
+            #label('admin.append.to.parent')
+        </label>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.seo.keywords')</th>
+    <td colspan="3">
+        <textarea name="vis_metaKeywords" class="multilang field string-large" rows="3"></textarea>
+        #foreach($l in $languages )
+            <input type="hidden" class="$l" name="metaKeywords" value="$!product.getLanguage($l).getMeta('keywords').metaValue"/>
+        #end
+        <label>
+            #scheckbox('name=metaKeywordsAppend' "value=$!product.getLanguage($defaultLanguage).getMeta('keywords').appendParent")
+            #label('admin.append.to.parent')
+        </label>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.seo.abstract')</th>
+    <td colspan="3">
+        <textarea name="vis_metaAbstract" class="multilang field string-large" rows="3"></textarea>
+        #foreach($l in $languages )
+            <input type="hidden" class="$l" name="metaAbstract" value="$!product.getLanguage($l).getMeta('abstract').metaValue"/>
+        #end
+        <label>
+            #scheckbox('name=metaAbstractAppend' "value=$!product.getLanguage($defaultLanguage).getMeta('abstract').appendParent")
+            #label('admin.append.to.parent')
+        </label>
+    </td>
+</tr>
+<tr class="block-title">
+    <th colspan="4">#label('admin.promotional.information')</th>
+</tr>
+<tr>
+    <th>#label('admin.sales')</th>
+    <td><input type="text" readonly="readonly" value="$!product.sales" class="field integer readonly"/></td>
+    <th rowspan="3">#label('admin.search.keywords')</th>
+    <td rowspan="3">#stextarea('name=product.searchKeywords' 'rows=4' 'cssClass=field string-medium')</td>
+</tr>
+<tr>
+    <th>#label('admin.extra.sales')</th>
+    <td>#stextfield('name=product.extraSales' 'cssClass=field integer')</td>
+</tr>
+<tr>
+    <th>#label('admin.rating.by')</th>
+    <td><input type="text" readonly="readonly" class="field decimal readonly" value="$!util.formatNumber($product.ratingBy,'0.0')"/></td>
+</tr>
+
+<tr class="block-title">
+    <th colspan="4">#label('admin.stock.and.shipping.information')</th>
+</tr>
+<tr>
+    <th>#label('admin.stock')</th>
+    <td>
+        #stextfield('name=product.stock' 'cssClass=field integer required')
+        <label>
+            #scheckbox('name=product.fixedStock') #label('admin.do.not.update.from.suppliers')
+        </label>
+    </td>
+    <th>#label('admin.length')</th>
+    <td>
+        #parentValue($product $product.category 'dimentionLength' 'decimal')
+        #stextfield('name=product.dimentionLength' "value=$!util.formatNumber($product.dimentionLength,'decimal2')" 'cssClass=field decimal')
+        <span style="float:left;margin:1px 4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.minimum.stock.alert')</th>
+    <td>
+        #parentValue($product $product.category 'stockMin' 'integer')
+                #stextfield('name=product.stockMin' 'cssClass=field integer')
+    </td>
+    <th>#label('admin.width')</th>
+    <td>
+        #parentValue($product $product.category 'dimentionWidth' 'decimal')
+        #stextfield('name=product.dimentionWidth' "value=$!util.formatNumber($product.dimentionWidth,'decimal2')" 'cssClass=field decimal')
+        <span style="float:left;margin:1px 4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.delivery.time')</th>
+    <td>
+        #parentValue($product $product.category 'deliveryTime' 'string-short')
+                #stextfield('name=product.deliveryTime' 'cssClass=field string-medium')
+    </td>
+    <th>#label('admin.height')</th>
+    <td>
+        #parentValue($product $product.category 'dimentionHeight' 'decimal')
+        #stextfield('name=product.dimentionHeight' "value=$!util.formatNumber($product.dimentionHeight,'decimal2')" 'cssClass=field decimal')
+        <span style="float:left;margin:1px 4px;">#label("dimension.unit.$!{dimensionUnit}")</span>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.eta')</th>
+    <td>
+        #stextfield('name=product.eta' 'cssClass=field string-medium')
+    </td>
+    <th>#label('admin.weight')</th>
+    <td>
+        #parentValue($product $product.category 'weight' 'decimal' 'decimal2')
+        #stextfield('name=product.weight' "value=$!util.formatNumber($product.weight,'decimal2')" 'cssClass=field decimal')
+        <span style="float:left;margin:1px 4px;">#label("weight.unit.$!{weightUnit}")</span>
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.need.shipping')</th>
+    <td>
+        #parentValue($product $product.category 'needShipping' 'string-char')
+        #sradio('name=product.needShipping' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+    </td>
+    <th>#label('admin.limit.per.customer')</th>
+    <td>#stextfield('name=product.limitPerUser' 'cssClass=field integer')</td>
+</tr>
+
+<tr class="block-title">
+    <th colspan="4">#label('admin.extra.information')</th>
+</tr>
+<tr>
+    <th>#label('admin.need.date.selection')</th>
+    <td>
+        #parentValue($product $product.category 'dateSelection' 'string-char' '')
+        #sradio('name=product.dateSelection' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+    </td>
+    <th>#label('admin.need.time.selection')</th>
+    <td>
+        #parentValue($product $product.category 'timeSelection' 'string-char')
+        #sradio('name=product.timeSelection' "list=#{'':'Inherited', 'Y':'Yes', 'N':'No'}" )
+    </td>
+</tr>
+<tr>
+    <th>#label('admin.product.template')</th>
+    <td>
+        #parentValue($product $product.category 'productTemplate' 'string-short')
+        #sselect('name=product.productTemplate' "list=#{'':'Inherited', 'product':'Default Template'}" 'cssClass=field myselect string-medium' )
+    </td>
+    <th>#label('admin.when.buyed.email.to')</th>
+    <td>#stextfield('name=product.mailVendor' 'cssClass=field email string-medium')</td>
+</tr>
+
+</table>
+
+<div class="button-bar">
+    <button type="submit" onclick="$('#reedit').val('');"><span class="ok">#label('admin.save.and.back')</span></button>
+    <button type="submit" onclick="$('#reedit').val('Y');"><span class="ok">#label('admin.save.and.stay')</span></button>
+    #surl('id=urlCancel' "action=productlist" )
+    <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+</div>
+</form>
+</div>
+
+    #if($product.idProduct)
+    <div id="tabPrice" class="tabpanel">
+        <div id="divPrices">
+            #parse('/WEB-INF/views/admin/productedit_price.vm')
+        </div>
+    </div>
+
+    <div id="tabAttributes" class="tabpanel">
+        <div id="divProperties">
+            #parse('/WEB-INF/views/admin/productedit_properties.vm')
+        </div>
+    </div>
+
+    <div id="tabImages" class="tabpanel">
+        <div id="divImages">
+            #parse('/WEB-INF/views/admin/productedit_images.vm')
+        </div>
+    </div>
+
+    <div id="tabLabels" class="tabpanel">
+        <div id="divLabels">
+            #parse('/WEB-INF/views/admin/productedit_labels.vm')
+        </div>
+    </div>
+
+    <div id="tabRelated" class="tabpanel">
+        <div id="divRelated">
+            #parse('/WEB-INF/views/admin/productedit_related.vm')
+        </div>
+    </div>
+
+    <div id="tabReviews" class="tabpanel">
+        <div id="divReviews">
+            #parse('/WEB-INF/views/admin/productedit_review.vm')
+        </div>
+    </div>
+
+    <div id="tabResources" class="tabpanel">
+        <div id="divStaticTexts">
+            #parse('/WEB-INF/views/admin/productedit_statictexts.vm')
+        </div>
+    </div>
+
+    <div id="tabComplements" class="tabpanel">
+        <div id="divComplements">
+            #parse('/WEB-INF/views/admin/productedit_complements.vm')
+        </div>
+    </div>
+
+    #end
+
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,17 @@
+<a href="#" onclick="$('input.exportField').attr('checked',true);return false;">#label('admin.select.all')</a>
+<span style="margin:0 3px;">|</span>
+<a href="#" onclick="$('input.exportField').attr('checked',false);return false;">#label('admin.select.none')</a>
+#if($profiles && !$profiles.isEmpty())
+<!--select id="profileField" onchange="applyProfile(this);" class="field">
+    <option value="">#label('admin.apply.profile')</option>
+    #foreach($pp in $profiles.entrySet())
+    <option value="$!pp.key" data="$!pp.value">$!pp.key</option>
+    #end
+</select>
+<button type="button" onclick="delProfile();"><span>#label('admin.remove.profile')</span></button-->
+    #foreach($pp in $profiles.entrySet())
+    <span style="margin:0 3px;">|</span>
+    <a href="#" rel="$!pp.value" class="profile-link" onclick="applyProfile(this);return false;">$!pp.key</a>
+    <a href="#" title="Remove Profile" rel="$!pp.key" onclick="deleteConfirm(function(){delProfile('$!pp.key');},'$!pp.key');return false;">(X)</a>
+    #end
+#end

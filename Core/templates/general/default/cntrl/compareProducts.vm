@@ -1,0 +1,8 @@
+#set($comparedProducts = $action.getComparedProducts())
+#if($util.isNotEmpty($comparedProducts))
+<div id="productComparator" class="compare-products clearfix">
+#parse('/WEB-INF/views/front/compareIndex.vm')
+</div>
+#else
+<div id="productComparator" class="compare-products clearfix" style="display: none;"></div>
+#end

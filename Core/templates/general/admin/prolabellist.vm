@@ -1,0 +1,45 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.product.label.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=listprolabel")
+    <form action="$urlForm" method="post">
+    #formErrors()
+    #if($util.isNotEmpty($prolabels))
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.code')</th>
+            <th>#label('admin.name')</th>
+            <th>#label('admin.show.in.list')</th>
+            <th>#label('admin.show.in.detail')</th>
+            <th style="width:1%;text-align:center;">#label('admin.filter')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($pl in $prolabels)
+            #surl('id=urlEdit' "action=editprolabel" "idLabel=$!pl.id")
+            #set( $imgUrl = $util.findImage($!action.storeFil("images/labels/$!{pl.urlCode}")))
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!pl.id"/></td>
+                <td>$!pl.code</td>
+                <td>$!pl.getName($defaultLanguage)</td>
+                <td>$!pl.getContentList($defaultLanguage)</td>
+                <td>$!pl.getContentDetail($defaultLanguage)</td>
+                <td class="#if($pl.filterInListing) chk_true #else chk_false #end" >&nbsp;</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <p>#label('admin.labels.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #surl('id=urlNew' "action=editprolabel")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.product.label.new')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

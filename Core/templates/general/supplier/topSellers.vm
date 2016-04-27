@@ -1,0 +1,48 @@
+#* @vtlvariable name="action" type="org.store.core.admin.AdminModuleAction" *#
+#* @vtlvariable name="product" type="org.store.core.beans.Product" *#
+#* @vtlvariable name="products" type="java.util.List<org.store.core.beans.Product>" *#
+
+#if($util.isNotEmpty($products))
+<script type="text/javascript">
+    $(function(){
+        var plot2 = jQuery.jqplot('chart2',
+                [[
+                    #set($first = true)
+                    #foreach($product in $products)
+                        #if($first) #set($first = false) #else , #end['$!product.getProductName($action.getDefaultLanguage())',$!product.getProperty('quantity')]
+                    #end
+                ]],
+                {
+                    seriesColors:["#33567f", "#416c9f", "#4c7db7", "#8aa3cc", "#b9c6dd"],
+                    seriesDefaults: {
+                        shadow: false,
+                        renderer: jQuery.jqplot.PieRenderer,
+                        rendererOptions: {
+                            startAngle: 270,
+                            sliceMargin: 4,
+                            padding: 4,
+                            showDataLabels: false }
+                    },
+                    grid:{shadow:false, drawBorder: false, background: '#ffffff'}
+                }
+        );
+    });
+</script>
+
+#set($colors = ["#33567f", "#416c9f", "#4c7db7", "#8aa3cc", "#b9c6dd"])
+<div style="width:800px" class="">
+    <h2 class="block-title">#label('admin.best.sellers')</h2>
+    <div class="clearfix">
+    <div id="chart2" style="width:150px;height: 150px;float: left"></div>
+    <table class="listado" cellpadding="0" cellspacing="0" width="100%" style="float: left;width: 600px;margin-top: 12px;margin-left: 20px;font-size: 9pt">
+        #foreach($product in $products)
+            <tr>
+                <td style="vertical-align: top;padding: 4px;width: 20px;"><span style="margin-top: 4px; background-color: $list.get($colors,$velocityCount);display: inline-block;width: 12px;height: 12px;"></span></td>
+                <td style="text-align: center;vertical-align: top;padding: 4px;font-weight: bold;width: 70px;">$!product.getProperty('quantity')</td>
+                <td style="vertical-align: top;padding: 4px;">$!product.getProductName($action.getDefaultLanguage())</td>
+            </tr>
+        #end
+    </table>
+    </div>
+</div>
+#end

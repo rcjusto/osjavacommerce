@@ -1,0 +1,16 @@
+<ul class="menu-minimun clearfix hoverable">
+    #if($frontUser && !$frontUser.anonymousCheckout)
+        <li class="profile">#linklabel('my.profile' $!action.url('profile'))</li>
+        <li class="orders">#linklabel('my.orders' $!action.url('orders'))</li>
+        <li class="wishlist">#linklabel('my.wishlist' $!action.url('wishlist'))</li>
+        <li class="logout">#linklabel('logout' $!action.url('logout'))</li>
+    #else
+        <li class="register">#linklabel('sign.in' $!action.url('profile'))</li>
+    #end
+    <li class="shopcart">
+        <a href="$!action.url('shopcart')">
+            #label('my.shopping.cart')
+            | <span class="num-items">$!userSession.items.size()</span> #label('shopcart.items')
+        </a>
+    </li>
+</ul>

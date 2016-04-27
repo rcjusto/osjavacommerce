@@ -1,0 +1,117 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.rma.data')</h1>
+#if($rma)
+<div style="width:960px;">
+    <div class="listado" style="float:left;width:440px;margin-right:30px;">
+        <h2 class="block-title">#label('admin.general.information')</h2>
+
+        <div class="block-content">
+            <table width="100%" class="listado" cellpadding="0" cellspacing="0">
+                #if($rma.rmaNumber)
+                    <tr>
+                        <th>#label('admin.rma.number')</th>
+                        <td>$!rma.rmaNumber</td>
+                    </tr>
+                #end
+                <tr>
+                    <th>#label('admin.created')</th>
+                    <td>$!util.formatDate($rma.createdDate,$defaultLanguage)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.status')</th>
+                    <td>#label("rma.status.$!rma.rmaStatus")</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.type')</th>
+                    <td>$!rma.rmaType.getName($defaultLanguage)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.order.id')</th>
+                    <td>
+                        #surl('id=urlOrder' "action=orderdata" "idOrder=$!rma.order.idOrder")
+                        <a href="$urlOrder">$!rma.order.idOrder</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.product')</th>
+                    <td>
+                        #surl('id=urlProduct' "action=productedit" "idProduct=$!rma.product.idProduct")
+                        <a href="$urlProduct" target="_blank">$!rma.product.getProductName($defaultLanguage)</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th nowrap="nowrap">#label('admin.serial.number')</th>
+                    <td>$!rma.rmaSerialNumber</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.user')</th>
+                    #surl('id=urlUser' "action=customeredit" "idUser=$!rma.order.user.idUser")
+                    <td><a href="$urlUser" target="_blank">$!rma.order.user.fullName</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="formulario" style="float:right;">
+        <h2 class="block-title">#label('admin.actions')</h2>
+        #surl('id=urlForm' "action=rmasave")
+        <form action="$urlForm" class="validable" method="post">
+            <input type="hidden" name="idRma" value="$!rma.id">
+            <table class="formulario" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('admin.rma.number')</th>
+                    <td><input type="text" name="rmaNumber" value="$!rma.rmaNumber" class="field string-short"/></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.change.status')</th>
+                    <td>
+                        <select name="rmaStatus" class="field string-short">
+                            #foreach($opt in $action.getRmaStatuses())
+                                <option value="$opt" #if($opt==$rma.rmaStatus) selected="selected" #end>$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div>#label('admin.add.comments')</div>
+                        <div><textarea name="rmaComment" class="field required" style="width:460px;" rows="6"></textarea></div>
+                    </td>
+                </tr>
+            </table>
+            <div class="button-bar">
+                <button type="submit"><span class="ok">#label('admin.ok')</span></button>
+            </div>
+        </form>
+    </div>
+
+    <div style="clear:both;"></div>
+    <div class="listado">
+        <h2 class="block-title">#label('admin.rma.log')<a href="#" rel="#tableLog"></a></h2>
+
+        <div class="block-content">
+            <table id="tableLog" width="100%" cellpadding="0" cellspacing="0" class="listado">
+                #foreach($rmaLog in $rma.logs)
+                    <tr class="product">
+                        <td>$!util.formatDate($rmaLog.actionDate)</td>
+                        <td>$!rmaLog.actionUser.fullName</td>
+                        <td>
+                            #if($util.isNotEmpty($rmaLog.rmaStatus)) $!rmaLog.rmaStatus #end
+                        </td>
+                    </tr>
+                    <tr class="rma">
+                        <td colspan="3">
+                            $!rmaLog.actionComments
+                        </td>
+                    </tr>
+                #end
+            </table>
+        </div>
+    </div>
+
+
+</div>
+#end
+#parse('/WEB-INF/views/admin/page_bot.vm')

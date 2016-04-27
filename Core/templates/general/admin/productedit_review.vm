@@ -1,0 +1,101 @@
+#surl('id=urlAddReview' "action=productaddreview")
+#surl('id=urlDelReview' "action=productdelreview")
+#surl('id=urlSaveReview' "action=productsavereviews")
+<form id="formreview">
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    <div class="listado" style="width:900px;">
+        #formErrors()
+        <div>
+            #if($util.isNotEmpty($reviews))
+                <table border="0" cellspacing="0" cellpadding="0" class="listado" width="100%">
+                    #foreach($r in $reviews)
+                        <tr>
+                            <td><input type="hidden" name="reviewId" value="$!r.idReview">
+                                <div>
+                                    #if($r.visible) #set($bgcolor='#005f00') #else #set($bgcolor='#333333') #end
+                                    <div style="padding:1px 6px;background-color:$bgcolor;color:white;float:left;margin-right:10px;">$!r.score</div>
+                                    <span style="float:left;margin-right:10px;">$!util.formatDate($r.created,$defaultLanguage)</span>
+                                    <span style="float:left;">
+                                        $!r.userName ($!r.email)
+                                    </span>
+                                    <span style="float:right;">
+                                        <label><span style="float:left;">#label('admin.visible')</span>
+                                            <select name="reviewVisible" class="field string-shortest">
+                                                <option value="N">No</option>
+                                                <option value="Y" #if($r.visible) selected="selected" #end >Yes</option>
+                                            </select>
+                                        </label>
+                                    </span>
+                                    <br style="clear:both;"/>
+                                </div>
+                                <h3 style="margin:4px 0 0 0;padding:0;">$!r.title</h3>
+                                <div style="font-size:8pt;">$!r.opinion</div>
+                            </td>
+                            <td style="width:1%;vertical-align:top;">
+                                <a class="delete-row" href="#" onclick="return dialogConfirm('Product Reviews','Remove review?', function(){delReview($!r.idReview);});"></a>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.product.reviews')</h2>
+                    <p>#label('admin.product.reviews.not.found')</p>
+                </div>
+            #end
+        </div>
+
+    </div>
+    <div class="button-bar">
+        <button type="button" onclick="saveReviews();"><span class="ok">#label('admin.review.visible.update')</span></button>
+    </div>
+</form>
+<form id="formnewreview">
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    <div class="formulario">
+        <h3>#label('admin.add.product.review')</h3>
+    #formErrors()
+    <table class="formulario" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>#label('admin.username')</th>
+            <td>#stextfield('name=review.userName' 'value=' 'cssClass=field required string-medium')</td>
+            <th>#label('admin.email')</th>
+            <td>#stextfield('name=review.email' 'value=' 'cssClass=field required email string-medium')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.title')</th>
+            <td>#stextfield('name=review.title' 'value=' 'cssClass=field required string-medium')</td>
+            <th>#label('admin.score')</th>
+            <td>#stextfield('name=review.averageScore' 'value=' 'cssClass=field required decimal')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.content')</th>
+            <td colspan="3">#stextarea('name=review.opinion' 'value=' 'cssClass=field required string-large')</td>
+        </tr>
+    </table>
+    </div>    
+    <div class="button-bar">
+        <button type="button" onclick="addReview();"><span class="add">#label('admin.review.add')</span></button>
+    </div>
+</form>
+<script type="text/javascript">
+    function addReview() {
+        if ($('#formnewreview').validForm()) {
+            var data = $('#formnewreview').serialize();
+            $('#divReviews').loading("$!action.getText('admin.adding.new.review')","$!action.getText('admin.please.wait')");
+            $('#divReviews').load("$urlAddReview",data);
+        }
+    }
+    function delReview(id) {
+        $('#divReviews').loading("$!action.getText('admin.deleting.review')","$!action.getText('admin.please.wait')");
+        $('#divReviews').load("$urlDelReview",{idProduct:"$product.idProduct",idReview:id});
+    }
+    function saveReviews() {
+        var data = $('#formreview').serialize();
+        $('#divReviews').loading("$!action.getText('admin.updating.reviews')","$!action.getText('admin.please.wait')");
+        $('#divReviews').load("$urlSaveReview",data);
+    }
+    $(function(){
+        $('table.listado').find("tr:nth-child(odd)").addClass("odd");
+    });
+</script>

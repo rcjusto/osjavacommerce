@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="store-admin" extends="store-default" namespace="/admin">
+        <interceptors>
+            <interceptor-stack name="storeAdminDefaultStack">
+                <interceptor-ref name="servletConfig"/>
+                <interceptor-ref name="storeDetectInterceptor"/>
+                <interceptor-ref name="hibernateSessionInterceptor">
+                    <param name="resultError">configStore</param>
+                </interceptor-ref>
+                <interceptor-ref name="storeDefaultStack"/>
+                <interceptor-ref name="storeSessionInterceptor"/>
+                <interceptor-ref name="adminSecurityInterceptor"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="storeAdminDefaultStack"/>
+        <global-results>
+            <result name="accessDeny" type="velocity">/WEB-INF/views/admin/accessdeny.vm</result>
+            <result name="notStore" type="velocity">/WEB-INF/views/admin/not-stores.vm</result>
+            <result name="empty" type="plainText"><param name="parse">true</param></result>
+            <result name="action" type="redirectAction">${actionResult}</result>
+            <result name="view" type="velocity">${velocityView}</result>
+            <result name="json" type="json"><param name="root">jsonResp</param></result>
+            <result name="redirectUrl" type="redirect">
+                <param name="location">${redirectUrl}</param>
+                <param name="parse">true</param>
+            </result>
+        </global-results>
+        <action name="list*" class="org.store.core.admin.{1}Action" method="list">
+            <result type="velocity">/WEB-INF/views/admin/{1}list.vm</result>
+            <result type="velocity" name="input">/WEB-INF/views/admin/{1}list.vm</result>
+            <result type="velocity" name="modal">/WEB-INF/views/admin/{1}listmodal.vm</result>
+            <result type="json" name="json">
+            </result>
+        </action>
+        <action name="edit*" class="org.store.core.admin.{1}Action" method="edit">
+            <result type="velocity">/WEB-INF/views/admin/{1}edit.vm</result>
+            <result type="velocity" name="input">/WEB-INF/views/admin/{1}edit.vm</result>
+        </action>
+        <action name="show*" class="org.store.core.admin.{1}Action" method="show">
+            <result type="velocity">/WEB-INF/views/admin/{1}show.vm</result>
+        </action>
+        <action name="save*" class="org.store.core.admin.{1}Action" method="save">
+            <result type="velocity" name="input">/WEB-INF/views/admin/{1}edit.vm</result>
+            <result type="redirectAction">list{1}</result>
+        </action>
+        <action name="del*" class="org.store.core.admin.{1}Action" method="del">
+            <result type="redirectAction">list{1}</result>
+        </action>
+        <action name="*" class="org.store.core.admin.OtherAction" method="unknownAction">
+            <result type="redirectAction">home</result>
+            <result name="" type="redirectAction">home</result>
+        </action>
+    </package>
+</struts>

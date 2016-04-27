@@ -1,0 +1,162 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    .link-selector {
+        float: left;
+        margin-left: 10px;
+    }
+</style>
+<h1>
+    #if ($menu.id)
+        #label('admin.menu.modify') - ID: $!menu.id
+        #set($mtsel = $menu.menu)
+    #else
+        #label('admin.menu.new')
+        #set($mtsel = $menuType)
+    #end
+</h1>
+#surl('id=urlformedit' "action=savemenu")
+<form id="formedit" action="$urlformedit" method="post" class="validable">
+<input type="hidden" id="menuLinkValue" name="menuLinkValue" value=""/>
+<input type="hidden" name="idMenu" value="$!menu.id"/>
+<div class="formulario">
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.menu')</th>
+            <td>
+                <select name="menu.menu" class="field string-medium required">
+                    #foreach($mt in $menuTypes)
+                        <option value="$mt" #if($mt==$mtsel) selected="selected" #end  >$mt</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.menu.parent')</th>
+            <td>         
+                <select id="menuParent" name="menu.idParent" class="field myselect string-medium ">
+                    <option value="">[Top Item]</option>
+                    #menuOption($menuTree 0 $!menu.idParent)
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.menu.order')</th>
+            <td>#stextfield('name=menu.menuOrder' 'cssClass=field integer required')</td>
+        </tr>
+        <tr>
+            <th>#label('admin.link.to')</th>
+            <td>
+                <select id="menuLinkType" name="menuLinkType" class="field required">
+                    <option value="c" #if($menu.linkCategory) selected="selected" #end>#label('admin.category')</option>
+                    <option value="m" #if($menu.linkManufacturer) selected="selected" #end>#label('admin.manufacturer')</option>
+                    <option value="l" #if($menu.linkLabel) selected="selected" #end>#label('admin.product.label')</option>
+                    <option value="s" #if($menu.linkStaticText) selected="selected" #end>#label('admin.static.text')</option>
+                    <option value="a" #if($menu.linkAction) selected="selected" #end>#label('admin.action')</option>
+                    <option value="u" #if($menu.linkUrl) selected="selected" #end>#label('admin.url')</option>
+                </select>
+                <div id="v_c" class="link-selector">
+                    #set($catTree = $treeCategory )
+                    <select id="f_c" class="field myselect string-medium link-value">
+                        <option value="0">#label('admin.none')</option>
+                        #categoryOption($catTree 0 $!menu.linkCategory.idCategory)
+                    </select>
+                    <span style="float:left; margin-left:10px;">
+                        <label>
+                        #scheckbox('name=menu.showSubcategories') #label('admin.show.subcategories')
+                        </label>
+                    </span>
+                </div>
+                <div id="v_m" class="link-selector">
+                    <select id="f_m" class="field myselect string-medium link-value">
+                        #foreach($opt in $manufacturerList)
+                            <option value="$opt.idManufacturer" #if($menu.linkManufacturer.idManufacturer==$opt.idManufacturer) selected="selected" #end >$!{opt.manufacturerName}</option>
+                        #end
+                    </select>
+                </div>
+                <div id="v_l" class="link-selector">
+                    <select id="f_l" class="field myselect string-medium link-value">
+                        #foreach($opt in $labelList)
+                            <option value="$opt.code" #if($menu.linkLabel.code==$opt.code) selected="selected" #end >$opt.getName($defaultLanguage)</option>
+                        #end
+                    </select>
+                </div>
+                <div id="v_s" class="link-selector">
+                    <select id="f_s" class="field myselect string-medium link-value">
+                        #foreach($opt in $allStaticTexts)
+                            <option value="$opt.id" #if($menu.linkStaticText.id==$opt.id) selected="selected" #end >$!opt.getLanguage($defaultLanguage).title</option>
+                        #end
+                    </select>
+                </div>
+                <div id="v_a" class="link-selector">
+                    <input type="text" id="f_a" value="$!menu.linkAction" class="field string-medium link-value"/>
+                </div>
+                <div id="v_u" class="link-selector">
+                    <input type="text" id="f_u" value="$!menu.linkUrl" class="field string-medium link-value"/>
+                </div>
+            </td>
+        </tr>
+        #foreach($lang in $languages)
+            <tr>
+                <th>#label('admin.menu.label') ($lang):</th>
+                <td><input type="text" name="menuLabel" class="field string-medium" value="$!menu.getMenuLabelLang($lang)"/></td>
+            </tr>
+        #end
+        <tr>
+            <th>#label('admin.special.content')</th>
+            <td>
+                <select name="menuSpecialContent" class="field myselect string-medium">
+                    <option value="">#label('admin.none')</option>
+                    #foreach($opt in $allStaticTexts)
+                        #set($stName = "$!opt.getLanguage($defaultLanguage).title")
+                        #if($util.isEmpty($stName)) #set($stName="[$!opt.code]") #end
+                        <option value="$opt.id" #if($menu.menuContent.id==$opt.id) selected="selected" #end >$!stName</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.show.menu')</th>
+            <td>
+                #sselect('name=menu.userConnected' "list=#{'':'Always', 'S':'When user connected', 'N':'When NO user connected'}" 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.css.class')</th>
+            <td>#stextfield('name=menu.cssClass' 'cssClass=field string-medium')</td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listmenu" "menuType=$!mtsel" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+<script type="text/javascript">
+    $(function() {
+        $('#menuParent').find('option').each(function(){
+            var l = eval($(this).attr('level'))*20+4;
+            if (!isNaN(l)) $(this).css('padding-left',l+'px')
+        });
+        $('#f_c').find('option').each(function() {
+            var l = eval($(this).attr('level')) * 20 + 4;
+            if (!isNaN(l)) $(this).css('padding-left', l + 'px')
+        });
+        $("#menuLinkType").change(function() {
+            $('.link-selector').hide();
+            $('#v_' + $('#menuLinkType').val()).show();
+        }).trigger('change');
+        $('#formedit').submit(function(){
+            var linkVal = $('#f_' + $('#menuLinkType').val()).val();
+            if (linkVal=='') {
+                return false;
+            } else {
+                $('#menuLinkValue').val(linkVal);
+                return true;
+            }
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

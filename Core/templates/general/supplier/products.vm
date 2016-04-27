@@ -1,0 +1,88 @@
+#* @vtlvariable name="action" type="org.store.core.admin.AdminModuleAction" *#
+#* @vtlvariable name="orders" type="java.util.List<org.store.core.beans.Order>" *#
+
+#set($menuSelected='products')
+#parse('/WEB-INF/views/supplier/page_top.vm')
+
+<div style="width:800px" class="listado">
+
+    <h2 class="block-title">#label('admin.product.list')</h2>
+    <form id="formProducts" action="$action.url('products','supplier')">
+    <div id="filterContainer" class="filters formulario">
+
+    </div>
+    </form>
+
+    #set($nav=$products)
+    <form id="form_filter" action="$action.url('products')" method="post" class="validable">
+
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="100%">
+                <tr>
+                    <th>#label('admin.part.number')</th>
+                    <td>#stextfield('name=filterCode' 'cssClass=field string-short')</td>
+                    <th>#label('admin.product.name')</th>
+                    <td>#stextfield('name=filterName' 'cssClass=field string-medium')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.items.per.page')</th>
+                    <td nowrap="nowrap">
+                        <select onchange="$('#$!{products.name}_pagerows').val($(this).val());" class="field">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$products.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <td colspan="2" style="text-align: right">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </td>
+                </tr>
+            </table>
+         </div>
+
+    #parse('/WEB-INF/views/admin/navigator.vm')
+    #if($util.isNotEmpty($products.listado))
+        <table width="100%" class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('product.code')</th>
+                <th>#label('product.name')</th>
+                <th style="width: 5%">#label('quantity')</th>
+                <th style="width: 6%">#label('admin.cost')</th>
+            </tr>
+        #foreach($product in $products.listado)
+            <tr>
+                <td>$!product.getPartNumber()</td>
+                <td>$!product.getProductName($action.defaultLanguage)</td>
+                <td style="padding: 1px">
+                    <input type="hidden" name="idProducts" value="$product.idProduct"/>
+                    #if($product.fixedStock)
+                        <input type="text" name="stock" value="$!util.formatNumber($product.stock,'0')" readonly="readonly" class="integer read-only"/>
+                    #else
+                        <input type="text" name="stock" value="$!util.formatNumber($product.stock,'0')" class="integer"/>
+                    #end
+                    </td>
+                <td style="padding: 1px">
+                    <input type="text" name="cost" value="$!util.formatNumber($product.costPrice,'decimal2')" class="decimal"/>
+                </td>
+            </tr>
+        #end
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span>#label('admin.update')</span></button>
+        </div>
+    #else
+        <div class="info">
+            <h2>#label('admin.products.not.found')</h2>
+            <p>#label('admin.products.not.found.text')</p>
+        </div>
+    #end
+    </form>
+
+</div>
+
+#parse('/WEB-INF/views/supplier/page_bot.vm')

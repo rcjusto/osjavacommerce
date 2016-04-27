@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShipmentAcceptRequest xml:lang="en-US">
+	<Request>
+		<TransactionReference>
+			<CustomerContext>$!bean.customerContext</CustomerContext>
+			<XpciVersion>$!bean.xpciVersion</XpciVersion>
+		</TransactionReference>
+		<RequestAction>$!bean.requestAction</RequestAction>
+		<RequestOption>$!bean.requestOption</RequestOption>
+	</Request>
+    <ShipmentDigest>$!bean.shipmentDigest</ShipmentDigest>
+</ShipmentAcceptRequest>

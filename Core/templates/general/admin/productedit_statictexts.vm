@@ -1,0 +1,103 @@
+<form id="formStaticText" action="#" class="validable">
+#shidden('name=idProduct' "value=$!product.idProduct")
+#formErrors()
+
+<div class="formulario">
+    <h2 class="block-title">#label('admin.static.texts.assigned')</h2>
+    #if($util.isNotEmpty($parentCategoryStaticTexts) || $util.isNotEmpty($productStaticText))
+        <table class="sheet formulario" cellpadding="0" cellspacing="0">
+            #if($util.isNotEmpty($parentCategoryStaticTexts))
+                <tr class="nohover">
+                    <td colspan="4"><h3>#label('admin.static.texts.assigned.inherited')</h3></td>
+                </tr>
+                <tr>
+                    <th style="text-align:left;">#label('admin.code')</th>
+                    <th style="text-align:left;">#label('admin.title')</th>
+                    <th style="text-align:left;">#label('admin.order')</th>
+                    <th style="text-align:left;">#label('admin.place')</th>
+                </tr>
+                #foreach($p in $parentCategoryStaticTexts)
+                    <tr>
+                        <td style="padding-right:20px;">$!p.staticText.code</td>
+                        <td style="padding-right:20px;width:250px;" nowrap="nowrap">$!p.staticText.getLanguage($defaultLanguage).title</td>
+                        <td><input type="text" readonly="readonly" value="$!p.contentOrder" class="field integer readonly"/></td>
+                        <td><input type="text" readonly="readonly" value="$!p.contentPlace" class="field string-short readonly"/></td>
+                        <td><input type="text" class="field readonly inherited" style="width:0;" readonly="readonly"/></td>
+                    </tr>
+                #end
+            #end
+            #if($util.isNotEmpty($productStaticText))
+                <tr class="nohover">
+                    <td colspan="4"><h3>#label('admin.static.texts.assigned.configured')</h3></td>
+                </tr>
+                <tr>
+                    <th style="text-align:left;">#label('admin.code')</th>
+                    <th style="text-align:left;">#label('admin.title')</th>
+                    <th style="text-align:left;">#label('admin.order')</th>
+                    <th style="text-align:left;">#label('admin.place')</th>
+                </tr>
+                #foreach($p in $productStaticText)
+                    <tr>
+                        <td style="padding-right:20px;">
+                            <input type="hidden" class="contentStaticTextId" value="$!p.staticText.id"/>
+                            <input type="hidden" name="contentStaticTextId" value="$!p.id"/>
+                            $!p.staticText.code
+                        </td>
+                        <td style="padding-right:20px;width:250px;" nowrap="nowrap">$!p.staticText.getLanguage($defaultLanguage).title</td>
+                        <td><input type="text" name="contentOrder" value="$!p.contentOrder" class="field integer"/></td>
+                        <td>
+                            <select name="contentPlace" class="field string-short">
+                                #foreach($place in ['tabs'])
+                                <option value="$place" #if($place==$!p.contentPlace) selected="selected" #end >$place</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                #end
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.static.texts.assigned')</h2>
+            <p>#label('admin.static.texts.assigned.not.found')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        <button type="button" onclick="configureStaticTexts();"><span class="add">#label('admin.add.and.remove.items')</span></button>
+        <button type="button" onclick="saveStaticTexts();"><span class="ok">#label('admin.save')</span></button>
+    </div>
+
+    <h2 class="block-title">#label('admin.resource.assigned')</h2>
+    <div class="listado">
+        #if($product.productResources && $product.productResources.size()>0)
+            <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <th>#label('admin.id')</th>
+                    <th>#label('admin.resource.type')</th>
+                    <th>#label('admin.resource.name')</th>
+                    <th>#label('admin.filename')</th>
+                </tr>
+                #foreach($res in $product.productResources)
+                    <tr>
+                        <td>
+                            <input type="hidden" class="contentResourceId" value="$!res.id"/> $!res.id
+                        </td>
+                        <td>$!res.resourceType</td>
+                        <td>$!res.getResourceName($defaultLanguage)</td>
+                        <td>$!res.fileName</td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.resource.assigned')</h2>
+                <p>#label('admin.resource.assigned.not.found')</p>
+            </div>
+        #end
+        <div class="button-bar">
+            <button type="button" onclick="configureResources();"><span class="add">#label('admin.add.and.remove.items')</span></button>
+        </div>
+    </div>
+
+</div>
+</form>

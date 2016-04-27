@@ -1,0 +1,51 @@
+<form action="$!action.url('ordercosts','admin')" method="post">
+    <input type="hidden" name="openTab" value="3"/>
+    <input type="hidden" name="idOrder" value="$!order.idOrder"/>
+    <div class="block-content listado">
+
+        <table class="grid" width="100%" cellpadding="0" cellspacing="0">
+            <tr class="block-title">
+                <th colspan="2">#label('admin.item.costs')</th>
+            </tr>
+            #foreach($detail in $order.orderDetails)
+                #foreach($odp in $detail.orderDetailProducts)
+                    <tr>
+                        <td>
+                            $!odp.product.getProductName($defaultLanguage)
+                            #if($odp.product.costPrice)(#label('admin.inventary.cost') $!util.formatNumber($!odp.product.costPrice,'0.00'))#end
+                        </td>
+                        <td><input type="hidden" name="productId" value="$odp.id"/><input type="text" name="productCost" value="$!util.formatNumber($odp.costPrice,'0.00')" class="field decimal required"/></td>
+                    </tr>
+                #end
+            #end
+            <tr class="block-title">
+                <th colspan="2">#label('admin.shipping.costs')</th>
+            </tr>
+            #if($packages && $packages.size()>0)
+                #foreach($package in $packages)
+                    <tr>
+                        <td>
+                            #label('admin.package') $math.add($velocityCount,1)
+                            ($package.packingProductList.size() #label('products'))
+                        </td>
+                        <td><input type="hidden" name="packageId" value="$package.id"/><input type="text" name="packagesCost" value="$!util.formatNumber($package.deliveryCost,'0.00')" class="field decimal required"/></td>
+                    </tr>
+                #end
+            #else
+                <tr>
+                    <td>#label('admin.packages.not.found')</td>
+                </tr>
+            #end
+            <tr class="block-title">
+                <th colspan="2">#label('admin.other.costs')</th>
+            </tr>
+            <tr>
+                <td>#label('admin.handling.cost')</td>
+                <td><input type="text" name="handlingCost" value="$!util.formatNumber($order.handlingCost,'0.00')" class="field decimal required"/></td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.update')</span></button>
+        </div>
+    </div>
+</form>

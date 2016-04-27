@@ -1,0 +1,354 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<div class="clearfix" style="width: 1000px;">
+    <h1>
+        #if ($designedMail.id)
+            #label('admin.designed.mail.modify') ID: $!designedMail.id
+        #else
+            #label('admin.design.new.mail')
+        #end
+    </h1>
+<form id="formDesignMail" action="$!action.url('designedmailsave')" method="post" enctype="multipart/form-data" class="validable">
+    <input type="hidden" name="idCampaignMail" value="$!designedMail.id">
+    #shidden('name=designedMail.id')
+    #shidden("id=designedMail" 'name=designedMail.content')
+    #shidden("id=templateName" 'name=designedMail.templateName')
+    <div class="empty-blocks-help info" style="display:none;">#label('admin.there.are.empty.blocks')</div>
+
+    #if ($designedMail.id)
+        <div style="padding:4px 10px;">
+            <strong>Public URL:</strong>
+            $!action.url('campaignmailcontent','',$util.map.add('id',$!designedMail.id.toString()),true)
+        </div>
+    #end
+    <div style="float:left;width:762px;background-color:#f4f4f4;border:4px solid #f4f4f4;">
+        <div id="templateData" style="padding:10px;">
+            #if($util.isNotEmpty($designedMail.content))
+                $!designedMail.content
+            #else
+                #parse('/WEB-INF/views/admin/designedmail_templates.vm')
+            #end
+        </div>
+    </div>
+    <div id="helpContent" style="float: left; width:230px;background-color: #f4f4f4; color: #333333; #if($util.isNotEmpty($designedMail.content)) #else display: none; #end">
+        #formErrors()
+        <div class="indice" style="padding: 10px;">
+            <div style="font-size: 8pt;">
+                #label('campaign.mail.designer.help')
+                <ul style="list-style: none;margin: 0; padding: 0;font-size: 8pt;padding-left: 30px;">
+                    <li style="background:url('/struts/css/images/html_add.png') no-repeat 0 center;padding-left:22px;margin: 4px;">#label('admin.edit.content')</li>
+                    <li style="background:url('/struts/css/images/image_add.png') no-repeat 0 center;padding-left:22px;margin: 4px;">#label('admin.insert.product')</li>
+                    <li style="background:url('/struts/css/images/layout_content.png') no-repeat 0 center;padding-left:22px;margin: 4px;">#label('admin.select.product.layout')</li>
+                    <li style="background:url('/struts/css/images/cross.png') no-repeat 0 center;padding-left:22px;margin: 4px;">#label('admin.remove.row')</li>
+                    <li style="background:url('/struts/css/images/arrow-turn-180.png') no-repeat 0 center;padding-left:22px;margin: 4px;">#label('admin.insert.row.after')</li>
+                </ul>
+            </div>
+            <div style="border-top: 1px dotted #bbbbbb;margin-top: 10px;padding-top: 5px;">
+                <ul style="list-style: none; margin: 0;padding: 0;">
+                    <li style="margin: 4px 8px;"><a href="#" id="openTestWindow">#label('admin.show.in.window')</a></li>
+                    <li style="margin: 4px 8px;"><a href="#" id="showCode">#label('admin.edit.html.code')</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="float:right;width:200px;margin:6px;">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            <button type="button" href="$action.url('designedmaillist','admin')"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+</div>
+
+<!-- Dialogo para insertar contenido html -->
+<div id="editor" style="display:none;" class="dialog">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.campaign.designer')</h2>
+            <h4>#label('admin.update.block.content')</h4>
+        </div>
+        <div class="dialog-data">
+            <textarea id="editorField" rows="10" cols="80" style="width:99%;"></textarea>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="saveBlock();"><span class="ok">#label('admin.ok')</span></button>
+            <button type="button" onclick="$('#editor').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+<!-- Dialogo para insertar una nueva fila -->
+<div id="rows" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.campaign.designer')</h2>
+            <h4>#label('admin.select.row.layout')</h4>
+        </div>
+        <div class="dialog-data">
+            <ul style="list-style:none;margin:0; padding:0;" class="clearfix">
+                #foreach($rl in $mailtemplaterows.keySet())
+                    <li style="float:left;margin:5px;">
+                        <input type="hidden" id="rowLayout_$rl" value="$!esc.html($mailtemplaterows.get($rl))">
+                        <a href="#" onclick="insertRowAfter('$rl');return false;"><img src="$!{util.siteUrl}/$!{action.storeFile('campaigns')}/${rl}.gif" alt="$rl"/></a>
+                    </li>
+                #end
+            </ul>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#rows').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+<!-- Dialogo para cambiar el layout de un producto -->
+<div id="productLayouts" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.campaign.designer')</h2>
+            <h4>#label('admin.select.product.layout')</h4>
+        </div>
+        <div class="dialog-data">
+            <ul style="list-style:none;margin:0; padding:0;" class="clearfix">
+                #foreach($pl in $productLayouts)
+                    <li style="float:left;margin:5px;text-align: center;">
+                        <a href="#" onclick="changeProductLayout('$pl');return false;" style="background-color: #cccccc;display: block;padding: 3px;">
+                            <img src="$!{util.siteUrl}$!{action.storeFile('campaigns')}/prod_${pl}.gif" alt=""/>
+                            <div style="padding: 4px;">$!pl</div>
+                        </a>
+                    </li>
+                #end
+            </ul>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#productLayouts').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+<!-- Dialogo para mostrar el codigo fuente -->
+<div id="dlgSourceCode" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.html.code')</h2>
+            <h4>#label('admin.html.code.instructions')</h4>
+        </div>
+        <div class="dialog-data">
+            <textarea id="emailSourceCode" wrap='off' rows="10" cols="80" style="width:99%;height:350px"></textarea>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#templateData').html($('#emailSourceCode').val());initializeAll();$('#dlgSourceCode').dialog('close');"><span class="ok">#label('admin.update')</span></button>
+            <button type="button" onclick="$('#dlgSourceCode').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var lastLayout = 'default';
+    function selectProduct(blockId) {
+        $('#dialogContent').loading("$!action.getText('admin.loading.products','admin.loading.products')", "$!action.getText('admin.please.wait','admin.please.wait')");
+        $('#dialogContent').load("$!action.url('productlist','admin')", {output:'selector',multiple:'false', rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selectedEl = $('#tab_listado').find("input[name='selectedProduct']:checked");
+                if (selectedEl.size() > 0) {
+                    var layout = $('#' + blockId).attr('layout');
+                    if (layout==null || layout=='') layout = lastLayout;
+                    if (layout==null || layout=='') layout = 'default';
+                    $('#' + blockId).attr('data', selectedEl.val());
+                    $('#' + blockId).find('div.mail-content').loading('', '');
+                    $('#' + blockId).find('div.mail-content').load("$!action.url('designedmailproduct','admin')", {idProduct:selectedEl.val(), template:layout}, function(data) {
+                        if (data != null) {
+                            $(this).removeClass('mail-empty');
+                            $('#' + blockId).addClass('product')
+                        } else {
+                            $(this).addClass('mail-empty');
+                            $('#' + blockId).removeClass('product')
+                        }
+                        emptyBlocks();
+                    });
+                    $('#dialogo').dialog('close');
+                } else {
+                    $('#' + blockId).attr('data', '').removeClass('product');
+                    $('#dialogo').dialog('close');
+                }
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    var currentBlock = null;
+    function selectLayout(blockId) {
+        currentBlock = blockId;
+        $('#productLayouts').dialog({width:690,modal:true,resizable:true});
+        return false;
+    }
+    function changeProductLayout(l) {
+        if (l!=null && l!='') lastLayout = l;
+        if (currentBlock!=null) {
+            var selId = $('#' + currentBlock).attr('data');
+            $('#' + currentBlock).attr('layout',l);
+            if (selId!=null && selId!='') {
+                $('#' + currentBlock).find('div.mail-content').loading('', '');
+                $('#' + currentBlock).find('div.mail-content').load("$!action.url('designedmailproduct','admin')", {idProduct:selId, template:l}, function(data) {
+                    if (data != null) {
+                        $(this).removeClass('mail-empty');
+                        $('#' + currentBlock).addClass('product')
+                    } else {
+                        $(this).addClass('mail-empty');
+                        $('#' + currentBlock).removeClass('product')
+                    }
+                    emptyBlocks();
+                });
+            }
+            $('#productLayouts').dialog('close');
+        }
+    }
+    function initializeAll() {
+        initializeBlocks();
+        $('#mail-container').find('.mail-block').hover(
+                function() {
+                    $(this).find('div.mail-blockbar').show().position({my:'left top',at:'left top',of:this,offset:'1 2'});
+                },
+                function() {
+                    $(this).find('div.mail-blockbar').hide();
+                }
+                );
+
+        initializeRows();
+        $('#mail-container').find('.mail-row').hover(
+                function() {
+                    $(this).find('div.mail-rowbar').show().position({my:'right bottom',at:'right bottom',of:this,offset:'-2 0'});
+                    $(this).addClass('focus');
+                },
+                function() {
+                    $(this).removeClass('focus').find('div.mail-rowbar').hide();
+                }
+                );
+        $('#mail-container').sortable({ start: function() {
+            $(this).find('div.mail-blockbar,div.mail-rowbar').hide();
+        }});
+        return false;
+    }
+
+    function initializeBlocks() {
+        var idIndex = 0;
+        $('#mail-container').find('.mail-block').each(function() {
+            var block = $(this);
+            $(this).attr('id', 'block_' + (idIndex++));
+            var bar = $(this).find('div.mail-blockbar');
+            if (bar.size() > 0) bar.html('');
+            else bar = $('<div>').addClass('mail-blockbar').hide().appendTo(this);
+            $('<a>').attr('href', '#').addClass('html-edit').attr('title', "$!action.getText('admin.edit.content','Edit Content')").click(function() {
+                editBlock(block.attr('id'));return false;
+            }).appendTo(bar);
+            $('<a>').attr('href', '#').addClass('product').attr('title', "$!action.getText('admin.insert.product','Insert Product')").click(function() {
+                selectProduct(block.attr('id'));return false;
+            }).appendTo(bar);
+            $('<a>').attr('href', '#').addClass('layout').attr('title', "$!action.getText('admin.select.product.layout','Select Product Layout')").click(function() {
+                selectLayout(block.attr('id'));return false;
+            }).appendTo(bar);
+            var blockContent = block.find('div.mail-content');
+            if (blockContent.html() == '') blockContent.addClass("mail-empty"); else blockContent.removeClass("mail-empty");
+        });
+        emptyBlocks();
+    }
+    function initializeRows() {
+        var idIndex = 0;
+        $('#mail-container').find('.mail-row').each(function() {
+            var row = $(this);
+            $(this).attr('id', 'row_' + (idIndex++));
+            var bar = $(this).find('div.mail-rowbar');
+            if (bar.size() > 0) bar.html('');
+            else bar = $('<div>').addClass('mail-rowbar').hide().appendTo(this);
+            $('<a>').attr('href', '#').addClass('remove').attr('title', "$!action.getText('admin.remove.row','Remove Row')").click(function() {
+                delRow(row.attr('id'));return false;
+            }).appendTo(bar);
+            $('<a>').attr('href', '#').addClass('insertabove').attr('title', "$!action.getText('admin.insert.row.after','Insert Row After')").click(function() {
+                selectedRow = row.attr('id');
+                $('#rows').dialog({width:690,modal:true,resizable:true});
+                return false;
+            }).appendTo(bar);
+            bar.position({my:'right bottom',at:'right bottom',of:row,offset:'-2 0'});
+        });
+        emptyBlocks();
+    }
+    var editedBlock, selectedRow;
+    function editBlock(id) {
+        editedBlock = id;
+        $('#editorField').val($('#' + id).find('div.mail-content').html());
+
+        $('#editor').dialog({width:780,modal:true,resizable:true});
+        $('#editorField').ckeditor({
+            filebrowserBrowseUrl : "$!{action.url('imgexplorer','admin')}",
+            filebrowserImageBrowseUrl : "$!{action.url('imgexplorer','admin')}?filterType=img",
+            filebrowserFlashBrowseUrl : "$!{action.url('imgexplorer','admin')}?filterType=swf"
+        });
+
+    }
+    function saveBlock() {
+        if (editedBlock != null) {
+            var blockContent = $('#' + editedBlock).find('div.mail-content');
+            blockContent.html($('#editorField').val());
+            if ($('#editorField').val() != '') blockContent.removeClass('mail-empty');
+            else blockContent.addClass('mail-empty');
+            $('#' + editedBlock).removeClass('product');
+            editedBlock = null;
+        }
+        emptyBlocks();
+        $('#editor').dialog('close');
+    }
+    function delRow(id) {
+        $('#' + id).remove();
+        initializeAll();
+    }
+    function insertRowAfter(id) {
+        $('#' + selectedRow).after($('#rowLayout_' + id).val());
+        initializeAll();
+        $('#rows').dialog('close');
+        return false;
+    }
+    function changeTemplate(tn) {
+        $('#templateName').val(tn);
+        $('#templateData').html($('#template_' + tn).val());
+        initializeAll();
+        $('#helpContent').show();
+        return false;
+    }
+    function emptyBlocks() {
+        var res = $('.mail-empty').size();
+        $('#noEmptyBlocks').html(res);
+        if (res > 0) $('.empty-blocks-help').show();
+        else $('.empty-blocks-help').hide();
+        return res;
+    }
+    var wndTest = null;
+    $(function() {
+        $('.mail-content a').live('click',function(){return false});
+        $('#formDesignMail').submit(function() {
+            $('#designedMail').val($('#templateData').html().trim());
+            return true;
+        });
+
+        $('.templateLink').click(function() {
+            changeTemplate($(this).attr('rel'));
+            return false;
+        });
+        $('.empty-blocks-help').hover(
+                function() {
+                    $('.mail-empty').addClass('enfatizar')
+                },
+                function() {
+                    $('.mail-empty').removeClass('enfatizar')
+                }
+                );
+        $('#openTestWindow').click(function() {
+            if (wndTest != null && !wndTest.closed) wndTest.close();
+            wndTest = window.open('', 'wndTest', 'toolbar=no,location=0,directories=no,status=no,menubar=0,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=600')
+            $(wndTest.document.body).html($('#templateData').html().trim());
+            return false;
+        });
+        $('#showCode').click(function() {
+            $('#emailSourceCode').val($('#templateData').html().trim());
+            $('#dlgSourceCode').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+            return false;
+        });
+        initializeAll();
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

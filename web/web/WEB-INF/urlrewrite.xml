@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.2//EN"
+        "http://tuckey.org/res/dtds/urlrewrite3.2.dtd">
+<urlrewrite>
+    <!-- Reglas para stores en el root de la aplicacion -->
+    <rule>
+        <note>Friendly url for product labels</note>
+        <from>^/label/(.+)$</from>
+        <to>/category.jsp?label=$1</to>
+    </rule>
+    <rule>
+        <note>Friendly url for categories</note>
+        <from>^/category/(.+)$</from>
+        <to>/category.jsp?code=$1</to>
+    </rule>
+    <rule>
+        <note>Friendly url for manufacturer</note>
+        <from>^/manufacturer/(.+)$</from>
+        <to>/category.jsp?manufacturer=$1</to>
+    </rule>
+    <rule>
+        <note>Friendly url for products</note>
+        <from>^/product/(.+)$</from>
+        <to>/product.jsp?code=$1</to>
+    </rule>
+    <rule>
+        <note>Friendly url for pages</note>
+        <from>^/page/(.+)$</from>
+        <to>/page.jsp?code=$1</to>
+    </rule>
+
+    <!-- Reglas para stores que no estan en el root de la aplicacion -->
+    <rule>
+        <note>Friendly url for product labels</note>
+        <from>^/([a-z0-9]+)/label/(.+)$</from>
+        <to>/$1/category.jsp?label=$2</to>
+    </rule>
+    <rule>
+        <note>Friendly url for categories</note>
+        <from>^/([a-z0-9]+)/category/(.+)$</from>
+        <to>/$1/category.jsp?code=$2</to>
+    </rule>
+    <rule>
+        <note>Friendly url for manufacturers</note>
+        <from>^/([a-z0-9]+)/manufacturer/(.+)$</from>
+        <to>/$1/category.jsp?manufacturer=$2</to>
+    </rule>
+    <rule>
+        <note>Friendly url for products</note>
+        <from>^/([a-z0-9]+)/product/(.+)$</from>
+        <to>/$1/product.jsp?code=$2</to>
+    </rule>
+    <rule>
+        <note>Friendly url for pages</note>
+        <from>^/([a-z0-9]+)/page/(.+)$</from>
+        <to>/$1/page.jsp?code=$2</to>
+    </rule>
+</urlrewrite>

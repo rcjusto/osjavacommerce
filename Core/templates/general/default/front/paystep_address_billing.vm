@@ -1,0 +1,158 @@
+#set($billingAddress = $userSession.billingAddress)
+#if($canChangeBillingAddress)
+<div id="billingChange" style="display:none;">
+    <form id="formBillingChange">
+        <input type="hidden" name="output" value="change"/>
+        <select class="field string-400" name="idBilling">
+            #foreach($add in $frontUser.addressList)
+                <option value="$add.idAddress" #if($add==$billingAddress) selected="selected" #end >
+                    $!add.address $!add.city $!add.stateCode $!add.zipCode $!add.idCountry
+                </option>
+            #end
+        </select>
+        <div class="buttons">
+            <button type="submit"><span class="ok">#label('ok')</span></button>
+            <button type="button" onclick="$('#nextButton').hide();$('#billingChange').hide();$('#billingShow').show();$('#nextButton').show();"><span class="cancel">#label('cancel')</span></button>
+        </div>
+    </form>
+</div>
+#end
+<div id="billingShow">
+    <div class="addressData">
+        <p>$!billingAddress.titulo $!billingAddress.fullName</p>
+        <p>$!billingAddress.address</p>
+        #if($util.isNotEmpty($billingAddress.address2))<p>$!billingAddress.address2</p>#end
+        <p>$!billingAddress.city $!billingAddress.stateCode $!billingAddress.zipCode $!billingAddress.idCountry</p>
+        #if($util.isNotEmpty($billingAddress.phone))<p>$!billingAddress.phone</p>#end
+    </div>
+    #if($canChangeBillingAddress)
+    <div class="buttons">
+        <button type="button" onclick="$('#nextButton').hide();$('#billingShow').hide();$('#billingEdit').show();$('#nextButton').show();"><span class="edit">#label('edit')</span></button>
+        #if($frontUser.addressList && $frontUser.addressList.size()>1)
+            <button type="button" onclick="$('#nextButton').hide();$('#billingShow').hide();$('#billingChange').show();$('#nextButton').show();"><span class="change">#label('change.address')</span></button>
+        #end
+    </div>
+    #end
+</div>
+#if($canChangeBillingAddress)
+<div id="billingEdit" style="display:none;">
+    <form id="formBillingEdit">
+        #set($countryList = $action.getCountries(true))
+        <input type="hidden" name="output" value="edit"/>
+        <input type="hidden" name="idBilling" value="$!billingAddress.idAddress"/>
+        <input type="hidden" name="billingAddress.idAddress" value="$!billingAddress.idAddress"/>
+        #if($action.getStoreProperty('address.show.name','Y')=='Y')
+        <label>
+            <span class="label">#label('salutation')</span>
+            #sselect("name=billingAddress.title" "value=$!billingAddress.title" 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+        </label>
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+            #stextfield("name=billingAddress.firstname" "value=$!billingAddress.firstname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.firstname")
+        </label>
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+            #stextfield("name=billingAddress.lastname" "value=$!billingAddress.lastname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.lastname")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.company','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+            #stextfield("name=billingAddress.company" "value=$!billingAddress.company" "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.company")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address.1')</span>
+            #stextfield("name=billingAddress.address" "value=$!billingAddress.address" "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.address")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">#label('address.2')</span>
+            #stextfield("name=billingAddress.address2" "value=$!billingAddress.address2" "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.address2")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.city','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+            #stextfield("name=billingAddress.city" "value=$!billingAddress.city" "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.city")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+        #if($countryList && $countryList.size()>1)
+            <label>
+                <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                <select name="billingAddress.idCountry" id="billingAddress_idCountry" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                    #foreach($c in $countryList)
+                        <option value="$!c.code" #if($c.code==$billingAddress.idCountry) selected="selected" #end>$!c.name</option>  #end
+                </select>
+                #fieldError("billingAddress.idCountry")
+            </label>
+        #end
+        #if($countryList && $countryList.size()==1)
+            <input type="hidden" id="billingAddress_idCountry" name="billingAddress.idCountry" value="$countryList.get(0).code">
+        #end
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+            <span id="billingAddressStateBlock" field-id="billingAddressState" field-name="billingAddressState" field-name-ex="billingAddress.stateName"></span>
+            ##sselect("id=billingAddressState" "name=billingAddressState" "value=$!billingAddress.state.idState" "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            ##fieldError("billingAddressState")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+            #stextfield("name=billingAddress.zipCode" "value=$!billingAddress.zipCode" "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.zipCode")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+            #stextfield("name=billingAddress.phone" "value=$!billingAddress.phone" "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.phone")
+        </label>
+        #end
+        #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+        <label>
+            <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('fax')</span>
+            #stextfield("name=billingAddress.fax" "value=$!billingAddress.fax" "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+            #fieldError("billingAddress.fax")
+        </label>
+        #end
+        <div class="buttons">
+            <button type="submit"><span class="ok">#label('save')</span></button>
+            <button type="button" onclick="$('#nextButton').hide();$('#billingEdit').hide();$('#billingShow').show();$('#nextButton').show();"><span class="cancel">#label('cancel')</span></button>
+        </div>
+    </form>
+</div>
+#end
+<script type="text/javascript">
+    $(function() {
+        #if($billingAddress) #else
+            $('#billingShow').hide();
+            $('#billingEdit').show();
+        #end
+        countryStateEx("billingAddress_idCountry", "billingAddressStateBlock", "$!billingAddress.state.idState", "$!billingAddress.stateName");
+        $('#formBillingEdit').submit(function() {
+            if ($('#formBillingEdit').validForm()) {
+                updateBilling($('#formBillingEdit').serialize());
+            }
+            return false;
+        });
+        $('#formBillingChange').submit(function() {
+            if ($('#formBillingChange').validForm()) {
+                updateBilling($('#formBillingChange').serialize());
+            }
+            return false;
+        });
+        $('button').button();
+    });
+</script>

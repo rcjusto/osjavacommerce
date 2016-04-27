@@ -1,0 +1,19 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.product.import.step1')</h1>
+<div class="formulario">
+    <form action="$!action.url('import_products_fields','admin')" method="post" enctype="multipart/form-data" class="validable">
+        <table class="formulario">
+            <tr>
+                <th>#label('admin.import.file')</th>
+                <td>#sfile('name=importFile' 'size=60')</td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="next">#label('admin.next')</span></button>
+        </div>
+    </form>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

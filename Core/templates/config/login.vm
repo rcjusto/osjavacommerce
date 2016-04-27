@@ -1,0 +1,53 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/struts/css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="/struts/css/jquery.ui.1.8.4.custom.css"/>
+    <link rel="stylesheet" type="text/css" href="/struts/css/clear.css"/>
+    <style type="text/css">
+        <!--
+        body {text-align: center}
+        body, table {font-family: sans-serif;font-size: 10pt;padding: 10px;}
+        #content {width:320px;padding: 20px;background-color: #f8f8f8;border: 1px solid #dddddd;margin: 40px auto;text-align: left}
+        table {width: 100%;}
+        a {color: #8b0000;text-decoration:none;}
+        a:hover {text-decoration:underline}
+        h1 {font-size: 24pt;margin:0 0 20px 0;font-weight:normal;}
+        label {display: block;margin: 10px;}
+        label span {display: inline-block;width: 70px;padding: 5px;}
+        .field {border: 1px solid #d0d0d0;font-size:12pt;padding: 5px;background-color: #ffffff;width: 200px}
+        .field.focus {border: 1px solid #b0b0b0;}
+        input.error, select.error {border:2px solid #b22222;}
+        .errors {margin:10px 0;background-color:#b22222;color:#ffffff;padding:10px;font-size:12pt;}
+        button span.ok {background:url("/struts/css/images/tick.png") no-repeat 0 50%;padding-left:20px;}
+        button {font-size:12pt; font-weight:bold;padding: 5px;background-color: #dddddd;border: 1px solid #bbbbbb;color: #333333;}
+        button:hover {background-color: #333333;border: 1px solid #bbbbbb;color: #ffffff;}
+        -->
+    </style>
+</head>
+<body>
+       <div id="content">
+           <h1>Login</h1>
+           #if($action.hasActionErrors())
+               <div class="errors">
+                    #foreach($err in $action.actionErrors)
+                    <div>$!err</div>
+                    #end
+               </div>
+           #end
+           #surl('id=urlLogin' 'action=login' 'namespace=/config')
+           <form action="$urlLogin">
+               <label>
+                   <span>User:</span>
+                   <input type="text" name="user" value="$!user" class="field"/>
+               </label>
+               <label>
+                   <span>Password:</span>
+                   <input type="password" name="password" value="" class="field"/>
+               </label>
+               <div style="text-align: center;margin-top: 20px;">
+                   <button type="submit"><span class="ok">Submit</span></button>
+               </div>
+           </form>
+       </div>
+</body>
+</html>

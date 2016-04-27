@@ -1,0 +1,40 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($codes.id)
+        #label('admin.bic.modify') #label('admin.code'): $!bic.code
+    #else
+        #label('admin.bic.new')
+    #end
+</h1>
+<form action="$!action.url('bicsaveaction','admin')" method="post" class="validable">
+<input type="hidden" name="id" value="$!codes.id" />
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.code')</th>
+            <td><input type="text" name="code" value="$!codes.code" class="field required string-short" /></td>
+        </tr>
+        <tr>
+            <th>#label('admin.text')</th>
+            <td>
+                <input name="vis_text" class="multilang field string-large" value=""/>
+                #foreach($l in $languages )
+                    <input type="hidden" class="$l" name="text" value="$!codes.getText($l)"/>
+                #end
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.active')</th>
+            <td><input type="checkbox" name="active" value="true" #if($codes.active) checked="checked" #end  /></td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        <button type="button" href="$!action.url('biclistaction','admin')"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

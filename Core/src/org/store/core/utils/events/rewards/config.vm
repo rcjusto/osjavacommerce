@@ -1,0 +1,99 @@
+#langSelector()
+<p>$!rewardHeaderText</p>
+<div class="formulario">
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('reward.label.enabled')</th>
+            <td>
+                <input type="checkbox" name="enabled" value="yes" #if($rewardData.get('enabled')) checked="checked" #end />
+            </td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.exchange.rate')</th>
+            <td>
+                <span style="float:left;margin:0 6px;">#label('reward.label.1rewardpoint.equals')</span>
+                <input type="text" name="exchangeRate" value="$!util.formatNumber($rewardData.get('exchangeRate'),'decimal2')" class="field decimal required" />
+                <span style="float:left;margin:0 6px;"> $!action.getDefaultCurrency().code</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><h2 class="block-title">#label('reward.label.actions')</h2></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.for.registration')</th>
+            <td><input type="text" name="pointsRegistration" value="$!rewardData.get('pointsRegistration')" class="field integer required" /></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.for.refer.friend')</th>
+            <td><input type="text" name="pointsReferFriend" value="$!rewardData.get('pointsReferFriend')" class="field integer required" /></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.for.purchase')</th>
+            <td>
+                <span style="float:left;margin:0 6px;">#label('reward.label.each')</span>
+                <input type="text" name="amountApprovedOrder" value="$!rewardData.get('amountApprovedOrder')" class="field integer required" />
+                <span style="float:left;margin:0 6px;"> $!action.getDefaultCurrency().code</span>
+                <span style="float:left;margin:0 6px;">#label('reward.label.spent.will.earn')</span>
+                <input type="text" name="pointsApprovedOrder" value="$!rewardData.get('pointsApprovedOrder')" class="field integer required" />
+                <span style="float:left;margin:0 6px;">#label('reward.label.reward.points')</span>
+            </td>
+        </tr>
+        <!--tr>
+            <th class="required">#label('reward.label.points.for.submit.review')</th>
+            <td><input type="text" name="pointsSubmitReview" value="$!rewardData.get('pointsSubmitReview')" class="field integer required" /></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.for.submit.poll')</th>
+            <td><input type="text" name="pointsSubmitPoll" value="$!rewardData.get('pointsSubmitPoll')" class="field integer required" /></td>
+        </tr-->
+
+        <tr>
+            <th class="required">#label('reward.label.points.when.friend.registering')</th>
+            <td><input type="text" name="pointsFriendRegister" value="$!rewardData.get('pointsFriendRegister')" class="field integer required" /></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.when.friend.click.link')</th>
+            <td><input type="text" name="pointsFriendLink" value="$!rewardData.get('pointsFriendLink')" class="field integer required" /></td>
+        </tr>
+        <tr>
+            <th class="required">#label('reward.label.points.for.friend.purchase')</th>
+            <td>
+                <span style="float:left;margin:0 6px;">#label('reward.label.each')</span>
+                <input type="text" name="amountFriendApprovedOrder" value="$!rewardData.get('amountFriendApprovedOrder')" class="field integer required" />
+                <span style="float:left;margin:0 6px;"> $!action.getDefaultCurrency().code</span>
+                <span style="float:left;margin:0 6px;">#label('reward.label.spent.will.earn')</span>
+                <input type="text" name="pointsFriendApprovedOrder" value="$!rewardData.get('pointsFriendApprovedOrder')" class="field integer required" />
+                <span style="float:left;margin:0 6px;">#label('reward.label.reward.points')</span>
+            </td>
+        </tr>
+        #if($adminWithEmail)
+        <tr>
+            <th >#label('reward.admin.user')</th>
+            <td>
+                <select name="contactUser" class="field string-medium">
+                    <option value=""></option>
+                    #foreach($admin in $adminWithEmail)
+                        <option value="$!admin.userId" #if($!rewardData.get('contactUser')==$admin.userId) selected="selected" #end >$!admin.fullName ($!admin.userId)</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('reward.welcome.text')</th>
+            <td>
+                <textarea name="vis_welcomeText" class="multilang field string-large"></textarea>
+                #foreach($l in $languages )
+                    #set($t = "")
+                    #set($t = $!rewardData.get("welcomeText_${l}"))
+                    <input type="hidden" class="$l" name="welcomeText" value="$!t"/>
+                #end
+            </td>
+        </tr>
+        #end
+    </table
+
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    </div>
+</div>    

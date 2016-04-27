@@ -1,0 +1,24 @@
+#if($nav)
+    #set($fnpr = "$!{nav.name}_pagerows")
+    #set($fncp = "$!{nav.name}_currentpage")
+    #if($nav.totalRows>0)
+    <div class="navigator">
+        #set($minMax = $nav.getPageListLikeGoogle(10))
+        <input type="hidden" id="$!fnpr" name="$!{nav.name}.pagerows" value="$!nav.pageRows">
+        <input type="hidden" id="$!fncp" name="$!{nav.name}.currentpage" value="$!nav.currentPage">
+        <span class="results">Showing $!nav.listado.size() of $!nav.totalRows</span>
+        <ul class="pages">
+            #foreach($p in [$minMax.get(0)..$minMax.get(1)])
+                #if($p==$nav.currentPage)
+                    <li class="selected"><span>$!p</span></li>
+                #else
+                    <li><a href="#" onclick="$('#${fncp}').val($p);$('#${fncp}').parents('form:first').submit();return false;">$!p</a></li>
+                #end
+            #end
+        </ul>
+        <br style="clear:both;"/>
+    </div>
+    #else
+        <input type="hidden" id="$!fnpr" name="$!{nav.name}.pagerows" value="$!nav.pageRows">
+    #end
+#end

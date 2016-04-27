@@ -1,0 +1,38 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.report.list')</h1>
+<div class="listado">
+    #if($util.isNotEmpty($reports))
+        <div id="reports" style="margin:20px;">
+            <ul style="list-style:none;margin:0;padding:0;">
+                #foreach($rMap in $reports)
+                    #surl('id=urlPDF' "action=reportdata" "reportName=$!rMap.get('file')" 'format=PDF')
+                    #surl('id=urlXLS' "action=reportdata" "reportName=$!rMap.get('file')" 'format=XLS')
+                    #surl('id=urlCSV' "action=reportdata" "reportName=$!rMap.get('file')" 'format=CSV')
+                    #surl('id=urlRTF' "action=reportdata" "reportName=$!rMap.get('file')" 'format=RTF')
+                    #surl('id=urlHTML' "action=reportdata" "reportName=$!rMap.get('file')" 'format=HTML')
+                    <li style="margin:6px;">
+                        <h2 style="margin:0;padding:0;">$!rMap.get('name')</h2>
+                        <p style="margin:0;padding:0;">$!rMap.get('description')</p>
+                        <p>
+                            <a style="background:url(/struts/css/images/ext/pdf.png) no-repeat; padding-left:18px;color:#333;" href="$urlPDF">PDF</a>
+                            <span>|</span>
+                            <a style="background:url(/struts/css/images/ext/xls.png) no-repeat; padding-left:18px;color:#333;" href="$urlXLS">Excel</a>
+                            <span>|</span>
+                            <a style="background:url(/struts/css/images/ext/doc.png) no-repeat; padding-left:18px;color:#333;" href="$urlRTF">RTF</a>
+                            <span>|</span>
+                            <a style="background:url(/struts/css/images/ext/html.png) no-repeat; padding-left:18px;color:#333;" href="$urlHTML">HTML</a>
+                            <span>|</span>
+                            <a style="background:url(/struts/css/images/ext/csv.png) no-repeat; padding-left:18px;color:#333;" href="$urlCSV">CSV</a>
+                        </p>
+                    </li>
+                #end
+            </ul>
+        </div>
+    #else
+        <div class="info">
+            <p>#label('admin.reports.not.found')</p>
+        </div>
+    #end
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

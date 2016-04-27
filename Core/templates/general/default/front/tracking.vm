@@ -1,0 +1,49 @@
+<div id="trackingHeader" class="dialog-header">
+    <h2>#label('package.tracking.title')</h2>
+    <h4>#label('package.tracking.text')</h4>
+</div>
+<div id="trackingInfo" class="dialog-data">
+
+    #actionErrors()
+    #if($package)
+
+        <table>
+            <tr>
+                <th nowrap="nowrap">#label('package.tracking.carrier'):</th>
+                <td>$!package.shippingMethod.carrierName</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">#label('package.tracking.method'):</th>
+                <td>$!package.shippingMethod.getMethodName($locale.language)</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">#label('package.tracking.number'):</th>
+                <td>$!package.trackingNumber</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">#label('package.sent.date'):</th>
+                <td>$!util.formatDate($package.deliveryDate, $locale.language)</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">#label('package.tracking.info'):</th>
+                <td>$!tracking</td>
+            </tr>
+            <tr>
+                <th nowrap="nowrap">#label('package.product.list'):</th>
+                <td>
+                    <ul>
+                        #foreach($prod in $package.packingProductList)
+                        <li>
+                            $!prod.orderDetailProduct.product.getProductName($locale.language)
+                        </li>
+                        #end
+                    </ul>
+                </td>
+            </tr>
+        </table>
+
+    #end
+</div>
+<div class="button-bar">
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>

@@ -1,0 +1,52 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($manufacturer.idManufacturer)
+        #label('admin.manufacturer.modify') ID: $!manufacturer.idManufacturer
+    #else
+        #label('admin.manufacturer.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savemanufacturer")
+<form action="$urlForm" method="post" enctype="multipart/form-data" class="validable">
+#shidden('name=manufacturer.idManufacturer')
+<div class="formulario">
+#formErrors()
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th class="required">#label('admin.name')</th>
+            <td>
+                #stextfield('name=manufacturer.manufacturerName' 'cssClass=field required string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.url.code')</th>
+            <td>
+                #stextfield('name=manufacturer.urlCode' 'cssClass=field string-medium')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.website.url')</th>
+            <td>
+                #stextfield('name=manufacturer.manufacturerUrl' 'cssClass=field string-large')
+            </td>
+        </tr>
+        <tr>
+            <th>#label('admin.image')</th>
+            <td>
+                #set( $imgUrl = $util.findImage($!action.storeFile("images/manufacturers/$!{manufacturer.urlCode}")))
+                #if($util.isNotEmpty($imgUrl))
+                    <img src="${imgUrl}?rnd=$!{math.random}" alt=""/><br/>
+                #end
+                #sfile('name=manufacturerImage' 'size=40' 'value=Browse...' )
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listmanufacturer" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

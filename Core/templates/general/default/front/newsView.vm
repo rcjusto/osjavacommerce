@@ -1,0 +1,11 @@
+<div id="blockContent" class="news-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        #if($news)
+            <h1>$!news.getLanguage($locale.language,$defaultLanguage).title</h1>
+            <div class="static-content">$!news.getLanguage($locale.language,$defaultLanguage).value</div>
+        #end
+    </div>
+</div>

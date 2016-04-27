@@ -1,0 +1,441 @@
+#set($triggerProducts = $config.get('trigger_products'))
+#set($triggerCustomers = $config.get('trigger_customers'))
+#set($triggerOrders = $config.get('trigger_orders'))
+#set($triggerTaxes = $config.get('trigger_taxes'))
+#set($jobProducts = $config.get('products'))
+#set($propProducts = $jobProducts.jobProperties)
+#set($jobCustomers = $config.get('customers'))
+#set($propCustomers = $jobCustomers.jobProperties)
+#set($jobOrders = $config.get('orders'))
+#set($propOrders = $jobOrders.jobProperties)
+#set($jobTaxes = $config.get('taxes'))
+#set($propTaxes = $jobTaxes.jobProperties)
+
+#macro(property_chk $modulo $name $defValue)
+<input type="hidden" name="sage${modulo}Property" value="$name">
+<label>
+    #set( $v = $jobProducts.getJobProperty($name,$defValue)=='Y' )
+    #checkboxEx($name "sage${modulo}Value" $v)
+    #label("admin.${name}")
+</label>
+#end
+
+<h1>#label('admin.sage.configuration')</h1>
+<div class="formulario">
+    <div id="sageTab">
+        <ul>
+            <li><a href="#tabConnection">#label('sage.connection')</a></li>
+            <li><a href="#tabProducts">Sincronizacion de Productos</a></li>
+            <li><a href="#tabCustomers">Sincronizacion de Clientes</a></li>
+            <li><a href="#tabTaxes">Sincronizacion de Impuestos</a></li>
+            <li><a href="#tabOrders">Sincronizacion de Ordenes</a></li>
+        </ul>
+        <div id="tabConnection">
+            <table class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.sage.url')</th>
+                    <td colspan="3"><input type="text" name="sageUrl" value="$!propProducts.getProperty('sage.url')" class="field string-large"></td>
+                </tr>
+                <tr>
+                    <th>#label('admin.sage.user')</th>
+                    <td><input type="text" name="sageUser" value="$!propProducts.getProperty('sage.user')" class="field string-short"/></td>
+                    <th>#label('admin.sage.password')</th>
+                    <td><input type="password" name="sagePassword" value="$!propProducts.getProperty('sage.password')" class="field string-short"/></td>
+                </tr>
+            </table>
+        </div>
+        <div id="tabProducts">
+            <div style="text-align:left;font-size:12pt;">
+                <input type="checkbox" name="jobProducts.active" value="Y" #if($jobProducts.active) checked="checked" #end /> #label('admin.active')
+            </div>
+            <table id="tableProducts" class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.job.start.at')</th>
+                    <td><input type="text" name="jobProducts.startAt" value="$!jobProducts.strBeginHour" class="field string-short"/></td>
+                    <th>#label('admin.job.run.every')</th>
+                    <td>
+                        <input type="text" name="jobProducts.intervalNumber" value="$!jobProducts.intervalNumber" class="field integer"/>
+                        <select name="jobProducts.intervalUnit" class="field string-short">
+                            #foreach($opt in ['HOUR','DAY','WEEK','MONTH','YEAR'])
+                                <option value="$opt" #if($opt==$jobProducts.intervalUnit) selected="selected" #end >$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.next.execution')</th>
+                    <td>$!util.formatDate($!triggerProducts.nextFireTime) $!date.format('HH:mm',$!triggerProducts.nextFireTime)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.previous.execution')</th>
+                    <td colspan="3">
+                        <div>
+                            <span style="font-weight:bold;">$!util.formatDate($!jobProducts.lastExecution) $!date.format('HH:mm',$!jobProducts.lastExecution) -</span>
+                            <span>#label("admin.execution.$!{jobProducts.executionStatus}") (<a href="#" onclick="$('#msgProducts').toggle();return false;">ver detalles</a>)</span>
+                        </div>
+                        <div id="msgProducts" style="display:none;background-color:#f5f5f5;padding:4px 8px;">$!jobProducts.executionMsg</div>
+                    </td>
+                </tr>
+                <tr class="block-title">
+                    <th colspan="4">#label('sage.catalog.options')</th>
+                </tr>
+                <tr>
+                    <td colspan="2">#property_chk('Product' 'import.all.categories' 'N')</td>
+                    <td colspan="2">#property_chk('Product' 'import.new.products' 'Y')</td>
+                </tr>
+                <tr>
+                    <td colspan="2">#property_chk('Product' 'import.all.userlevels' 'N')</td>
+                    <td colspan="2">#property_chk('Product' 'update.old.products' 'Y')</td>
+                </tr>
+            </table>
+            <div id="jobproductsState" class="box" style="display:none;">
+                <div id="taskproductsMsg" style="margin:4px;"></div>
+                <div class="progressbar" id="taskproductsPercent"></div>
+            </div>
+            #if($jobProducts.active)
+                <div id="barProducts" class="button-bar">
+                    <button type="button" onclick="executeNowProducts();"><span>#label('admin.execute.now')</span></button>
+                </div>
+            #end
+        </div>
+        <div id="tabCustomers">
+            <div style="text-align:left;font-size:12pt;">
+                <input type="checkbox" name="jobCustomers.active" value="Y" #if($jobCustomers.active) checked="checked" #end /> #label('admin.active')
+            </div>
+            <table id="tableCustomerss" class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.job.start.at')</th>
+                    <td><input type="text" name="jobCustomers.startAt" value="$!jobCustomers.strBeginHour" class="field string-short"/></td>
+                    <th>#label('admin.job.run.every')</th>
+                    <td>
+                        <input type="text" name="jobCustomers.intervalNumber" value="$!jobCustomers.intervalNumber" class="field integer"/>
+                        <select name="jobCustomers.intervalUnit" class="field string-short">
+                            #foreach($opt in ['HOUR','DAY','WEEK','MONTH','YEAR'])
+                                <option value="$opt" #if($opt==$jobCustomers.intervalUnit) selected="selected" #end >$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.next.execution')</th>
+                    <td>$!util.formatDate($!triggerCustomers.nextFireTime) $!date.format('HH:mm',$!triggerCustomers.nextFireTime)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.previous.execution')</th>
+                    <td colspan="3">
+                        <div>
+                            <span style="font-weight:bold;">$!util.formatDate($!jobCustomers.lastExecution) $!date.format('HH:mm',$!jobCustomers.lastExecution) -</span>
+                            <span>#label("admin.execution.$!{jobCustomers.executionStatus}") (<a href="#" onclick="$('#msgCustomers').toggle();return false;">ver detalles</a>)</span>
+                        </div>
+                        <div id="msgCustomers" style="display:none;background-color:#f5f5f5;padding:4px 8px;">$!jobCustomers.executionMsg</div>
+                    </td>
+                </tr>
+                <tr class="block-title">
+                    <th colspan="4">#label('sage.import.from.sage')</th>
+                </tr>
+                <tr>
+                    <td colspan="2">#property_chk('Customer' 'import.new.clients' 'Y')</td>
+                    <td colspan="2">#property_chk('Customer' 'update.old.clients' 'Y')</td>
+                </tr>
+                <tr class="block-title">
+                    <th colspan="4">#label('sage.export.to.sage')</th>
+                </tr>
+                <tr>
+                    <td colspan="2">#property_chk('Customer' 'update.client.addresses.to.sage' 'Y')</td>
+                    <td colspan="2">#property_chk('Customer' 'update.client.names.to.sage' 'Y')</td>
+                </tr>
+                <tr>
+                    <td colspan="2">#property_chk('Customer' 'update.client.contact-info.to.sage' 'Y')</td>
+                </tr>
+            </table>
+            <div id="jobcustomersState" class="box" style="display:none;">
+                <div id="taskcustomersMsg" style="margin:4px;"></div>
+                <div class="progressbar" id="taskcustomersPercent"></div>
+            </div>
+            #if($jobCustomers.active)
+                <div id="barCustomers" class="button-bar">
+                    <button type="button" onclick="executeNowCustomers();"><span>#label('admin.execute.now')</span></button>
+                </div>
+            #end
+        </div>
+        <div id="tabTaxes">
+            <div style="text-align:left;font-size:12pt;">
+                <input type="checkbox" name="jobTaxes.active" value="Y" #if($jobTaxes.active) checked="checked" #end /> #label('admin.active')
+            </div>
+            <table id="tableTaxes" class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.job.start.at')</th>
+                    <td><input type="text" name="jobTaxes.startAt" value="$!jobTaxes.strBeginHour" class="field string-short"/></td>
+                    <th>#label('admin.job.run.every')</th>
+                    <td>
+                        <input type="text" name="jobTaxes.intervalNumber" value="$!jobTaxes.intervalNumber" class="field integer"/>
+                        <select name="jobTaxes.intervalUnit" class="field string-short">
+                            #foreach($opt in ['HOUR','DAY','WEEK','MONTH','YEAR'])
+                                <option value="$opt" #if($opt==$jobTaxes.intervalUnit) selected="selected" #end >$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.next.execution')</th>
+                    <td>$!util.formatDate($!triggerTaxes.nextFireTime) $!date.format('HH:mm',$!triggerTaxes.nextFireTime)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.previous.execution')</th>
+                    <td colspan="3">
+                        <div>
+                            <span style="font-weight:bold;">$!util.formatDate($!jobTaxes.lastExecution) $!date.format('HH:mm',$!jobTaxes.lastExecution) -</span>
+                            <span>#label("admin.execution.$!{jobTaxes.executionStatus}") (<a href="#" onclick="$('#msgTaxes').toggle();return false;">ver detalles</a>)</span>
+                        </div>
+                        <div id="msgTaxes" style="display:none;background-color:#f5f5f5;padding:4px 8px;">$!jobTaxes.executionMsg</div>
+                    </td>
+                </tr>
+                <tr class="block-title">
+                    <th colspan="4">#label('sage.options')</th>
+                </tr>
+                <tr>
+                    #set( $v = $action.getStoreProperty('use.tax.per.product','N')=='Y' )
+                    <td colspan="2"><label>#checkboxEx('useTaxPerProduct' 'use.tax.per.product' $v) #label('sage.use.tax.per.product')</label></td>
+                </tr>
+            </table>
+            <div id="jobtaxesState" class="box" style="display:none;">
+                <div id="tasktaxesMsg" style="margin:4px;"></div>
+                <div class="progressbar" id="tasktaxesPercent"></div>
+            </div>
+            #if($jobTaxes.active)
+                <div id="barTaxes" class="button-bar">
+                    <button type="button" onclick="executeNowTaxes();"><span>#label('admin.execute.now')</span></button>
+                </div>
+            #end
+        </div>
+        <div id="tabOrders">
+            <div style="text-align:left;font-size:12pt;">
+                <input type="checkbox" name="jobOrders.active" value="Y" #if($jobOrders.active) checked="checked" #end /> #label('admin.active')
+            </div>
+            <table id="tableOrders" class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>#label('admin.job.start.at')</th>
+                    <td><input type="text" name="jobOrders.startAt" value="$!jobOrders.strBeginHour" class="field string-short"/></td>
+                    <th>#label('admin.job.run.every')</th>
+                    <td>
+                        <input type="text" name="jobOrders.intervalNumber" value="$!jobOrders.intervalNumber" class="field integer"/>
+                        <select name="jobOrders.intervalUnit" class="field string-short">
+                            #foreach($opt in ['HOUR','DAY','WEEK','MONTH','YEAR'])
+                                <option value="$opt" #if($opt==$jobOrders.intervalUnit) selected="selected" #end >$opt</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.next.execution')</th>
+                    <td>$!util.formatDate($!triggerOrders.nextFireTime) $!date.format('HH:mm',$!triggerOrders.nextFireTime)</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.previous.execution')</th>
+                    <td colspan="3">
+                        <div>
+                            <span style="font-weight:bold;">$!util.formatDate($!jobOrders.lastExecution) $!date.format('HH:mm',$!jobOrders.lastExecution) -</span>
+                            <span>#label("admin.execution.$!{jobOrders.executionStatus}") (<a href="#" onclick="$('#msgOrders').toggle();return false;">ver detalles</a>)</span>
+                        </div>
+                        <div id="msgOrders" style="display:none;background-color:#f5f5f5;padding:4px 8px;">$!jobOrders.executionMsg</div>
+                    </td>
+                </tr>
+                <tr class="block-title">
+                    <th colspan="4">#label('sage.options')</th>
+                </tr>
+                <tr>
+                    <th>#label('admin.sage.order.status.to.export')</th>
+                    <td>
+                        <input type="hidden" name="sageOrderProperty" value="sage.order.status.to.export">
+                        <input type="hidden" id="orderStatuses" name="sageOrderValue" value="$!jobOrders.getJobProperty('sage.order.status.to.export','approved')">
+                        #set($arrSelected = $util.split($!jobOrders.getJobProperty('sage.order.status.to.export','approved') , ','))
+                        #foreach($os in $action.getOrderStatusList())
+                            <div><label><input type="checkbox" class="orderStatuses" value="$os.getStatusCode()" #if($list.contains($arrSelected,$os.getStatusCode())) checked="checked" #end > $os.getStatusName($defaultLanguage)</label></div>
+                        #end
+                    </td>
+                </tr>
+                #if($pickInStore)
+                    <tr>
+                        <th>#label('admin.sage.order.carrier.for.pick.in.store')</th>
+                        <td>
+                            <select name="sagePickInStore" class="field string-medium">
+                                #foreach($sc in $sageCarriers.entrySet())
+                                    <option value="$!sc.key" #if($!jobOrders.getJobProperty("sage.order.pick.in.store",'')=="$!sc.key") selected="selected" #end >$!sc.value</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                #end
+                #foreach($carr in $carriers)
+                    <tr>
+                        <th>
+                            <input type="hidden" name="storeCarriers" value="$!carr.id" />
+                            #label('admin.sage.order.carrier.for') $!carr.getMethodName($defaultLanguage)
+                        </th>
+                        <td>
+                            <select name="sageCarriers" class="field string-medium">
+                                #foreach($sc in $sageCarriers.entrySet())
+                                    <option value="$!sc.key" #if($!jobOrders.getJobProperty("sage.order.carrier.$!carr.id",'')=="$!sc.key") selected="selected" #end >$!sc.value</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                #end
+            </table>
+            <div id="jobordersState" class="box" style="display:none;">
+                <div id="taskordersMsg" style="margin:4px;"></div>
+                <div class="progressbar" id="taskordersPercent"></div>
+            </div>
+            #if($jobOrders.active)
+                <div id="barOrders" class="button-bar">
+                    <button type="button" onclick="executeNowOrders();"><span>#label('admin.execute.now')</span></button>
+                </div>
+            #end
+        </div>
+    </div>
+    <input type="hidden" id="activeTab" name="activeTab" value="$!request.getParameter('activeTab')"/>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    </div>
+</div>
+#surl('id=urlExecute' "action=jobexecute")
+#surl('id=urlExecuteState' "action=jobexecutestate")
+#surl('id=urlReload' "action=editpluginproperty" "plugin=$plugin")
+<script type="text/javascript">
+    function executeStateProducts() {
+        jQuery.getJSON("$urlExecuteState", {jobName:'sage.products.synchronization'}, function(data) {
+            if (data.result == 'error') {
+                $('#jobproductsState').hide();
+                $('#barProducts').show();
+            } else {
+                $('#jobproductsState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#taskproductsMsg').html("<h3>#stext('name=admin.task.complete')</h3><a href='#' class='refresh'>#stext('name=admin.click.here.to refresh.status')</a>");
+                    $('#taskproductsPercent').hide();
+                    $('#barProducts').show();
+                } else {
+                    if (data.percent != null) {
+                        $('#taskproductsMsg').html(data.percent + '%: ' + data.msg);
+                        $('#taskproductsPercent').progressbar('option', 'value', data.percent).show();
+                    }
+                    setTimeout(executeStateProducts, 1000);
+                }
+            }
+        });
+    }
+    function executeStateCustomers() {
+        jQuery.getJSON("$urlExecuteState", {jobName:'sage.customers.synchronization'}, function(data) {
+            if (data.result == 'error') {
+                $('#jobcustomersState').hide();
+                $('#barCustomers').show();
+            } else {
+                $('#jobcustomersState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#taskcustomersMsg').html("<h3>#stext('name=admin.task.complete')</h3><a href='#' class='refresh'>#stext('name=admin.click.here.to refresh.status')</a>");
+                    $('#taskcustomersPercent').hide();
+                    $('#barCustomers').show();
+                } else {
+                    if (data.percent != null) {
+                        $('#taskcustomersMsg').html(data.percent + '%: ' + data.msg);
+                        $('#taskcustomersPercent').progressbar('option', 'value', data.percent).show();
+                    }
+                    setTimeout(executeStateCustomers, 1000);
+                }
+            }
+        });
+    }
+    function executeStateOrders() {
+        jQuery.getJSON("$urlExecuteState", {jobName:'sage.orders.synchronization'}, function(data) {
+            if (data.result == 'error') {
+                $('#jobordersState').hide();
+                $('#barOrders').show();
+            } else {
+                $('#jobordersState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#taskordersMsg').html("<h3>#stext('name=admin.task.complete')</h3><a href='#' class='refresh'>#stext('name=admin.click.here.to refresh.status')</a>");
+                    $('#taskordersPercent').hide();
+                    $('#barOrders').show();
+                } else {
+                    if (data.percent != null) {
+                        $('#taskordersMsg').html(data.percent + '%: ' + data.msg);
+                        $('#taskordersPercent').progressbar('option', 'value', data.percent).show();
+                    }
+                    setTimeout(executeStateOrders, 1000);
+                }
+            }
+        });
+    }
+    function executeStateTaxes() {
+        jQuery.getJSON("$urlExecuteState", {jobName:'sage.taxes.synchronization'}, function(data) {
+            if (data.result == 'error') {
+                $('#jobtaxesState').hide();
+                $('#barTaxes').show();
+            } else {
+                $('#jobtaxesState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#tasktaxesMsg').html("<h3>#stext('name=admin.task.complete')</h3><a href='#' class='refresh'>#stext('name=admin.click.here.to refresh.status')</a>");
+                    $('#tasktaxesPercent').hide();
+                    $('#barTaxes').show();
+                } else {
+                    if (data.percent != null) {
+                        $('#tasktaxesMsg').html(data.percent + '%: ' + data.msg);
+                        $('#tasktaxesPercent').progressbar('option', 'value', data.percent).show();
+                    }
+                    setTimeout(executeStateTaxes, 1000);
+                }
+            }
+        });
+    }
+    function executeNowProducts() {
+        $('#barProducts').hide();
+        jQuery.getJSON("$urlExecute", {jobName:'sage.products.synchronization'}, function(data) {
+            if (data.result == 'ok') executeStateProducts();
+            else alert(data.msg);
+        });
+    }
+    function executeNowCustomers() {
+        $('#barCustomers').hide();
+        jQuery.getJSON("$urlExecute", {jobName:'sage.customers.synchronization'}, function(data) {
+            if (data.result == 'ok') executeStateCustomers();
+            else alert(data.msg);
+        });
+    }
+    function executeNowOrders() {
+        $('#barOrders').hide();
+        jQuery.getJSON("$urlExecute", {jobName:'sage.orders.synchronization'}, function(data) {
+            if (data.result == 'ok') executeStateOrders();
+            else alert(data.msg);
+        });
+    }
+    function executeNowTaxes() {
+        $('#barTaxes').hide();
+        jQuery.getJSON("$urlExecute", {jobName:'sage.taxes.synchronization'}, function(data) {
+            if (data.result == 'ok') executeStateTaxes();
+            else alert(data.msg);
+        });
+    }
+    $(function() {
+        var activeTab = ($('#activeTab').val()!='' && !isNaN(parseInt($('#activeTab').val()))) ? parseInt($('#activeTab').val()) : 0;
+        $('#sageTab').tabs({ selected: activeTab });
+        $(".progressbar").progressbar({ value: 0 });
+        $('input.orderStatuses').click(function() {
+            var value = '';
+            $('input.orderStatuses').each(function() {
+                if ($(this).is(':checked')) {
+                    if (value != '') value += ',';
+                    value += $(this).attr('value');
+                }
+            });
+            $('#orderStatuses').val(value);
+        });
+        $('.refresh').live('click',function() {
+            var tabAct = $("#sageTab").tabs("option", "selected");
+            document.location.href = "$!urlReload" + '&activeTab='+tabAct;
+            return false;
+        });
+        executeStateProducts();
+        executeStateCustomers();
+        executeStateOrders();
+    });
+</script>

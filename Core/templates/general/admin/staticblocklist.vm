@@ -1,0 +1,44 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label("admin.static.${filterType}.list")</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=liststatic$!{filterType}")
+    <form action="$urlForm" method="post">
+    #if($util.isNotEmpty($currentBlocks))
+        <ul style="list-style:none;margin:0;padding:0">
+            #foreach($b in $currentBlocks)
+                <li style="float:left;margin:10px;padding:6px;border:1px solid #d0d0d0;height:125px;">
+                    <table cellpadding="0" cellspacing="0">
+                        <tr style="vertical-align:top;">
+                            <td rowspan="2"><img src="/struts/templates/${template}/blocks/${b.code}.gif" style="border:1px solid #d0d0d0;width:100px; height:123px;"/></td>
+                            <td style="padding-left:12px;">
+                                <h4 style="margin-top:0;padding-top:0">$!b.getName($defaultLanguage)</h4>
+                                #set($s = '')
+                                #set($s = $action.getStaticText($b.code,'block'))
+                                #if($s!='' && $!s.getLanguage($defaultLanguage).value)
+                                    <p>#label('admin.content'): $!s.getLanguage($defaultLanguage).value.length() bytes</p>
+                                #else
+                                    <p>#label('admin.empty.block')</p>
+                                #end
+                            </td>
+                        </tr>
+                        <tr style="vertical-align:bottom;text-align:right;">
+                            #surl('id=urlMod' "action=editstatic$!{filterType}" "staticId=$!b.code")
+                            <td class="link-bar"><a href="$urlMod"><span class="edit">#label('admin.modify')</span></a></td>
+                        </tr>
+                    </table>
+
+                </li>
+            #end
+        </ul>
+        <div style="clear:both;"></div>
+    #else
+        <div class="info">
+            <h2>#label("admin.static.${filterType}.list")</h2>
+            <p>#label("admin.static.${filterType}.list.not.found")</p>
+        </div>
+    #end
+</form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

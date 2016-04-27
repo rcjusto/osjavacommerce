@@ -1,0 +1,71 @@
+<div id="blockContent" class="orders-page clearfix">
+    <div id="blockOrders">
+        <div class="block">
+            <h1>#label('my.orders')</h1>
+
+            #if($orders)
+                #surl("id=urlFormOrders" "action=orders")
+                <form action="$urlFormOrders" method="post">
+                    #set($fnpr = "$!{orders.name}_pagerows")
+                    #set($fncp = "$!{orders.name}_currentpage")
+                    #if($orders.totalRows>0)
+                        <div class="navigator clearfix">
+                            #set($minMax = $orders.getPageListLikeGoogle(10))
+                            <input type="hidden" id="$!fnpr" name="$!{orders.name}.pagerows" value="$!orders.pageRows">
+                            <input type="hidden" id="$!fncp" name="$!{orders.name}.currentpage" value="$!orders.currentPage">
+                            <span class="results">#label('showing') $!orders.listado.size() #label('of') $!orders.totalRows</span>
+                            <ul class="pages clearfix">
+                                #foreach($p in [$minMax.get(0)..$minMax.get(1)])
+                                    #if($p==$orders.currentPage)
+                                        <li class="selected"><span>$!p</span></li>
+                                    #else
+                                        <li><a href="#" onclick="$('#${fncp}').val($p);$('#${fncp}').parents('form:first').submit();return false;">$!p</a></li>
+                                    #end
+                                #end
+                            </ul>
+                        </div>
+                    #else
+                        <input type="hidden" id="$!fnpr" name="$!{orders.name}.pagerows" value="$!orders.pageRows">
+                    #end
+                </form>
+            #end
+
+            <table id="tablaOrders" class="listado" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('code')</th>
+                    <th>#label('created')</th>
+                    <th>#label('status')</th>
+                    <th>#label('payment')</th>
+                    <th>#label('shipping')</th>
+                    <th class="price">#label('total')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($order in $orders.listado)
+                    #surl('id=urlEdit' "action=order" "idOrder=$!order.idOrder")
+                    #surl('id=urlRmas' "action=rmaorder" "idOrder=$!order.idOrder")
+                    <tr class="hoverable">
+                        <td>$!order.idOrder</td>
+                        <td>$!util.formatDate($order.createdDate, $locale.language)</td>
+                        <td>$!order.status.getStatusName($locale.language)</td>
+                        <td>$!order.paymentMethod</td>
+                        <td>
+                            #if($order.pickInStore)
+                                #label('pick.in.store') $!order.pickInStore.name
+                            #else
+                                $!order.shippingMethod.getMethodName($locale.language)
+                            #end
+                        </td>
+                        <td class="price">$!action.formatActualCurrency($order.total,$order.currency)</td>
+                        <td class="links">
+                            #linklabel('order.details' $!urlEdit)
+                            #if($action.getStoreProperty('can.do.rma','Y')=='Y')
+                                <span>|</span>
+                                #linklabel('rmas' $!urlRmas)
+                            #end
+                        </td>
+                    </tr>
+                #end
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="dialog-header">
+    <h2>#label('admin.resource.list')</h2>
+    <h4>#label('admin.resource.list.instructions')</h4>
+</div>
+<form id="form_statictext">
+    <div class="dialog-data" style="height:300px;" id="treeatt">
+        #if($resourceMap && $resourceMap.keySet().size()>0)
+            <ul>
+                #foreach($key in $resourceMap.keySet())
+                    #set($listaST = $resourceMap.get($key))
+                    <li>
+                        $!key
+                        <ul>
+                            #foreach($s in $listaST)
+                            <li id="$!s.id">$!s.getResourceName($defaultLanguage) ($!s.fileName)</li>
+                            #end
+                        </ul>
+                    </li>
+                #end
+            </ul>
+        #else
+            <div class="info">
+                <h2>#label('admin.resources.not.found')</h2>
+                <p>#label('admin.resources.not.found.text')</p>
+            </div>
+        #end
+    </div>
+</form>
+<div class="button-bar">
+    <button id="dialogBtnOk" type="button"><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+<script type="text/javascript">
+    $(function() {$('#treeatt').dynatree({checkbox: true,selectMode:3});});
+    function modalResource_getSelectedNodes() {
+        return $('#treeatt').dynatree("getTree").getSelectedNodes(false);
+    }
+    function modalResource_getSelectedIds() {
+        var selectedNodes = modalResource_getSelectedNodes();
+        return (selectedNodes != null) ? jQuery.map(selectedNodes, function(node) {return (node.getLevel() > 0) ? node.data.key : null;}) : null;
+    }
+    function modalResource_selectId(id) {
+        $('#treeatt').dynatree("getTree").selectKey(id);
+    }
+    function modalResource_serialize(fName) {
+        var res = '';
+        var selected = modalResource_getSelectedIds();
+        jQuery.each(selected, function() {
+            if (/^-?\d+$/.test(this)) {
+                if (res != '') res += '&';
+                res += fName + '=' + this
+            }
+        });
+        return res;
+    }
+</script>

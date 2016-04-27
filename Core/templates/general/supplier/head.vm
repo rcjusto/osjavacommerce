@@ -1,0 +1,101 @@
+#set($tabSelected = 0)
+#if($menuSelected=='customers')#set($tabSelected = 1)#end
+#if($menuSelected=='orders')#set($tabSelected = 2)#end
+#if($menuSelected=='configuration')#set($tabSelected = 3)#end
+<title></title>
+<link rel="stylesheet" type="text/css" href="/struts/css/clear.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/admin.css?v=0.003"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.ui.1.8.4.custom.css?v=1.1"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/dynatree/ui.dynatree.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.treeTable.css"/>
+<link rel="stylesheet" type="text/css" href="/struts/css/plupload/plupload.queue.css"/>
+<link rel="stylesheet" type="text/css" href="$!action.skinFile('/css/admin.css')"/>
+<script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ui.autocomplete.html.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ck.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.mymenu.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.dynatree.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.treeTable.min.js"></script>
+<script type="text/javascript" src="/struts/js/swfobject.js"></script>
+<script type="text/javascript" src="/struts/js/plupload/plupload.full.min.js"></script>
+<script type="text/javascript" src="/struts/js/plupload/jquery.plupload.queue.js"></script>
+#if($locale.language=='es')
+<script type="text/javascript" src="/struts/js/plupload/i18n/es.js"></script>
+#end
+<script type="text/javascript" src="/struts/js/ckeditor/ckeditor.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/struts/js/ckeditor/adapters/jquery.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/struts/js/admin.js"></script>
+<script type="text/javascript">
+    var thisLanguage = "$!defaultLanguage";
+    var params = {
+        urlBase: "$!util.siteUrl",
+        urlImgExplorer: "$action.url('imgexplorer','admin')",
+        dateFormat: #if($!defaultLanguage=='es') 'dd/mm/yy' #else 'mm/dd/yy' #end
+    };
+    validationErrorTitle = "$!action.getText('admin.error.in.values')";
+    validationErrorText = "$!action.getText('admin.error.check.marked.fields')";
+    loadingText = "$!action.getText('admin.please.wait')";
+    var deleteDialogTitle = "$!action.getText('admin.deleting')";
+    var deleteDialogText = "$!action.getText('admin.deleting.question')";
+    $(function() {
+        initPage($!tabSelected);
+    });
+
+    function editLabel(lId) {
+        var url = "$!action.url('staticlabeledit','admin')";
+        $('#dialogContent').loading(loadingText, '');
+        $('#dialogContent').load(url, {modal:true,staticId:lId,rnd:Math.random()});
+        $('#dialogo').dialog({width:600,modal:true,resizable:false});
+        return false;
+    }
+    function dialogConfirm(title, text, f) {
+        $('#dialogo').width(400);
+        $('#dialogContent').html('');
+
+        var div1 = $('<div>').addClass('confirm-header')
+                .append($('<h2>').html(title))
+                .append($('<h4>').html(text));
+        var div2 = $('<div>').addClass('button-bar').addClass('confirm-bar')
+                .append($('<button type="button">').html('<span class="ok">Ok</span>').click(function() {
+            if (jQuery.isFunction(f)) f();
+            $('#dialogo').dialog('close');
+        }))
+                .append($('<span>').html('&nbsp;'))
+                .append($('<button type="button">').html('<span class="cancel">Cancel</span>').click(function() {
+            $('#dialogo').dialog('close')
+        }));
+
+        $('#dialogContent').append(div1).append(div2);
+        $('#dialogo').dialog({width:600,modal:true,resizable:false});
+        return false;
+    }
+    function deleteConfirm(f, t) {
+        var dt = (t != null && t != '') ? deleteDialogText + ' "' + t + '"' : deleteDialogText;
+        dialogConfirm(deleteDialogTitle, dt, f);
+        return false;
+    }
+    function formatCurrency(cad, decimalPlaces) {
+        var cadStr = cad + '';
+        var arrTemp = cadStr.split(".");
+        var intPart = (arrTemp.length > 0) ? arrTemp[0] : cadStr;
+        var decPart = (arrTemp.length > 1) ? arrTemp[1] : '';
+        decPart = decPart + '0000';
+        if (decimalPlaces == null) decimalPlaces = 2;
+        return intPart + '.' + decPart.substring(0, decimalPlaces);
+    }
+    function countryState(cId, sId, stateId) {
+        $('#' + cId).change(function() {
+            var oldValue = (stateId != null) ? stateId : $('#' + sId).val();
+            $('#' + sId).html('<option value="">' + loadingText + '</option>');
+            jQuery.getJSON("$!action.url('countrystates','admin')", {country:$(this).val()}, function(data) {
+                $('#' + sId).html('');
+                jQuery.each(data, function(i, c) {
+                    $('<option>').attr('value', c.idState).attr('selected', (oldValue == c.idState)).html(c.htmlStateName).appendTo('#' + sId);
+                });
+            });
+        }).trigger('change');
+    }
+
+</script>

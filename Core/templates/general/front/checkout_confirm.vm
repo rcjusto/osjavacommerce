@@ -1,0 +1,2 @@
+#parse("/WEB-INF/views/${template}/front/checkout_confirm.vm")
+

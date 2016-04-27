@@ -1,0 +1,73 @@
+<div id="blockContent" class="product-registration-page clearfix">
+    <div id="blockRegistration">
+        <div class="block">
+            <form id="formRegistration" action="$action.url('product_registration_save')" method="post" class="">
+                <input type="hidden" name="registration.id" value="$!registration.id"/>
+                <div class="form">
+                    <h1>#label('product.registration')</h1>
+
+                    <p>#label('product.registration.enter.data')</p>
+
+                    <label class="half">
+                        <span class="label required">#label('registration.purchaseCountry')</span>
+                        #stextfield('name=registration.purchaseCountry' 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                        #fieldError('registration.purchaseCountry')
+                    </label>
+                    <label class="half">
+                        <span class="label required">#label('registration.purchaseCity')</span>
+                        #stextfield('name=registration.purchaseCity' 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                        #fieldError('registration.purchaseCity')
+                    </label>
+                    <label class="half">
+                        <span class="label required">#label('registration.purchasePlace')</span>
+                        #stextfield('name=registration.purchasePlace' 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                        #fieldError('registration.purchasePlace')
+                    </label>
+                    <label class="half">
+                        <span class="label required">#label('registration.invoiceNumber')</span>
+                        #stextfield('name=registration.invoiceNumber' 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                        #fieldError('registration.invoiceNumber')
+                    </label>
+                    <label class="half">
+                        <span class="label required">#label('registration.purchaseDate')</span>
+                        #stextfield('name=purchaseDate' "value=$!util.formatDate($registration.purchaseDate)" 'cssClass=field date required string-200' 'cssErrorClass=invalid')
+                        #fieldError('purchaseDate')
+                    </label>
+                    <label class="half">
+                        <span class="label required">#label('registration.modelNumber')</span>
+                        #stextfield('name=registration.modelNumber' 'cssClass=field required string-200' 'cssErrorClass=invalid')
+                        #fieldError('registration.modelNumber')
+                    </label>
+                    <div>
+                        <div>#label('add.other.model.number') <a href="#" id="addField">#label('click.here')</a></div>
+                        <div id="extraFields"></div>
+                    </div>
+                    <label>
+                        <span class="label">#label('registration.details')</span>
+                        #stextarea('name=registration.details' 'cssClass=field string-500' 'rows=6' )
+                        #fieldError('registration.details')
+                    </label>
+
+                </div>
+
+                <div class="button-bar">
+                    <button type="submit" onclick="$('.validation-error').hide();"><span class="ok">#label('submit.registration')</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="application/javascript">
+    $(function () {
+        $('input.date').datepicker();
+        $('#formRegistration').submit(function () {
+            return $(this).validForm();
+        });
+        $('#addField').click(function () {
+            var span = $('<span>').addClass('label').html("$action.getText('registration.extra.modelNumber')");
+            var input = $('<input>').attr('type', 'text').attr('name', 'extraNumbers').addClass('field string-200');
+            $('<label>').addClass('half').append(span).append(input).appendTo('#extraFields')
+            return false;
+        });
+    })
+</script>

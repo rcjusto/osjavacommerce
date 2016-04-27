@@ -1,0 +1,90 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($question.id)
+        #label('admin.inquiry.modify') ID: $!question.id
+    #else
+        #label('admin.inquiry.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveinquiry")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=idQuestion' "value=$!question.id")
+    #shidden('name=question.id')
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.question')</th>
+                <td>
+                    <input name="vis_questionText" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="questionText" value="$!question.getQuestion($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.ask.in.register')</th>
+                <td>
+                    #stextfield('name=question.useInRegister' 'cssClass=field integer')
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            <button type="button" href="$action.url('listinquiry','admin')"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+
+#if($question && $util.isNotEmpty($question.answers))
+<form action="$!action.url('editinquiry','admin')" method="post">
+    #shidden('name=idQuestion' "value=$!question.id")
+    <div class="listado">
+        <h2>#label('admin.answers')</h2>
+        <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                <th>#label('admin.answer')</th>
+            </tr>
+            #foreach($a in $question.answers)
+                #surl('id=urlEdit' "action=editinquiry" "idQuestion=$!a.id")
+                <tr>
+                    <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!a.id"/></td>
+                    <td>$!a.getAnswer($defaultLanguage)</td>
+                </tr>
+            #end
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        </div>
+    </div>
+</form>
+#end
+
+#if($question)
+<form action="$!action.url('inquiryaddanswer','admin')" method="post" class="validable">
+    #shidden('name=idQuestion' "value=$!question.id")
+    <div class="formulario">
+        <h2>#label('admin.new.answer')</h2>
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.answer')</th>
+                <td>
+                    <input name="vis_answerText" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="answerText" value=""/>
+                    #end
+                </td>
+                <td>
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</form>
+#end
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

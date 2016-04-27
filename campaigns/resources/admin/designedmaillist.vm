@@ -1,0 +1,64 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.campaign.mail.list')</h1>
+<div class="listado clearfix">
+    <div style="width: 500px;float: left;">
+        <form action="$!action.url('designedmaillist','admin')" method="post">
+            #formErrors()
+            #if($util.isNotEmpty($mails.listado))
+                #set($nav=$mails)
+                #parse('/WEB-INF/views/admin/navigator.vm')
+                <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                        <th>#label('admin.id')</th>
+                        <th>#label('admin.date')</th>
+                        <th>#label('admin.template')</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    #foreach($c in $mails.listado)
+                        <tr class="mail-row" data="$!c.id">
+                            <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!c.id"/></td>
+                            <td>$!c.id</td>
+                            <td>$!util.formatDate($c.created)</td>
+                            <td>$!c.templateName &nbsp;</td>
+                            <td class="link-bar">
+                                <a href="$!action.url('designedmailedit','admin', $util.map.add('idDesignedMail',$!c.id.toString()))">
+                                    <span class="edit">#label('admin.modify')</span></a>
+                                <a href="$!action.url('designedmailduplicate','admin', $util.map.add('idDesignedMail',$!c.id.toString()))">
+                                    <span class="edit">#label('admin.duplicate')</span></a>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <p>#label('admin.designed.mails.not.found')</p>
+                </div>
+            #end
+
+            <div class="button-bar">
+                <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+                <button type="button" href="$action.url('designedmailedit','admin')"><span class="add">#label('admin.design.new.mail')</span></button>
+            </div>
+        </form>
+
+    </div>
+    <div style="width: 270px; float: left;margin-left: 20px;" >
+        <div id="txtPreview" style="display: none;padding-left: 12px;"><strong>#label('mail.preview.id'): <span id="mailIdPreview"></span></strong></div>
+        <img src="" alt="" id="imgPreview" width="470">
+    </div>
+
+</div>
+<script type="text/javascript">
+    var rnd = Math.random();
+    $(function(){
+        $('.mail-row').mouseenter(function(){
+            $('#mailIdPreview').html($(this).attr('data'));
+            $('#txtPreview').show();
+            $('#imgPreview').attr('src',"$!{action.storeFile('images/mails')}/"+$(this).attr('data')+'.jpg?rnd='+rnd).show();
+           // alert(1);
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

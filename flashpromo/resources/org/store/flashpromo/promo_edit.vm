@@ -1,0 +1,132 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function() {
+        $('#mytabs').tabs({
+            selected: 1,
+            select: function(event, ui) {
+                var url = $.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+<form action="$!action.url('flash_promo_save','admin')" method="post" class="validable">
+    <input type="hidden" name="id" value="$!promo.id" />
+    <h1>#label('fp.config.title')</h1>
+
+    <div id="mytabs">
+        <ul class="tabs">
+            <li><a href="$!action.url('flash_page_edit','admin')">#label('fp.page.config.title')</a></li>
+            <li><a href="#promo">#label('fp.promo.config.title')</a></li>
+        </ul>
+        <div id="promo" class="tabpanel">
+
+            <div class="formulario" style="width: 900px;">
+                <h2 class="block-title">
+                    #if($promo.id)
+                    #label('fb.promo.edit.content')
+                    #else
+                    #label('fp.configure.new.promo')
+                    #end
+                </h2>
+                #langSelector()
+                #formErrors()
+                <table class="formulario" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <th class="required">#label('admin.name'):</th>
+                        <td colspan="2"><input type="text" name="name" value="$!promo.name" class="field string-large required"></td>
+                    </tr>
+                    <tr>
+                        <th class="required">#label('fp.width'):</th>
+                        <td colspan="2"><input type="text" name="width" value="$!promo.width" class="field integer"></td>
+                    </tr>
+                    <tr>
+                        <th class="required">#label('fp.position'):</th>
+                        <td colspan="2">
+                            <select name="horizontal" class="field string-short" style="margin-right: 8px;">
+                                <optgroup label="Commun Positions">
+                                #foreach($p in ['left','center','right'])
+                                <option value="$p" #if($!promo.horizontal==$p) selected="selected" #end>$p</option>
+                                #end
+                                </optgroup>
+                                <optgroup label="Left Positions">
+                                    #foreach($p in [0..10])
+                                        #set($v = $math.mul($p,30))
+                                        <option value="$v.toString()" #if($!promo.horizontal==$v.toString()) selected="selected" #end>$v.toString() px</option>
+                                    #end
+                                </optgroup>
+                                <optgroup label="Right Positions">
+                                    #foreach($p in [0..10])
+                                        #set($v = $math.mul($p,-30))
+                                        <option value="$v.toString()" #if($!promo.horizontal==$v.toString()) selected="selected" #end>$v.toString() px</option>
+                                    #end
+                                </optgroup>
+                            </select>
+
+                            <select name="vertical" class="field string-short">
+                                <optgroup label="Commun Positions">
+                                #foreach($p in ['top','center','bottom'])
+                                <option value="$p" #if($!promo.vertical==$p) selected="selected" #end>$p</option>
+                                #end
+                                </optgroup>
+                                <optgroup label="Top Positions">
+                                    #foreach($p in [0..10])
+                                        #set($v = $math.mul($p,30))
+                                        <option value="$v.toString()" #if($!promo.vertical==$v.toString()) selected="selected" #end>$v.toString() px</option>
+                                    #end
+                                </optgroup>
+                                <optgroup label="Bottom Positions">
+                                    #foreach($p in [0..10])
+                                        #set($v = $math.mul($p,-30))
+                                        <option value="$v.toString()" #if($!promo.vertical==$v.toString()) selected="selected" #end>$v.toString() px</option>
+                                    #end
+                                </optgroup>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#label('fp.popup.content'):</th>
+                        <td colspan="2">
+                            <textarea name="vis_content" rows="10" class="multilang field string-large"></textarea>
+                            #foreach($l in $languages )
+                                #set($t = "")
+                                #set($t = $!promo.getContent(${l}))
+                                <input type="hidden" class="$l" name="content" value="$!esc.html($t)"/>
+                            #end
+                            <a href="#" class="textarea-ckeditor"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <td>
+                            <label>
+                                #checkbox('subscription' $!promo.subscription)
+                                <span>#label('fp.subscription')</span>
+                            </label>
+                        </td>
+                        <td>
+                            #if($groups && !$groups.isEmpty())
+                                <select name="group" class="field string-medium">
+                                    <option value="">#label('fp.add.user.to.group')</option>
+                                    #foreach($g in $groups)
+                                        <option value="$!g.idGroup" #if($!g.idGroup==$promo.subscriptionGroup) selected="selected" #end>$!g.groupName</option>
+                                    #end
+                                </select>
+                            #end
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="button-bar">
+                <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                <button type="button" href="$!action.url('flash_promo_list','admin')"><span class="cancel">#label('admin.back')</span></button>
+            </div>
+        </div>
+    </div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

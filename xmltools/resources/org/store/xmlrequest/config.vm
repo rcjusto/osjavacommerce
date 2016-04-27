@@ -1,0 +1,39 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.xmlrequest.title')</h1>
+<div class="formulario">
+<form action="$!action.url('xmltool_config_save','/admin')" method="post">
+    <table class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('xmlrequest.label.enabled')</th>
+            <td>
+                <input type="checkbox" name="enabled" value="yes" #if($configData.get('enabled')) checked="checked" #end />
+            </td>
+        </tr>
+        <tr>
+            <th>#label('xmlrequest.label.need.credentials')</th>
+            <td>
+                <input type="checkbox" name="needCredentials" value="yes" #if($configData.get('needCredentials')) checked="checked" #end />
+            </td>
+        </tr>
+        <tr>
+            <th>#label('xmlrequest.label.max.items.for.request')</th>
+            <td>
+                <input type="text" name="maxItemsForRequest" value="$!configData.get('maxItemsForRequest')" class="field integer"/>
+            </td>
+        </tr>
+        <tr>
+            <th>#label('xmlrequest.label.url')</th>
+            <td>
+                $!serviceUrl
+            </td>
+        </tr>
+    </table
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

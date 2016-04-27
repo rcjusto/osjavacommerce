@@ -1,0 +1,93 @@
+#surl('id=urlAddRelated' "action=productaddrelated")
+#surl('id=urlDelRelated' "action=productdelrelated")
+#surl('id=urlSaveRelated' "action=productsaverelated")
+#surl('id=urlprodlist' "action=productlist")
+<h2 class="block-title">#label('admin.related.products')</h2>
+<form id="formrelated" action="$urlSaveRelated" method="post" class="validable">
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    <div class="listado">
+        #formErrors()
+        <div>
+            #set($listRelated = $action.getProductsRelated($product))
+            #if($util.isNotEmpty($listRelated))
+                <table border="0" cellspacing="0" cellpadding="0" class="listado">
+                    <tr>
+                        <th colspan="5">&nbsp;</th>
+                        <th colspan="2" style="text-align:center;">#label('admin.combined.sale')</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.part.number')</th>
+                        <th>#label('admin.product.name')</th>
+                        <th>#label('admin.active')</th>
+                        <th>#label('admin.stock')</th>
+                        <th>#label('admin.price')</th>
+                        <th style="text-align:center;">#label('admin.sugested')</th>
+                        <th style="text-align:center;">#label('admin.price')</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    #foreach($r in $listRelated)
+                        #set($p = $r.related)
+                        <tr>
+                            <td>$!p.partNumber</td>
+                            <td>$!p.getLanguage($defaultLanguage).productName</td>
+                            <td class="#if($p.active) chk_true #else chk_false #end" >&nbsp;</td>
+                            <td class="#if($p.stock<1) no-stock #end">$!p.stock</td>
+                            <td class="price">$!util.formatNumber($p.basePrice, 'money')</td>
+                            <td class="price" style="border-left:1px dotted #d3a658;">$!util.formatNumber($math.add($p.basePrice,$product.basePrice), 'money')</td>
+                            <td style="border-right:1px dotted #d3a658;">
+                                <input type="hidden" name="related" value="$!p.idProduct"/>
+                                <input type="text" name="productPrice" value="$!util.formatNumber($r.combinedPrice,'money')" class="field decimal">
+                            </td>
+                            <td>
+                                <a class="delete-row" href="#" onclick="return dialogConfirm('Related Products','Remove related product?', function(){delRelated($!p.idProduct);});"></a>
+                            </td>
+                        </tr>
+                    #end
+                </table>
+            #else
+                <div class="info">
+                    <h2>#label('admin.related.products')</h2>
+
+                    <p>#label('admin.related.products.not.found')</p>
+                </div>
+            #end
+        </div>
+
+    </div>
+    <div class="button-bar">
+        <button type="button" onclick="saveRelated();"><span class="ok">#label('admin.update')</span></button>
+        <button type="button" onclick="addRelated();"><span class="add">#label('admin.add.related')</span></button>
+    </div>
+</form>
+<script type="text/javascript">
+    function saveRelated() {
+        var data = $('#formrelated').serialize();
+        $('#divRelated').loading("$!action.getText('admin.updating.related.products')", "$!action.getText('admin.please.wait')");
+        $('#divRelated').load("$urlSaveRelated", data);
+    }
+    function delRelated(pId) {
+        $('#divRelated').loading("$!action.getText('admin.removing.related.products')", "$!action.getText('admin.please.wait')");
+        $('#divRelated').load("$urlDelRelated", {idProduct:$!{product.idProduct},related:pId});
+    }
+    function addRelated() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.products')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$urlprodlist", {output:'selector', rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selIds = (jQuery.isFunction(selectedlist)) ? selectedlist() :null;
+                if (selIds!=null && selIds.length>0) {
+                    var data = "idProduct=$product.idProduct";
+                    jQuery.each(selIds, function(){
+                        data += "&related="+this;
+                    });
+                    $('#divRelated').loading("$!action.getText('admin.adding.related.products')", "$!action.getText('admin.please.wait')");
+                    $('#divRelated').load("$urlAddRelated", data);
+                }
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    $(function(){initPage();});
+</script>

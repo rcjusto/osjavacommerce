@@ -1,0 +1,15 @@
+<div id="blockContent" class="order-page clearfix">
+    <div id="blockOrderDetail">
+        <div class="block" style="margin-bottom:6px;">
+            #if($blockCode) #block("$blockCode") #end
+        </div>
+
+        <div class="block">
+
+            <div>
+                #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,56 @@
+<div class="dialog-header">
+    <h2>#label('admin.productatt.list')</h2>
+    <h4>Check ..</h4>
+</div>
+<form id="form_productatt">
+    <div class="dialog-data" style="height:300px;" id="treeatt">
+        #if($util.isNotEmpty($productAttGroups))
+            <ul>
+                #foreach($g in $productAttGroups)
+                    #set($listAtt = $action.getAttributesByGroup($g))
+                    <li>$!g
+                        <ul>
+                            #foreach($a in $listAtt)
+                                <li id="$!a.id">$!a.getAttributeName($defaultLanguage)</li>
+                            #end
+                        </ul>
+                    </li>
+                #end
+            </ul>
+        #else
+            <div class="info">
+                <h2>#label('admin.product.attributes')</h2>
+
+                <p>#label('admin.product.attributes.not.found')</p>
+            </div>
+        #end
+    </div>
+</form>
+<div class="button-bar">
+    <button id="dialogBtnOk" type="button"><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+<script type="text/javascript">
+    $(function() {$('#treeatt').dynatree({checkbox: true,selectMode:3});});
+    function modalAttributes_getSelectedNodes() {
+        return $('#treeatt').dynatree("getTree").getSelectedNodes(false);
+    }
+    function modalAttributes_getSelectedIds() {
+        var selectedNodes = modalAttributes_getSelectedNodes();
+        return (selectedNodes != null) ? jQuery.map(selectedNodes, function(node) {return (node.getLevel() > 0) ? node.data.key : null;}) : null;
+    }
+    function modalAttributes_selectId(id) {
+        $('#treeatt').dynatree("getTree").selectKey(id);
+    }
+    function modalAttributes_serialize(fName) {
+        var res = '';
+        var selected = modalAttributes_getSelectedIds();
+        jQuery.each(selected, function() {
+            if (/^-?\d+$/.test(this)) {
+                if (res != '') res += '&';
+                res += fName + '=' + this
+            }
+        });
+        return res;
+    }
+</script>

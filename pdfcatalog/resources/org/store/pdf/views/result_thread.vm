@@ -1,0 +1,40 @@
+<div id="jobproductsState" class="box" style="display:none;">
+    <div id="taskproductsMsg" style="margin:4px;"></div>
+    <div class="progressbar" id="taskproductsPercent"></div>
+</div>
+#if($filename)
+<p id="fileDownload" style="display: none;"><a class="ext_pdf" href="/stores/$!{storeCode}/pdf/$!{filename}.pdf" target="_blank">$!{filename}.pdf</a></p>
+#end
+<script type="text/javascript">
+    $(function(){
+        $(".progressbar").progressbar({ value: 0 });
+        executeUpdThreadStatus();
+    });
+
+    // actualizar el progreso
+    function executeUpdThreadStatus() {
+        jQuery.getJSON("$action.url('threadexecutestate','admin')", {threadName:"pdf_gen_$!{request.session.id}"}, function(data) {
+            if (data.result == 'error') {
+                $('#jobproductsState').hide();
+                $('#fileDownload').hide();
+                $('#btnBar').show();
+            } else {
+                $('#jobproductsState').show();
+                if (data.msg == 'FINISHED') {
+                    $('#jobproductsState').hide();
+                    $('#fileDownload').show();
+                    $('#btnBar').show();
+                } else {
+                    if (data.percent != null) {
+                        $('#taskproductsMsg').html(data.percent + '%: ' + data.msg);
+                        $('#taskproductsPercent').progressbar('option', 'value', data.percent).show();
+                        $('#btnBar').hide();
+                    }
+                    setTimeout(executeUpdThreadStatus, 1000);
+                }
+            }
+        });
+    }
+
+
+</script>

@@ -1,0 +1,21 @@
+<div id="blockContent" class="home-page clearfix">
+
+    <h2>An unexpected error has occurred</h2>
+    <p>
+        Please report this error to your system administrator
+        or appropriate technical support personnel.
+        Thank you for your cooperation.
+    </p>
+    <hr/>
+    <h3>Error Message</h3>
+    <p>
+        $!{exception.message}
+    </p>
+    <hr/>
+    <h3>Technical Details</h3>
+    <p>
+        $!{exceptionStack}
+    </p>
+
+
+</div>

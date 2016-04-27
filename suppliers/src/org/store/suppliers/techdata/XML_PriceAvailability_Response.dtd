@@ -1,0 +1,80 @@
+ <!ELEMENT XML_PriceAvailability_Response (
+      Header ,
+      Detail ,
+      Summary ) >
+
+      <!ELEMENT   Header (
+                  TransSetIDCode ,
+                  TransControlID? ,
+                  ResponseVersion? ) >
+
+          <!ELEMENT TransSetIDCode              (#PCDATA) >
+          <!ELEMENT TransControlID              (#PCDATA) >
+          <!ELEMENT ResponseVersion             (#PCDATA) >
+
+      <!ELEMENT   Detail ( LineInfo+ ) >
+          <!ELEMENT LineInfo (
+                    AssignedID? ,
+                    RefIDQual1? ,
+                    RefID1? ,
+                    RefIDQual2? ,
+                    RefID2? ,
+                    RefIDQual4? ,
+                    RefID4? ,
+                    ProductDesc? ,
+                    PriceIDCode1? ,
+                    UnitPrice1? ,
+                    PriceIDCode2? ,
+                    UnitPrice2? ,
+                    RequiredEndUserInfo? ,
+                    RequiredLicenseInfo? ,
+                    PromoAppliedInd? ,
+                    ProductWeight? ,
+                    ItemStatus? ,
+                    WhseInfo* ,
+                    ErrorInfo* ) >
+
+                <!ELEMENT AssignedID            (#PCDATA) >
+                <!ELEMENT RefIDQual1            (#PCDATA) >
+                <!ELEMENT RefID1                (#PCDATA) >
+                <!ELEMENT RefIDQual2            (#PCDATA) >
+                <!ELEMENT RefID2                (#PCDATA) >
+                <!ELEMENT RefIDQual4            (#PCDATA) >
+                <!ELEMENT RefID4                (#PCDATA) >
+                <!ELEMENT ProductDesc           (#PCDATA) >
+                <!ELEMENT PriceIDCode1          (#PCDATA) >
+                <!ELEMENT UnitPrice1            (#PCDATA) >
+                <!ELEMENT PriceIDCode2          (#PCDATA) >
+                <!ELEMENT UnitPrice2            (#PCDATA) >
+                <!ELEMENT RequiredEndUserInfo   (#PCDATA) >
+                <!ELEMENT RequiredLicenseInfo   (#PCDATA) >
+                <!ELEMENT PromoAppliedInd       (#PCDATA) >
+                <!ELEMENT ProductWeight         (#PCDATA) >
+                <!ELEMENT ItemStatus            (#PCDATA) >
+
+                <!ELEMENT WhseInfo (
+                          IDCode ,
+                          WhseCode? ,
+                          Qty ,
+                          TotalOnOrderQty? ,
+                          OnOrderQty? ,
+                          OnOrderETADate? ) >
+
+                    <!ELEMENT IDCode            (#PCDATA) >
+                    <!ELEMENT WhseCode          (#PCDATA) >
+                    <!ELEMENT Qty               (#PCDATA) >
+                    <!ELEMENT TotalOnOrderQty   (#PCDATA) >
+                    <!ELEMENT OnOrderQty        (#PCDATA) >
+                    <!ELEMENT OnOrderETADate    (#PCDATA) >
+               
+                <!ELEMENT ErrorInfo (
+                          RefIDQual3 ,
+                          RefID3 ,
+                          ErrorDesc ) >
+
+                    <!ELEMENT RefIDQual3        (#PCDATA) >
+                    <!ELEMENT RefID3            (#PCDATA) >
+                    <!ELEMENT ErrorDesc         (#PCDATA) >
+
+    <!ELEMENT Summary ( NbrOfSegments ) >
+        <!ELEMENT NbrOfSegments                 (#PCDATA) > 

@@ -1,0 +1,26 @@
+<div class="control_shopcart">
+    <div class="title">#label('my.shopping.cart')</div>
+    <ul>
+        #if($!userSession.items.isEmpty())
+            <li class="empty-cart">#label('shopping.cart.empty')</li>
+        #else
+            #foreach($item in $userSession.items)
+                <li class="clearfix hoversable">
+                    <div class="product_name"><a href="$!action.urlProduct($item.beanProd1)">$!item.quantity $!item.fullName</a></div>
+                    <div class="product_price">$!action.formatActualCurrency($item.subtotal)</div>
+                </li>
+            #end
+            <li class="total clearfix">
+                <div class="product_name">
+                    #label('shopcart.total')
+                    <span class="currency">($!action.actualCurrency.code)</span>
+                </div>
+                <div class="product_price">$!action.formatActualCurrency($userSession.total)</div>
+            </li>
+        #end
+    </ul>
+    <div class="actions clearfix">
+        <a href="$!action.url('shopcart', '')" class="shopcart"><img src="$!action.skinFile('images/[lang]/cart.gif')" alt="Shopcart"/></a>
+        <a href="$!action.url('checkout', '')" class="checkout"><img src="$!action.skinFile('images/[lang]/checkout.gif')" alt="Checkout"/></a>
+    </div>
+</div>

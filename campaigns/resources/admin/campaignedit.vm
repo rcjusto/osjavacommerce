@@ -1,0 +1,201 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($campaign.id)
+        #label('admin.campaign.modify') ID: $!campaign.id
+    #else
+        #label('admin.campaign.new')
+    #end
+</h1>
+
+<form id="formCampaign" action="$!action.url('campaignsave')" method="post" enctype="multipart/form-data" class="validable">
+    <input type="hidden" name="idCampaign" value="$!campaign.id">
+    #shidden('name=campaign.id')
+    #shidden("id=campaignMail" 'name=campaign.campaignMail')
+    <div style="float:left;width:762px" class="formulario">
+        <h2 class="block-title">1. #label('admin.design.content')</h2>
+
+        #formErrors()
+        <table class="formulario" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <th style="width:15%;">#label('admin.subject'):</th>
+                <td>
+                    #stextfield('name=campaign.subject' 'cssClass=field required string-medium')
+                </td>
+                <td rowspan="2" style="width: 30%">
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                    <button type="button" href="$!action.url('campaignlist','admin')"><span class="cancel">#label('admin.cancel')</span></button>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.content'):</th>
+                <td>
+                    <a href="#" id="linkSelectMail">Select a designed mail</a>
+                </td>
+            </tr>
+            <tr>
+                <td id="templateData" colspan="3" style="border: 3px solid #dddddd;background-color: #f4f4f4;">
+                    $!campaign.campaignMail
+                </td>
+            </tr>
+        </table>
+
+        <div class="button-bar">
+        </div>
+    </div>
+</form>
+
+#if($campaign.id)
+<div style="float:left;width:220px;margin-left:15px;">
+    <h2 class="block-title">2. #label('admin.send.test.email')</h2>
+
+    <p>#label('admin.send.test.email.text')</p>
+
+    <div class="formulario" style="margin-top:8px;">
+        <form id="formTestCampaign">
+            <input type="hidden" name="idCampaign" value="$!campaign.id">
+            <div class="validation-error error hidden" style="margin:6px 0;"></div>
+            <div>
+                <input type="hidden" id="testEmailBody" name="testEmailBody"/>
+                <input type="hidden" id="testEmailSubject" name="testEmailSubject"/>
+                <label>
+                    <input type="text" id="testEmailAddress" name="testEmailAddress" value="" class="field required string_medium"/>
+                </label>
+
+                <div style="clear:both;"></div>
+            </div>
+            <div id="testEmailResult"></div>
+            <div style="margin-top:8px;">
+                <button type="submit"><span class="email">#label('admin.test.email')</span></button>
+            </div>
+        </form>
+    </div>
+
+    <h2 class="block-title" style="padding-top:30px;">3. #label('admin.generate.emails')</h2>
+
+    <p>#label('admin.generate.emails.text')</p>
+
+    <form id="formGenerateCampaign" action="$action.url('campaigngenerate')" method="post" class="validable">
+        #shidden('name=idCampaign' "value=$!campaign.id")
+        #shidden("id=campaignMailFinal" 'name=campaign.campaignMail')
+        #shidden('name=campaign.templateName')
+        <div class="formulario" style="margin-top:8px;">
+            #formErrors()
+            <table class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th style="text-align:left;padding:0 4px 0 4px;">#label('admin.send.to')</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="sendTo" name="campaign.sendTo" class="field required" style="width:200px;">
+                            #foreach($opt in ['all.customers','newsletter.subscribers'])
+                                <option value="$opt" #if($opt==$campaign.sendTo) selected="selected" #end >#label("campaign.sendto.$opt")</option>
+                            #end
+                            #if($util.isNotEmpty($userGroups))
+                                <option value="customer.group" #if('customer.group'==$campaign.sendTo) selected="selected" #end >#label("campaign.sendto.customer.group")</option>
+                            #end
+                        </select>
+
+                        #if($util.isNotEmpty($userGroups))
+                            <div id="groups">
+                                <select name="idGroup" class="field" style="width:200px;">
+                                    <option value="">Select a group</option>
+                                    #foreach($g in $userGroups)
+                                        <option value="$!g.idGroup" #if($g==$campaign.userGroup) selected="selected" #end >$!g.groupName</option>
+                                    #end
+                                </select>
+                            </div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <th style="text-align:left;padding:0 4px 0 4px;">#label('admin.send.date')</th>
+                </tr>
+                <tr>
+                    <td>
+                        #stextfield('name=sentDate' "value=$!util.formatDate($campaign.dateToSend)" 'cssClass=field date required')
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="clear:both;margin-top:15px;">
+            <button type="submit"><span class="ok">#label('admin.generate.emails')</span></button>
+        </div>
+    </form>
+</div>
+#end
+<div style="clear:both;"></div>
+
+<!-- Dialogo para insertar una nueva fila -->
+<div id="dlgSelectMail" class="dialog" style="display:none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('admin.campaign.designer')</h2>
+            <h4>#label('admin.campaign.mail.select')</h4>
+        </div>
+        <div class="dialog-data">
+            <div id="listadoMails"></div>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#dlgSelectMail').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</div>
+
+#surl('id=urlprodlist' "action=productlist")
+#surl('id=urlprodlayout' "action=campaignproduct")
+#surl('id=urlTestCampaign' "action=campaigntest" )
+<script type="text/javascript">
+    var wndTest = null;
+    $(function() {
+        $('#sendTo').change(
+                function() {
+                    if ($(this).val() == 'customer.group') $('#groups').show();
+                    else $('#groups').hide();
+                }).trigger('change');
+        $('#formCampaign').submit(function() {
+            var html = $('#templateData').html();
+            $('#campaignMail').val(html!=null ? html.trim() : '');
+            if ($('#campaignMail').val()=='') {
+                alert("$!action.getText('please.select.email')");
+                return false;
+            }
+            return true;
+        });
+        $('#formTestCampaign').submit(function() {
+            if ($('#formTestCampaign').validForm()) {
+                $('#testEmailSubject').val($('#campaign_subject').val());
+                $('#testEmailBody').val($('#templateData').html().trim());
+                $('#testEmailResult').show().loading("$!action.getText('admin.sending.mail','admin.sending.mail')", "$!action.getText('admin.please.wait','admin.please.wait')");
+                jQuery.post("$urlTestCampaign", $('#formTestCampaign').serialize(), function(data) {
+                    if (data == 'ok') $('#testEmailResult').info("$!action.getText('admin.mail.sent','admin.mail.sent')", "$!action.getText('admin.mail.was.sent.to','admin.mail.was.sent.to')" + $('#testEmailAddress').val());
+                    else $('#testEmailResult').error("$!action.getText('admin.mail.not.sent')", "$!action.getText('admin.mail.not.sent.text')");
+                    setTimeout(6000, function() {
+                        $('#testEmailResult').hide()
+                    });
+                });
+            }
+            return false;
+        });
+        $('#formGenerateCampaign').submit(function() {
+            if ($('#formGenerateCampaign').validForm()) {
+                $('#campaignMailFinal').val($('#templateData').html().trim());
+                return true;
+            } else {
+                return false;
+            }
+        });
+        $('#linkSelectMail').click(function(){
+            $('#listadoMails').loading('Loading Mails', 'Please wait...');
+            $('#listadoMails').load("$!action.url('designedmaillist','admin')",{modal:true});
+            $('#dlgSelectMail').dialog({width:600,modal:true,resizable:false,position:['center',50]});
+        });
+        $('a.select-mail').live('click', function(){
+            var id = $(this).attr('rel');
+            $('#templateData').load("$!action.url('campaignmailcontent','')?id="+id);
+            $('#dlgSelectMail').dialog('close');
+        });
+        $('#templateData a').live('click', function(){return false;})
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

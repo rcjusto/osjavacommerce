@@ -1,0 +1,89 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function() {
+        $('table.tree').treeTable({initialState:'collapsed',treeColumn:0});
+    });
+</script>
+
+<h1>#label('admin.role.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=rolesave")
+    <form action="$urlForm" method="post">
+    <table class="listado tree sheet" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th >#label('admin.action')</th>
+            #if($roles && $roles.size()>0)
+                #foreach($r in $roles)
+                <th style="text-align:center;">
+                    <input type="hidden" name="roleId" value="$!r.id" />
+                    <label>
+                    <input type="checkbox" onclick="$('.field$!r.id').attr('checked', $(this).is(':checked') )" style="display:none;">
+                    $!r.roleCode
+                    </label>
+                </th>
+                #end
+            #end
+        </tr>
+
+        #foreach($actName in $actionList.keySet())
+            #set($actionL = $util.split($actionList.getProperty($actName),','))
+            <tr id="row_${actName}">
+                <td style="padding-left:24px;font-weight: bold;">$!actName</td>
+                #if($roles && $roles.size()>0)
+                    #foreach($r in $roles)
+                        #set($_checked = true)
+                        #foreach($act in $actionL) #if(!$r.hasAction($act)) #set($_checked = false) #end #end
+                        <td style="text-align:center;#if($_checked) background-color: #CDEB8B; #end">
+                            <input type="checkbox" value="parent$!{actName}$!{r.id}" class="field$!{r.id}" onchange="$('input.'+$(this).val()).attr('checked', $(this).is(':checked'))" #if($_checked) checked="checked" #end />
+                        </td>
+                    #end
+                #end
+            </tr>
+            #foreach($act in $actionL)
+                <tr class="child-of-row_${actName}">
+                    <td style="padding-left:24px;">$!act</td>
+                    #if($roles && $roles.size()>0)
+                        #foreach($r in $roles)
+                        <td style="text-align:center; #if($!r.hasAction($act)) background-color: #CDEB8B; #end">
+                            <input type="checkbox" class="parent$!{actName}$!{r.id} field$!{r.id}" name="action_$!r.id" value="$!act" #if($!r.hasAction($act)) checked="checked" #end />
+                        </td>
+                        #end
+                    #end
+                </tr>
+            #end
+        #end
+        #foreach($plMenus in $action.getAdminMenus(''))
+            <tr>
+                <td>$!plMenus.getMenuLabel()</td>
+                #if($roles && $roles.size()>0)
+                    #foreach($r in $roles)
+                    <td style="text-align:center;">
+                        <input type="checkbox" class="field$!r.id" name="action_$!r.id" value="$!plMenus.getMenuLabel()" #if($!r.hasAction($plMenus.getMenuLabel())) checked="checked" #end />
+                    </td>
+                    #end
+                #end
+            </tr>
+        #end
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.update')</span></button>
+    </div>
+    </form>
+    <div class="formulario">
+        <h1>#label('admin.role.add')</h1>
+        #surl('id=urlForm1' "action=rolecreate")
+        <form action="$urlForm1" method="post">
+        <table class="formulario">
+            <tr>
+                <th>Role Code</th>
+                <td><input type="text" name="role.roleCode" value="" class="field string-medium"></td>
+                <td>
+                    <button type="submit"><span class="ok">#label('admin.save')</span></button>
+                </td>
+            </tr>
+        </table>
+        </form>
+    </div>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

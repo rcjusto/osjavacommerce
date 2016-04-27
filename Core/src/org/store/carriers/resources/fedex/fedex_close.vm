@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FDXCloseRequest xmlns:api="http://www.fedex.com/fsmapi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FDXCloseRequest.xsd">
+  <RequestHeader>
+      <AccountNumber>$!bean.user.accountNumber</AccountNumber>
+      <MeterNumber>$!bean.user.meterNumber</MeterNumber>
+      <CarrierCode>$!bean.carrierCode</CarrierCode>
+  </RequestHeader>
+  <Date>$!bean.shipDate</Date>
+  <Time>$!bean.shipTime</Time>
+</FDXCloseRequest>

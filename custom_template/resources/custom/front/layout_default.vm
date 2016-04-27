@@ -1,0 +1,75 @@
+#* @vtlvariable name="decorator" type="org.store.template.TemplateDecorator" *#
+#macro(columns $page)
+    #foreach($column in $decorator.getLayoutForPage($!page))
+    <div class="column column_$column">
+        $!decorator.getHTMLContent("$!{page}_$!{column}")
+    </div>
+    #end
+#end
+#macro(zone $name $params)
+    #if($zoneInfo)
+        <block name="$!name" params="$!params"/>
+    #else
+        #parse("/WEB-INF/views/$!{template}/front/zone_$!{name}.vm")
+    #end
+#end
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html>
+<head>
+    #parse('/WEB-INF/views/front/head.vm')
+</head>
+<body>
+  $!extraTopContent
+  <div class="page_all $!locale.language">
+        <div class="page_header non-block">
+            <div class="content">
+                $!decorator.getHTMLContent('page_header')
+            </div>
+        </div>
+        <div class="page_top_menu non-block">
+            <div class="content">
+                $!decorator.getHTMLContent('page_top_menu')
+            </div>
+        </div>
+        <div class="page_container">
+            <div class="content clearfix">
+                #if($util.isNotEmpty($contentPage))
+                    #parse($contentPage)
+                #end
+            </div>
+        </div>
+        <div class="page_footer non-block">
+            <div class="content">
+                $!decorator.getHTMLContent('page_footer')
+            </div>
+        </div>
+    </div>
+    <div id="dialogo"><div id="dialogContent"></div></div>
+    $!extraBottomContent
+<script type="text/javascript">
+    /*
+    $(function(){
+        $('.template-block').each(function(){
+            if ($(this).css('position')=='absolute') {
+                $('<div>')
+                        .css({position:'absolute', left: 0, top: 0, 'z-index':99999})
+                        .width($(this).width()).height($(this).height())
+                        .hover(function(){$(this).css('background-color','#000000').css('opacity',0.7)}, function(){$(this).css('background-color','transparent').css('opacity',0)})
+                        .appendTo(this);
+                $(this).draggable();
+            } else {
+                var d = $('<div>').addClass('over')
+                        .css({position:'absolute', 'z-index':99999})
+                        .width($(this).width()).height($(this).height())
+
+                        .hover(function(){$(this).css('background-color','#000000').css('opacity',0.7)}, function(){$(this).css('background-color','transparent').css('opacity',0)});
+                    d.appendTo(this);
+                d.position({my:'left top', at:'left top',of:this});
+            }
+        });
+        $('.column').sortable({connectWith:'.column', handle :'.over'});
+    })
+    */
+</script>
+</body>
+</html>

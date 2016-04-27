@@ -1,0 +1,10 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<p style="margin-bottom:8px;">$!{mailFromName} ($!{mailFrom}) $!{action.getText('mail.user.ask.to.sent.email')}</p>
+<p>$!{mailComment}</p>
+<p><br/></p>
+<p>$!{friend.promotionalImage}</p>
+<p>$!action.getText('click.following.link','Please click the following link to register')</p>
+<p style="word-wrap: break-word; width:775px;background-color:#eeeeee;padding:4px 10px;"><a href="$!{friend.linkUrl}">$!{friend.linkUrl}</a></p>

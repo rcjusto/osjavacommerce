@@ -1,0 +1,160 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.jqplot.min.css" />
+<script type="text/javascript" src="/struts/js/jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="/struts/js/jqplot/jqplot.dateAxisRenderer.min.js"></script>
+<script type="text/javascript" src="/struts/js/jqplot/jqplot.pieRenderer.min.js"></script>
+<script type="text/javascript" src="/struts/js/jqplot/jqplot.highlighter.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+          var line1=$!chartOpened;
+          var line2=$!chartClicked;
+          var plot1 = jQuery.jqplot('chart1', [line1, line2], {
+            seriesColors:['#00bb00','#0000bb'],
+            axes:{
+                xaxis:{
+                    min: "$!date.format('yyyy-MM-dd HH:mm', $chartMin)",
+                    max: "$!date.format('yyyy-MM-dd HH:mm', $chartMax)",
+                    tickInterval:"$!chartInterval hour",
+                    tickOptions:{formatString:'%R<br/>%b, %e'},
+                    renderer:$.jqplot.DateAxisRenderer
+                },
+                yaxis:{
+                    min:0 ,
+                    max: $!chartYMax,
+                    numberTicks: 5
+                }
+            },
+            highlighter: {
+                show: true
+              },
+            grid:{shadow:false, drawBorder: false, background: '#ffffff'},
+            series:[{lineWidth:3, label:'Opened mails'},{lineWidth:3, label:'Clicked mails'}]
+          });
+
+ #set($notSended = $math.sub($mails.get('total'),$mails.get('sent')))
+ #set($notOpened = $math.sub($mails.get('sent'),$mails.get('opened')))
+ var plot2 = jQuery.jqplot('chart2',
+    [[['Opened', $!mails.get('opened')],['Not opened', $!notOpened], ['Not sended', $!notSended]]],
+    {
+      seriesColors:['#00bb00','#4a94d9','#bb0000'],
+      seriesDefaults: {
+        shadow: false,
+        renderer: jQuery.jqplot.PieRenderer,
+        rendererOptions: {
+          startAngle: 180,
+          sliceMargin: 4,
+          showDataLabels: false }
+      },
+      grid:{shadow:false, drawBorder: false, background: '#ffffff'}
+    }
+  );
+
+    });
+</script>
+
+#set($reference = "'CAMPAIGN ID $!{campaign.id}'")
+<div style="width: 900px;margin-top: 20px;" class="clearfix">
+    <div style="font-size: 14pt;font-weight: bold;">CAMPAIGN ID $!{campaign.id}</div>
+    <div>#label('mail.subject'): $!campaign.subject</div>
+    <div style="float: left;">#label('sent.to') $mails.get('total') #label('subscribers'). $!util.formatDate($campaign.dateToSend)</div>
+    <div style="float: right;">
+        <span style="width: 10px;height: 10px;background-color:#00bb00;display: inline-block;"></span>
+        <span style="margin-right: 20px;">#label('opened.mails')</span>
+        <span style="width: 10px;height: 10px;background-color:#0000bb;display: inline-block;"></span>
+        <span style="margin-right: 20px;">#label('clicked.mails')</span>
+    </div>
+</div>
+<div id="chart1" style="width: 900px; height: 200px;"></div>
+<div style="width: 900px;" class="clearfix">
+    <div id="chart2" style="width: 200px; height: 200px;float: left;"></div>
+    <div style="float: left; width: 200px;margin-left: 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 8pt;margin-top: 34px;">
+            <tr>
+                <td width="9%"><div style="width: 10px;height: 10px;background-color:#00bb00;"></div></td>
+                <td width="91%" nowrap="nowrap" style="font-size: 12pt;"><strong>$!mails.get('opened')</strong> #label('opened.mails')</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>#label('this.value.is.estimated')</td>
+            </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr>
+                <td><div style="width: 10px;height: 10px;background-color:#4a94d9;"></div></td>
+                <td nowrap="nowrap" style="font-size: 12pt;"><strong>$!notOpened</strong> #label('not.opened')</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>#label('this.value.is.estimated')</td>
+            </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr>
+                <td><div style="width: 10px;height: 10px;background-color:#bb0000;"></div></td>
+                <td nowrap="nowrap" style="font-size: 12pt;"><strong>$!notSended</strong> #label('not.sent')</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    #if($!notSended<1) #label('all.mails.could.be.delivered')
+                    #else
+                        #if($!mails.get('errorT')>0) $!mails.get('errorT') #label('with.temporal.error'). #end
+                        #if($!mails.get('errorF')>0) $!mails.get('errorT') #label('with.fatal.error'). #end
+                        #if($!mails.get('pending')>0) $!mails.get('pending') #label('pending'). #end
+                    #end
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="float: left;width: 200px;margin-left: 20px;margin-top: 34px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 8pt;">
+            <tr><td style="font-size: 12pt;"><strong>$!number.format('percent', $math.div($mails.get('opened'),$mails.get('sent')))</strong> #label('opened.mails')</td></tr>
+            <tr><td>$!mails.get('opened') #label('of') $!mails.get('sent') #label('people.opened.the.mail')</td></tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr><td style="font-size: 12pt;"><strong>$!number.format('percent', $math.div($mails.get('clicked'),$mails.get('sent')))</strong> #label('clicked.mails')</td></tr>
+            <tr><td>$!mails.get('clicked') #label('of') $!mails.get('sent') #label('people.click.a.link')</td></tr>
+            <tr><td>&nbsp;</td></tr>
+        </table>
+        <div>
+            <a href="$!action.url('campaignmembers','admin',$util.map.add('idCampaign',$campaign.id.toString()))">#label('view.recipient.activity')</a>
+        </div>
+    </div>
+    <div style="float: left;width: 210px;margin-left: 20px;margin-top: 34px;padding: 10px;background-color: #f8f8f8;font-size: 9pt;">
+        <div>#label("campaign.sendto.$!{campaign.sendTo}")#if($campaign.sendTo=='customer.group'): $!campaign.userGroup.groupName #end</div>
+        <div>$!mails.get('total') <a target="_blank" href="$!action.url('listmail','admin',$util.toMap(['filters.filterReference',$!{reference}]), false)">#label('total.mails')</a></div>
+        <div>$!mails.get('sent') <a target="_blank" href="$!action.url('listmail','admin',$util.toMap(['filters.filterStatus','sent','filters.filterReference',$!{reference}]), false)">#label('sent.mails')</a></div>
+        <div>$!mails.get('pending') <a target="_blank" href="$!action.url('listmail','admin',$util.toMap(['filters.filterStatus','pending','filters.filterReference',$!{reference}]), false)">#label('pending')</a></div>
+        <div>$!mails.get('errorT') <a target="_blank" href="$!action.url('listmail','admin',$util.toMap(['filters.filterStatus','error','filters.filterReference',$!{reference}]), false)">#label('with.temporal.error')</a></div>
+        <div>$!mails.get('errorF') <a target="_blank" href="$!action.url('listmail','admin',$util.toMap(['filters.filterStatus','fatal','filters.filterReference',$!{reference}]), false)">#label('with.fatal.error')</a></div>
+    </div>
+</div>
+#if($urls && !$urls.isEmpty())
+<div style="width: 900px;" class="listado">
+    <h3 style="margin-bottom: 4px">#label('most.popular.links')</h3>
+    <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <th>#label('url')</th>
+            <th style="text-align: center;">#label('clicks')</th>
+        </tr>
+        #foreach($arr in $urls)
+        <tr>
+            <td><a href="$!list.get($arr,0)" target="_blank">$!list.get($arr,0)</a></td>
+            <td style="text-align: center;">$list.get($arr,1)</td>
+        </tr>
+        #end
+    </table>
+</div>
+#end
+<div class="formulario">
+    <div class="button-bar">
+        #if($mails.get('cancellable'))
+            <form action="$action.url('campaigncancel')" style="margin:0;padding:0;display:inline-block;">
+                <input type="hidden" name="idCampaign" value="$!campaign.id" />
+                <button type="submit"><span>#label('admin.cancelar.envio')</span></button>
+            </form>
+        #end
+        <button type="button" href="$!action.url('campaignlist','admin')"><span class="back">#label('admin.back')</span></button>
+    </div>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

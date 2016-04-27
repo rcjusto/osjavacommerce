@@ -1,0 +1,26 @@
+    <label>
+        <span>Database Type:</span>
+        <select style="width:150px;" name="dbType" id="dbType">
+            <option value=""></option>
+            <option value="mssql" data="jdbc:sqlserver://localhost;databaseName=[database-name]" #if($dbType=='mssql') selected="selected" #end>Sql Server</option>
+            <option value="mysql" data="jdbc:mysql://localhost/[database-name]" #if($dbType=='mysql') selected="selected" #end>MySQL</option>
+        </select>
+        <a id="dbTypeHelp" href="#" style="display:none;"></a>
+    </label>
+    <label>
+        <span>Database URL:</span>
+        <input type="text" id="dbUrl" name="dbUrl" style="width:400px;" value="$!dbUrl"/>
+    </label>
+    <label>
+        <span>Database User:</span>
+        <input type="text" name="dbUser" value="$!dbUser"/>
+    </label>
+    <label>
+        <span>Database Password:</span>
+        <input type="text" name="dbPassword" value="$!dbPassword"/>
+    </label>
+    <label>
+        <span>Use Lucene:</span>
+        <input type="checkbox" name="dbUseLucene" value="true" #if($!dbUseLucene=='true') checked="checked" #end />
+    </label>
+

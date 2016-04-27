@@ -1,0 +1,31 @@
+#set($_dataNavigator = $_parameters.get('data'))
+
+#if($_dataNavigator.needPagination())
+<div class="category_navigator_bot">
+    <div class="nav_wrapper_pages">
+        <div class="clearfix">
+    #if($_dataNavigator.isPrevPage())
+        <a href="#" data="1" class="gotopage navigator-first"></a>
+        <a href="#" data="$!_dataNavigator.getPrevPage()" class="gotopage navigator-prev"></a>
+    #end
+    <div class="page">
+        #set($_navArr = $!_dataNavigator.getPageListLikeGoogle(5))
+        #foreach($_p in [$list.get($_navArr,0)..$list.get($_navArr,1)])
+            #if($_p==$_dataNavigator.currentPage)
+                <span>$!_p</span>
+            #else
+                <a href="#" data="$!_p" class="gotopage">$!_p</a>
+            #end
+        #end
+    </div>
+    #if($_dataNavigator.isNextPage())
+        <a href="#" data="$!_dataNavigator.getNextPage()" class="gotopage navigator-next"></a>
+        <a href="#" data="$!_dataNavigator.getPageCount()" class="gotopage navigator-last"></a>
+    #end
+            </div>
+    </div>
+</div>
+#end
+
+
+#set($_dataNavigator = $util.null)

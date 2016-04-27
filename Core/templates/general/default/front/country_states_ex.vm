@@ -1,0 +1,13 @@
+#if ($select)
+    <input type="hidden" name="$!fieldNameEx" value=""/>
+    <select name="$!fieldName" id="$!fieldId" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200 $!fieldClass">
+        #foreach($c in $states)
+            <option value="$!c.idState" #if($c.idState==$addressState) selected="selected" #end>$!c.stateName</option>
+        #end
+    </select>
+    #fieldError("$!fieldName")
+#else
+    <input type="hidden" name="$!fieldName" value="$!idState">
+    <input type="text" name="$!fieldNameEx" id="$!fieldId" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200 $!fieldClass" value="$!stateName" />
+    #fieldError("$!fieldNameEx")
+#end

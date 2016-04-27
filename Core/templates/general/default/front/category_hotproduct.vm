@@ -1,0 +1,26 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'')")
+#set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+<div class="product">
+    #if($action.canShowPrices)
+        <div class="price" style="">#fancyPrice($price)</div>
+    #end
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!pName" style="max-width:200px;width:200px;"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')" style="max-width:200px;width:200px;"/></a></div>
+    #end
+    <div class="name"><a href="$urlDetail">$!pName</a></div>
+    <div class="desc"><a href="$urlDetail">$!util.left($pDesc,120)</a></div>
+    #if($action.canShowPrices)
+        <div>
+        #if($!action.getStoreProperty('catalog.only', 'N')!='Y')
+            #addToCart($p)
+        #end
+        </div>
+    #end
+</div>
+

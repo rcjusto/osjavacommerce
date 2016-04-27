@@ -1,0 +1,99 @@
+<div class="clearfix checkout-complements">
+    <form id="formSelectComplements">
+        <input type="hidden" name="idShopCart" value="$!shopCart.id"/>
+        <ul class="product-list">
+            #foreach($item in $shopCart.items)
+                #if($item.getProperty('complements'))
+                    #set($image = $imageResolver.getImageForProduct($item.beanProd1,'list/'))
+                    #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)")) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif")) #end
+                    <li class="product-list-item hoverable">
+                        <table>
+                            <tr>
+                                <td class="product">
+                                    <img src="$!srcImg" alt=""/>
+                                    <span class="name">$!item.quantity $!item.fullName</span>
+                                    <span class="price">$!action.formatActualCurrency($item.getSubtotal())</span>
+                                    <input type="hidden" name="itemId" value="$!item.id"/>
+                                    <input type="hidden" id="complementId_$!{item.id}" name="complementId" value="$!item.complement"/>
+                                </td>
+                                <td id="complement_$!{item.id}" class="complement">
+                                    #if($item.beanComponent)
+                                        #set($imageCompl = $imageResolver.getImageForProduct($item.beanComponent,'list/'))
+                                        #if($util.isNotEmpty($imageCompl)) #set($srcImgCompl = $!action.storeFile("images/products/list/$!util.encodeUrl($imageCompl)")) #else #set($srcImgCompl = $!action.skinFile("images/[lang]/not-available.gif")) #end
+                                        <img src="$!srcImgCompl" alt=""/>
+                                        <span class="name">$!item.beanComponent.getProductName($locale.language)</span>
+                                        <span class="price">$!action.formatActualCurrency($item.complementPrice)</span>
+
+                                    #else
+                                        #label('no.complement.selected')
+                                    #end
+                                </td>
+                                <td class="links">
+                                    <a href="#" data="$!{item.id}" class="show-selector">#label('select.complement')</a>
+                                    <a href="#" data="$!{item.id}" class="remove-selection" id="removeSelection_$!{item.id}" #if($item.beanComponent) #else style="display:none;" #end>#label('remove.complement')</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="complementList_$!{item.id}" class="complement-list" style="display:none;">
+                            <h3>#label('select.a.complement')</h3>
+                            <ul class="clearfix">
+                                #foreach($compl in $item.getProperty('complements'))
+                                    #set($imageCompl = $imageResolver.getImageForProduct($compl,'list/'))
+                                    #if($util.isNotEmpty($imageCompl)) #set($srcImgCompl = $!action.storeFile("images/products/list/$!util.encodeUrl($imageCompl)")) #else #set($srcImgCompl = $!action.skinFile("images/[lang]/not-available.gif")) #end
+                                    <li class="clearfix hoverable #if($item.complement==$compl.idProduct) selected #end">
+                                        <div>
+                                            <img src="$!srcImgCompl" alt=""/>
+                                            <span class="name">$!item.quantity $!compl.getProductName($locale.language)</span>
+                                            <span class="price">$!action.formatActualCurrency($math.mul($!item.quantity, $compl.getBasePrice()))</span>
+                                        </div>
+                                        <a href="#" class="select-complement" data="$!compl.idProduct" item="$!item.id">#label('click.to.select')</a>
+                                    </li>
+                                #end
+                            </ul>
+                        </div>
+                    </li>
+                #end
+            #end
+        </ul>
+        <div class="button-bar clearfix">
+            <button type="submit"><span class="next">#label('next')</span></button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function reloadNextStep(info) {
+        activateTitle(1);
+        if (info.data != null) setTitleData(0, info.data);
+        $('#contBillingInfo').loadingSmall().show().load("$!action.url('checkout_get_billing')", {idShopCart: $!shopCart.id});
+    }
+    $(function() {
+        $('button').button();
+        $('.show-selector').click(function() {
+            $('.complement-list').hide();
+            $('#complementList_' + $(this).attr('data')).show();
+        });
+        $('.remove-selection').click(function() {
+            $('#complement_' + $(this).attr('data')).html("$!action.getText('no.complement.selected','no.complement.selected')");
+            $('#complementId_' + $(this).attr('data')).val('');
+            $('#removeSelection_' + $(this).attr('data')).hide();
+            $('#complementList_' + $(this).attr('data')).hide();
+        });
+        $('.select-complement').click(function() {
+            $(this).parent('ul').find('li').removeClass('selected');
+            $(this).parent('li').addClass('selected');
+            $('#complementId_' + $(this).attr('item')).val($(this).attr('data'));
+            $('#complement_' + $(this).attr('item')).html($(this).parent('li').children('div').html());
+            $('#removeSelection_' + $(this).attr('item')).show();
+            $('#complementList_' + $(this).attr('item')).hide();
+        });
+        $('#formSelectComplements').submit(function() {
+            var data = $('#formSelectComplements').serialize();
+            jQuery.post("$!action.url('checkout_set_complements')", data, function(res) {
+                if (res.result == 'OK') reloadNextStep(res);
+                else alert(res.error);
+            });
+            return false;
+        });
+
+    });
+</script>

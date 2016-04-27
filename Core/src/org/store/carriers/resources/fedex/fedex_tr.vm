@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FDXTrack2Request xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="FDXTrack2Request.xsd">
+    <RequestHeader>
+        <AccountNumber>$!bean.user.accountNumber</AccountNumber>
+        <MeterNumber>$!bean.user.meterNumber</MeterNumber>
+        <CarrierCode>$!bean.carrierCode</CarrierCode>
+    </RequestHeader>
+    <PackageIdentifier>
+        <Value>$!bean.trackingNumber</Value>
+        <Type></Type>
+    </PackageIdentifier>
+    <DetailScans>$!bean.detailScan</DetailScans>
+</FDXTrack2Request>

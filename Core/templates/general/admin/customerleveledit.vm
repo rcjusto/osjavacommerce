@@ -1,0 +1,92 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($userLevel.id)
+        #label('admin.customer.level.modify') ID: $!userLevel.id
+    #else
+        #label('admin.customer.level.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=savecustomerlevel")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=idLevel' "value=$!userLevel.id")
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th class="required">#label('admin.level.code')</th>
+                <td>
+                    #if ($userLevel.id)
+            #stextfield('name=userLevel.code' 'cssClass=field string-medium readonly required' 'readonly=true')
+            #else
+                        #stextfield('name=userLevel.code' 'cssClass=field string-medium required')
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.level.name')</th>
+                <td>
+                    <input name="vis_levelName" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="levelName" value="$!userLevel.getName($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.global.discount.percent')</th>
+                <td>
+                    #stextfield('name=userLevel.discountPercent' "value=$!util.formatNumber($userLevel.discountPercent,'decimal4')" 'cssClass=field decimal')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.order.in.list')</th>
+                <td>
+                    #stextfield('name=userLevel.levelOrder' 'cssClass=field integer')
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.disable.volume.price')</th>
+                <td>#scheckbox('name=userLevel.disableVolume')</td>
+            </tr>
+            <tr>
+                <th>#label('admin.need.approval')</th>
+                <td>#scheckbox('name=userLevel.needApproval')</td>
+            </tr>
+            <tr>
+                <th>#label('admin.available.payment.methods')</th>
+                <td>
+                    <label>
+                        <input type="checkbox" id="chkAllPayments" name="chkAllPayments" #if($userLevel && $userLevel.allPaymentMethods()) checked="checked" #end />
+                        #label('admin.all.payment.methods')
+                    </label>
+
+                    <div id="paymentMethods" #if($userLevel && $userLevel.allPaymentMethods()) style="display:none;" #end>
+                        #foreach($pm in $metodosPago)
+                            <label style="margin-right:20px;">
+                                <input type="checkbox" name="paymentMethod" value="$pm.get('name')" #if($userLevel && $userLevel.canPayWith($pm.get('name'))) checked="checked" #end >
+                                <span>#label($!pm.get('label'))</span>
+                            </label>
+                        #end
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listcustomerlevel" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(function() {
+        $('#chkAllPayments').click(function() {
+            if ($(this).is(':checked')) {
+                $('#paymentMethods').hide();
+                $("input[name='paymentMethod']").attr('checked', false);
+            } else $('#paymentMethods').show();
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

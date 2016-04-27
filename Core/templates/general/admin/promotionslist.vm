@@ -1,0 +1,49 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.promotional.code.list')</h1>
+<div class="listado">
+    #surl('id=urlForm' "action=listpromotions")
+    <form action="$urlForm" method="post">
+    #formErrors()
+    #if($util.isNotEmpty($promotions))
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th>#label('admin.code')</th>
+            <th>#label('admin.name')</th>
+            <th style="text-align:center;width:1%;">#label('admin.active')</th>
+            <th>#label('admin.valid.from')</th>
+            <th>#label('admin.valid.to')</th>
+            <th>#label('admin.action')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($p in $promotions)
+            #surl('id=urlEdit' "action=editpromotions" "idPromotionalCode=$!p.idPromotion")
+            <tr>
+                <td>$!p.code</td>
+                <td>$!p.getName($defaultLanguage)</td>
+                <td class="#if($p.active) chk_true #else chk_false #end">&nbsp;</td>
+                <td>$!util.formatDate($p.validFrom)</td>
+                <td>$!util.formatDate($p.validTo)</td>
+                <td>
+                    #if($p.freeShipping) #label('admin.free.shipping') #end
+                    #if($p.freeProduct) #label('admin.free.product'): $!p.freeProduct.partNumber #end
+                    #if($p.discount) #label('admin.fixed.discount'): $!util.formatNumber($p.discount,'money')#end
+                    #if($p.discountPercent) #label('admin.discount.percent'): $!util.formatNumber($p.discountPercent,'money')%#end
+                </td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.promotional.codes.not.found')</h2>
+            <p>#label('admin.promotional.codes.not.found.text')</p>
+        </div>
+    #end
+    <div class="button-bar">
+        #surl('id=urlNew' "action=editpromotions")
+        <button type="button" href="$urlNew"><span class="add">#label('admin.promotional.code.new')</span></button>
+    </div>
+</form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

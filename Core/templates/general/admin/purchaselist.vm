@@ -1,0 +1,122 @@
+#set($menuSelected='purchases')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>#label('admin.purchase.order.create')</h1>
+<form action="$!action.url('createpurchase','admin')" method="post" class="validable">
+    <div class="formulario">
+        <table cellpadding="0" cellspacing="0" class="formulario">
+            <tr>
+                <th>#label('admin.select.supplier')</th>
+                <td>
+                    <select name="idProvider" class="field myselect string-medium">
+                        #foreach($prov in $action.providerList)
+                            <option value="$!prov.idProvider" >$!prov.providerName</option>
+                        #end
+                    </select>
+                </td>
+                <td>
+                    <button type="submit"><span class="add">#label('admin.create')</span></button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</form>
+
+<h1>#label('admin.purchase.order.list')</h1>
+<div class="listado">
+
+    <form action="$action.url('listpurchase','admin')" method="post" class="validable">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.code')</th>
+                    <td>
+                        #stextfield('name=filters.code' "value=$!{filters.get('code')}" 'cssClass=field integer')
+                    </td>
+                    <th>#label('admin.status')</th>
+                    <td>
+                        <select name="filters.status" class="field myselect string-medium">
+                            <option value="">#label('admin.not.filter')</option>
+                            #foreach($opt in ['New','Sent','Received','Paid','Closed','Cancelled'])
+                                <option value="$opt" #if($opt==$filters.get('status')) selected="selected" #end >${opt}</option>
+                            #end
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.supplier')</th>
+                    <td>
+                        <select name="filters.provider" class="field myselect string-medium">
+                            <option value="">#label('admin.not.filter')</option>
+                            #foreach($prov in $action.providerList)
+                                <option value="$!prov.idProvider" #if($!prov.idProvider==$filters.get('provider')) selected="selected" #end >$!prov.providerName</option>
+                            #end
+                        </select>
+                    </td>
+                    <th>#label('admin.date')</th>
+                    <td style="line-height:22px;">
+                        <span style="float:left;margin-right:10px;">#label('admin.between')</span>
+                        #stextfield('name=filters.dateIni' "value=$!{util.formatDate($filters.get('dateIni'))}" 'cssClass=field date')
+                        <span style="float:left;margin:0 10px;"> #label('admin.and') </span>
+                        #stextfield('name=filters.dateEnd' "value=$!{util.formatDate($filters.get('dateEnd'))}" 'cssClass=field date')
+                    </td>
+                </tr>
+                <tr>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{payments.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$payments.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <td colspan="2" style="text-align: center;">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        #if($util.isNotEmpty($purchases.listado))
+            #set($nav=$purchases)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>#label('admin.code')</th>
+                    <th>#label('admin.status')</th>
+                    <th>#label('admin.supplier')</th>
+                    <th>#label('admin.expected.date')</th>
+                    <th>#label('admin.amount')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #if($util.isNotEmpty($purchases.listado))
+                    #foreach($p in $purchases.listado)
+                        <tr>
+                            <td width="1%" style="text-align: center;"><input type="checkbox" name="selecteds" value="$!p.id" /></td>
+                            <td>$!p.id</td>
+                            <td>#label("purchase.status.$!{p.status}")</td>
+                            <td>$!p.provider.providerName</td>
+                            <td>$!util.formatDate($p.requiredDate)</td>
+                            <td>$!util.formatNumber($p.total,'0.00')</td>
+                            <td class="link-bar" nowrap="nowrap"><a href="$action.url('editpurchase','admin',$util.toMap(['idPurchase',$!p.id.toString()]))"><span class="edit">#label('admin.modify')</span></a></td>
+                        </tr>
+                    #end
+                #end
+            </table>
+            <div class="button-bar">
+                <button type="submit"><span class="delete">#label('admin.remove.selected')</span></button>
+            </div>
+        #else
+            <div class="info">
+                <p>#label('admin.purchases.order.not.found')</p>
+            </div>
+        #end
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

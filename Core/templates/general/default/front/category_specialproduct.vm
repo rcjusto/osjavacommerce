@@ -1,0 +1,6 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'')")
+#set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+#set($urlDetail = $action.urlProduct($p))
+<a href="$urlDetail">$!pName</a>

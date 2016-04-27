@@ -1,0 +1,18 @@
+#set($menuSelected='reports')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.report.list')</h1>
+
+<ul class="reports">
+    #foreach($report in $reports)
+        #foreach($code in $report.getCodes($action))
+            #set($info = $report.getName($code,$action))
+            <li>
+            <a href="$!action.url('report','admin',$util.toMap(['className',$!report.class.name,'code',$code]))">
+                <h2>$!info.name</h2>
+                <p>$!info.description</p>
+            </a>
+            </li>
+        #end
+    #end
+</ul>
+#parse('/WEB-INF/views/admin/page_bot.vm')

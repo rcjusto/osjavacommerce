@@ -1,0 +1,104 @@
+#set($menuSelected='customer')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    function toggleFilters(el) {
+        if ($('#filterToggler').text()=="$!action.getText('admin.hide.filters')") {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+            jQuery.cookie('filters.visible','false');
+        } else {
+            $('#filterContainer').show();
+            $('#filterToggler').text("$!action.getText('admin.hide.filters')");
+            jQuery.cookie('filters.visible','true');
+        }
+    }
+    $(function(){
+        if (jQuery.cookie('filters.visible')=='false') {
+            $('#filterContainer').hide();
+            $('#filterToggler').text("$!action.getText('admin.show.filters')");
+        }
+    });
+</script>
+
+<h1 style="float: left;">#label('admin.comments.list')</h1>
+<span style="float:right;margin:14px 10px 0 0;"><a id="filterToggler" href="#" onclick="toggleFilters();">#label('admin.hide.filters')</a></span>
+<br style="clear:both;"/>
+
+<div class="listado">
+    #surl('id=urlForm' "action=listcomment")
+    <form action="$urlForm" method="post">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.type')</th>
+                    <td>#sselect('name=filterType' 'list=commentTypeList' 'emptyOption=true' 'cssClass=myselect field string-short' )</td>
+                    <th>#label('admin.status')</th>
+                    <td>#sselect('name=filterStatus' 'list=commentStatusList' 'emptyOption=true' 'cssClass=myselect field string-short' )</td>
+                    <th>#label('admin.name')</th>
+                    <td>#stextfield('name=filterName' 'cssClass=field string-short')</td>
+                </tr>
+                <tr>
+                <th>#label('admin.text')</th>
+                    <td>#stextfield('name=filterText' 'cssClass=field string-short')</td>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{comments.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$comments.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th>
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+    #formErrors()
+    #if($util.isNotEmpty($comments.listado))
+        #set($nav=$comments)
+        #parse('/WEB-INF/views/admin/navigator.vm')
+    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+            <th>#label('admin.id')</th>
+            <th>#label('admin.type')</th>
+            <th>#label('admin.title')</th>
+            <th>#label('admin.email')</th>
+            <th>#label('admin.status')</th>
+            <th>#label('admin.created')</th>
+            <th>&nbsp;</th>
+        </tr>
+        #foreach($m in $comments.listado)
+            #surl('id=urlEdit' "action=editcomment" "idComment=$!m.idComment")
+            <tr>
+                <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!m.idComment"/></td>
+                <td>$!m.idComment</td>
+                <td>#label("comment.type.$!{m.commentType}")</td>
+                <td>$!m.title</td>
+                <td>$!m.userEmail</td>
+                <td nowrap="nowrap"><span class='$!action.getText("comment.color.$!{m.commentStatus}")'></span>#label("comment.status.$!{m.commentStatus}") &nbsp;</td>
+                <td>$!util.formatDate($m.created)</td>
+                <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+            </tr>
+        #end
+    </table>
+    #else
+        <div class="info">
+            <p>#label('admin.comments.not.found')</p>
+        </div>
+    #end
+
+    <div class="button-bar">
+        <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        <button type="button" href="$!action.url('editcomment')"><span class="add">#label('admin.comments.new')</span></button>
+    </div>
+</form>
+</div>
+
+#parse('/WEB-INF/views/admin/page_bot.vm')

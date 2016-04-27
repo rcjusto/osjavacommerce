@@ -1,0 +1,53 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($productAtt.id)
+        #label('admin.productatt.modify')
+    #else
+        #label('admin.productatt.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveproductatt")
+<form action="$urlForm" method="post" class="validable">
+    #shidden('name=idProductAtt' "value=$!productAtt.id")
+    #shidden('name=productAtt.id')
+    <div class="formulario">
+        #langSelector()
+        #formErrors()
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>#label('admin.group')</th>
+                <td>
+                    #stextfield('name=productAtt.attributeGroup' 'cssClass=field string-medium')
+                </td>
+            </tr>
+            <tr>
+                <th class="required">#label('admin.name')</th>
+                <td>
+                    <input type="text" name="vis_attributeName" class="multilang field string-large" value=""/>
+                    #foreach($l in $languages )
+                        <input type="hidden" class="$l" name="attributeName" value="$!productAtt.getAttributeName($l)"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.hide.in.product')</th>
+                <td>
+                    #scheckbox('name=productAtt.hideInProduct' )
+                </td>
+            </tr>
+            <tr>
+                <th>#label('admin.options')</th>
+                <td>
+                    #stextarea('name=productAtt.attributeOptions' 'cssClass=field string-large' 'rows=10')
+                </td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+            #surl('id=urlCancel' "action=listproductatt" )
+            <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+    </div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

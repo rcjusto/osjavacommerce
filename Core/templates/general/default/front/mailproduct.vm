@@ -1,0 +1,44 @@
+#if($mailSent=='Y')
+<div id="mailSent" class="info">
+    <h2>#label('mail.sent.successfully')</h2>
+    <p>#label('mail.sent.to') $!mailTo.</p>
+</div>
+#end
+<div id="mailProduct" #if(!$mailSent || $mailSent=='Y')style="display:none;"#end class="block">
+<div class="mail-header">
+    <h2>#label('product.email.friend.title')</h2>
+    <p>#label('product.email.friend.text')</p>
+</div>
+<form id="formEmailProduct">
+    <input type="hidden" name="idProduct" value="$!product.idProduct" />
+    #formErrors()
+    #if($frontUser)
+    #else
+        <label>
+            <span class="label required">#label('mail.from.name')</span>
+            <input type="text" name="mailFromName" value="$!mailFromName" class="field required string-300">
+            #fieldError("mailFromName")
+        </label>
+        <label>
+            <span class="label required">#label('mail.from')</span>
+            <input type="text" name="mailFrom" value="$!mailFrom" class="field email required string-300">
+            #fieldError("mailFrom")
+        </label>
+    #end
+    <label>
+        <span class="label required">#label('mail.to')</span>
+        <input type="text" name="mailTo" value="$!mailTo" class="field email required string-300">
+        #fieldError("mailTo")
+    </label>
+    <label>
+        <span class="label">#label('mail.comment')</span>
+        <textarea name="mailComment" class="field string-300" rows="3">$!mailComment</textarea>
+    </label>
+    <div class="actions">
+        <span class="label">&nbsp;</span>
+        <button type="button" id="sendEmail"><span class="mail">#label('send.email')</span></button>
+        <button type="button" onclick="$('#mailProduct').hide();"><span class="cancel">#label('cancel')</span></button>
+    </div>
+</form>
+</div>
+    

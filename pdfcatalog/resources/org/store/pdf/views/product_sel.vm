@@ -1,0 +1,54 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('plugin.pdf.generator')</h1>
+<div class="clearfix listado">
+<form id="formSelProd" action="$!action.url('pdf_product_sel','admin')" method="post">
+    <h4 style="margin-bottom: 4px;">#label('pdf.select.products.to.pdf')</h4>
+<table class="listado" width="900" cellpadding="0" cellspacing="0">
+    <tr>
+        <th style="text-align: center;width: 1%"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+        <th>#label('admin.code')</th>
+        <th>#label('admin.name')</th>
+    </tr>
+    #if($products && !$products.isEmpty())
+        #foreach($p in $products)
+            <tr>
+                <td style="text-align: center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!p.id" /></td>
+                <td>$!p.code</td>
+                <td>$!p.name</td>
+            </tr>
+        #end
+    #else
+        <tr>
+            <td colspan="3">#label('admin.produts.not.found')</td>
+        </tr>
+    #end
+</table>
+    <div class="button-bar">
+        <button type="submit" ><span class="del">#label('admin.remove.selected')</span></button>
+        <button type="button" onclick="addRelated();"><span class="add">#label('admin.add.product')</span></button>
+        <button type="button" href="$!action.url('pdf_main_config','admin', $util.map.add('mode','products'))"><span class="back">#label('admin.back')</span></button>
+    </div>
+</form>
+</div>
+<script type="text/javascript">
+    function addRelated() {
+        $('#dialogContent').loading("$!action.getText('admin.loading.products')", "$!action.getText('admin.please.wait')");
+        $('#dialogContent').load("$!action.url('productlist','admin')", {output:'selector', rnd:Math.random()}, function() {
+            $('#dialogo').find('button.buttonOk:first').click(function() {
+                var selIds = (jQuery.isFunction(selectedlist)) ? selectedlist() :null;
+                if (selIds!=null && selIds.length>0) {
+                    var data = '';
+                    jQuery.each(selIds, function(){
+                        $('<input>').attr('type','hidden').attr('name','newproducts').val(this).appendTo('#formSelProd');
+                    });
+                    $('#formSelProd').submit();
+                }
+                $('#dialogo').dialog('close');
+            });
+        });
+        $('#dialogo').dialog({width:800,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,3 @@
+<div class="ajax-shopcart hoverable block template-block">
+    #parse('/WEB-INF/views/custom/front/ajax_cart.vm')
+</div>

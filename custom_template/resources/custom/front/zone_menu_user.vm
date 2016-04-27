@@ -1,0 +1,13 @@
+<div class="menu-customer block clearfix template-block">
+    <h2>#label('customer.options')</h2>
+    <ul class="clearfix hoverable">
+        #if($frontUser && !$frontUser.anonymousCheckout)
+            <li class="profile">#linklabel('my.profile' $!action.url('profile'))</li>
+            <li class="orders">#linklabel('my.orders' $!action.url('orders'))</li>
+            <li class="wishlist">#linklabel('my.wishlist' $!action.url('wishlist'))</li>
+            <li class="logout">#linklabel('logout' $!action.url('logout'))</li>
+        #else
+            <li class="register">#linklabel('sign.in' $!action.url('profile'))</li>
+        #end
+    </ul>
+</div>

@@ -1,0 +1,31 @@
+<table width="100%">
+    #if( $bean.errorCode && $bean.errorCode!='' )
+        <tr>
+            <td>
+                <div>
+                    <div>ERROR</div>
+                    <div>$!bean.errorCode - $!bean.errorDescription</div>
+                </div>
+            </td>
+        </tr>
+    #else
+        #if( $bean.guaranteedDeliveryDate && $bean.guaranteedDeliveryDate!='' )
+        <tr>
+            <td>Delivery Date</td><td>$!bean.guaranteedDeliveryDate</td>
+        </tr>
+        #end
+        #if( $bean.trackSummary && $bean.trackSummary!='' )
+        <tr>
+            <td>Summary</td><td>$!bean.trackSummary</td>
+        </tr>
+        #end
+        #if( $bean.trackDetails.size()>0 )
+        <tr><th colspan="2">Details</th></tr>
+        #foreach( $det in $bean.trackDetails )
+        <tr>
+            <td colspan="2">$!det</td>
+        </tr>
+        #end
+        #end
+    #end
+</table>

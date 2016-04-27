@@ -1,0 +1,7 @@
+<div id="adminmenu">
+    <ul class="menu-left clearfix">
+        <li #if($menuSelected=='home') class="selected" #end><a href='#surl("action=home")'>#label('admin.menu.dashboard')</a></li>
+        <li #if($menuSelected=='orders') class="selected" #end><a href="$action.url('orders','supplier',$util.map.add('month',$date.format('M',$date)))">#label('admin.order.list')</a></li>
+        <li #if($menuSelected=='products') class="selected" #end><a href="$action.url('products','supplier')">#label('admin.product.list')</a></li>
+    </ul>
+</div>

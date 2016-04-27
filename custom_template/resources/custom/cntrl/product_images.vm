@@ -1,0 +1,102 @@
+#set($image = $imageResolver.getImageForProduct($product,''))
+#set($images = $imageResolver.getImagesForProduct($product,''))
+#if(!$list.isEmpty($images))
+    <div class="product-detail-images">
+        #if($action.getStoreProperty('image.zoom.mode','lightbox')=='lightbox')
+            #if($images.size()>1)
+                <div class="image"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/></div>
+                <div class="thumbnails clearfix">
+                    <ul>
+                        #foreach($img in $images)
+                            #if($util.fileExist("$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"))
+                                <li><a class="lightbox" rel="gallery" href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)" alt=""/></a></li>
+                            #else
+                                <li><a class="lightbox" rel="gallery" href="$!action.storeFile('images/products')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)" alt=""/></a></li>
+                            #end
+                        #end
+                    </ul>
+                </div>
+            #else
+                <div class="image"><a class="lightbox" rel="gallery" href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($image)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/></a></div>
+            #end
+        #else
+            <div class="image">
+                <div id="mainImageContainer" style="position: relative;display: inline-block;">
+                    <img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/>
+                    <div id="zoomVisor" style="position:absolute;display: none;"></div>
+                </div>
+            </div>
+            #if($images.size()>1)
+                <div class="thumbnails clearfix">
+                    <ul>
+                        #foreach($img in $images)
+                            #if($util.fileExist("$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"))
+                                <li><a class="set-main-image" zoom="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)" href="$!action.storeFile('images/products')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)" alt=""/></a></li>
+                            #else
+                                <li><a class="set-main-image" href="$!action.storeFile('images/products')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)" alt=""/></a></li>
+                            #end
+                        #end
+                    </ul>
+                </div>
+            #end
+            <div id="zoomImageContainer" style="position: absolute;overflow: hidden;left:-9999px;top:-9999px;"><img style="position: absolute;left:0;top:0;" src="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($image)"/></div>
+            <script type="text/javascript">
+                $(function () {
+                    $('.set-main-image').live('click', function (e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        var ni = $(this).attr('href');
+                        var zi = $(this).attr('zoom');
+                        $('#mainImageContainer > img').one('load',function (e) {
+                            $('#mainImageContainer').removeClass('has-image');
+                            if (zi != null && zi != undefined && zi != '') {
+                                $('#zoomImageContainer > img').attr('src', zi);
+                            }
+                        }).attr('src', ni);
+                        return false;
+                    });
+
+                    $('#zoomImageContainer > img').load(function (e) {
+                        $('#mainImageContainer').addClass('has-image');
+
+                        var no = $('#mainImageContainer > img');
+                        var vw = no.width() * $('#zoomImageContainer').width() / $(this).width();
+                        var vh = no.height() * $('#zoomImageContainer').height() / $(this).height();
+                        $(this).css({'left':0, 'top':0});
+                        $('#zoomVisor').width(vw).height(vh).css({'left':0, 'top':0, 'opacity':0.3}).attr('zw', $(this).width() / no.width()).attr('zh', $(this).height() / no.height());
+                    }).each(function () {
+                                if (this.complete) $(this).load();
+                            });
+
+                    $('#mainImageContainer').hover(
+                            function (e) {
+                                if ($('#mainImageContainer').hasClass('has-image')) {
+                                    $('#zoomVisor').show();
+                                    $('#zoomImageContainer').css('visibility', 'visible').position({my:'left top', at:'right top', of:'#mainImageContainer', offset:'10px 0'});
+                                }
+                            },
+                            function (e) {
+                                if ($('#mainImageContainer').hasClass('has-image')) {
+                                    $('#zoomVisor').hide();
+                                    $('#zoomImageContainer').css('visibility', 'hidden');
+                                }
+                            }
+                    ).mousemove(function (e) {
+                                var xx = Math.min(Math.max(e.pageX - $(this).offset().left - $('#zoomVisor').width() / 2, 0), $(this).width() - $('#zoomVisor').width());
+                                var yy = Math.min(Math.max(e.pageY - $(this).offset().top - $('#zoomVisor').height() / 2, 0), $(this).height() - $('#zoomVisor').height());
+                                $('#zoomVisor').css({'left':xx + 'px', 'top':yy + 'px'});
+                                var zw = ($('#zoomImageContainer').width() > $('#zoomImageContainer img').width())
+                                        ? ($('#zoomImageContainer').width() - $('#zoomImageContainer img').width()) / 2
+                                        : -eval($('#zoomVisor').attr('zw')) * xx;
+                                var zh = ($('#zoomImageContainer').height() > $('#zoomImageContainer img').height())
+                                        ? ($('#zoomImageContainer').height() - $('#zoomImageContainer img').height()) / 2
+                                        : -eval($('#zoomVisor').attr('zh')) * yy;
+                                $('#zoomImageContainer > img').css({'left':zw + 'px', 'top':zh + 'px'});
+                            }
+                    );
+                });
+            </script>
+        #end
+    </div>
+#end
+<div id="gallery" style="top: 198.1px; position: absolute; width: 500px; height: 258px; left: 580.5px; display: none;"></div>

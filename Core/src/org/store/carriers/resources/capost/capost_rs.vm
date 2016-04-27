@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<eparcel>
+    #if($bean.language)<language>$!bean.language</language>#end
+    <ratesAndServicesRequest>
+        <merchantCPCID>$!bean.user.userId</merchantCPCID>
+        <fromPostalCode>$!bean.shipper.address.postalCode</fromPostalCode>
+        #if($bean.turnAroundTime)<turnAroundTime> $!bean.turnAroundTime </turnAroundTime>#end
+        #if($bean.insuranceCalculation)<itemsPrice>$!tool.format($bean.totalInsuredValue, '0.##')</itemsPrice>#end
+        <lineItems>
+            #foreach( $pack in $bean.packages)
+                <item>
+                    <quantity>1</quantity>
+                    <weight>$!tool.format($pack.packageWeight, '0.##')</weight>
+                    <length>$!tool.roundToInt($pack.dimensionsLength)</length>
+                    <width>$!tool.roundToInt($pack.dimensionsWidth)</width>
+                    <height>$!tool.roundToInt($pack.dimensionsHeight)</height>
+                    <description>$!pack.description </description>
+                </item>
+            #end
+        </lineItems>
+        <city>$!bean.shipTo.address.city</city>
+        <provOrState>$!bean.shipTo.address.stateProvinceCode</provOrState>
+        <country>$!bean.shipTo.address.countryCode</country>
+        <postalCode>$!bean.shipTo.address.postalCode</postalCode>
+    </ratesAndServicesRequest>
+</eparcel>

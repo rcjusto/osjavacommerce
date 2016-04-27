@@ -1,0 +1,107 @@
+<div id="blockContent" class="checkout-onepage clearfix">
+    <div class="block">
+        <h1>#label('checkout')</h1>
+
+        #if($canPickComplements)
+        <div class="step-wrapper">
+            <div id="titComplements" class="step-title step-0 active clearfix">
+                <h2>#label('add.complements')</h2>
+                <span class="data"></span>
+                <a href="#" id="modComplements">#label('checkout.step.modify')</a>
+            </div>
+            <div id="contComplements" class="content-step">
+                #parse("/WEB-INF/views/front/checkout_complements.vm")
+            </div>
+        </div>
+        #end
+
+        <div class="step-wrapper">
+            <div id="titBillingInfo" class="step-title step-1 #if($canPickComplements) pending #else active #end clearfix">
+                <h2>#label('billing.information')</h2>
+                <span class="data"></span>
+                <a href="#" id="modBillingInfo">#label('checkout.step.modify')</a>
+            </div>
+            #if($canPickComplements)
+                <div id="contBillingInfo" class="content-step" style="display:none;"></div>
+            #else
+                <div id="contBillingInfo" class="content-step">
+                    #parse("/WEB-INF/views/front/checkout_billing.vm")
+                </div>
+            #end
+        </div>
+
+        <div class="step-wrapper">
+            <div id="titShippingInfo" class="step-title step-2 pending clearfix" #if(!$scu.shippingNeeded) style="display:none;" #end >
+                <h2>#label('shipping.information')</h2>
+                <span class="data"></span>
+                <a href="#" id="modShippingInfo">#label('checkout.step.modify')</a>
+            </div>
+            <div id="contShippingInfo" class="content-step" style="display:none;"></div>
+        </div>
+
+        <div class="step-wrapper">
+            <div id="titShippingMethod" class="step-title step-3 pending clearfix" #if(!$scu.shippingNeeded) style="display:none;" #end>
+                <h2>#label('shipping.method')</h2>
+                <span class="data"></span>
+                <a href="#" id="modShippingMethod">#label('checkout.step.modify')</a>
+            </div>
+            <div id="contShippingMethod" class="content-step" style="display:none;"></div>
+        </div>
+
+        <form id="formPaymentConfirm">
+            <input type="hidden" name="idShopCart" value="$!shopCart.id"/>
+
+            <div class="step-wrapper">
+                <div id="titPaymentInfo" class="step-title step-4 pending clearfix">
+                    <h2>#label('payment.information')</h2>
+                    <span class="data"></span>
+                    <a href="#" id="modPaymentInfo">#label('checkout.step.modify')</a>
+                </div>
+                <div id="contPaymentInfo" class="content-step" style="display:none;"></div>
+            </div>
+
+            <div class="step-wrapper">
+                <div id="titOrderConfirm" class="step-title step-5 pending clearfix">
+                    <h2>#label('order.confirmation')</h2>
+                </div>
+                <div id="contOrderConfirm" class="content-step" style="display:none;"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function activateTitle(index) {
+        $('.content-step').hide();
+        for (i = 0; i <= 5; i++) {
+            if (i < index) $('.step-title.step-' + i).removeClass('active').removeClass('pending').addClass('modificable');
+            else if (i == index) $('.step-title.step-' + i).removeClass('pending').removeClass('modificable').addClass('active');
+            else if (i > index) $('.step-title.step-' + i).removeClass('active').removeClass('modificable').addClass('pending');
+        }
+    }
+    function setTitleData(index, data) {
+        $('.step-title.step-' + index).find('.data').html(data);
+    }
+    $(function() {
+        $('#modComplements').click(function() {
+            activateTitle(0);
+            $('#contComplements').loadingSmall().show().load("$action.url('checkout_get_complements')", {idShopCart: $!shopCart.id});
+        });
+        $('#modBillingInfo').click(function() {
+            activateTitle(1);
+            $('#contBillingInfo').loadingSmall().show().load("$action.url('checkout_get_billing')", {idShopCart: $!shopCart.id});
+        });
+        $('#modShippingInfo').click(function() {
+            activateTitle(2);
+            $('#contShippingInfo').loadingSmall().show().load("$action.url('checkout_get_shipping')", {idShopCart: $!shopCart.id});
+        });
+        $('#modShippingMethod').click(function() {
+            activateTitle(3);
+            $('#contShippingMethod').loadingSmall().show().load("$action.url('checkout_get_method')", {idShopCart: $!shopCart.id});
+        });
+        $('#modPaymentInfo').click(function() {
+            activateTitle(4);
+            $('#contPaymentInfo').show();
+        });
+    });
+</script>

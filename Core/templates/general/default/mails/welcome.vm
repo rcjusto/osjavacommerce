@@ -1,0 +1,11 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<h1>$!{action.getText('mail.welcome')}</h1>
+<p>$!{action.getText('mail.your.credentials.are')}</p>
+<div style="padding: 10px;background-color: #f4f4f4;margin-top: 5px;">
+    <p>$!{action.getText('admin.user')}: $!{user.userId}</p>
+    <p>$!{action.getText('admin.password')}: $!{password}</p>
+</div>
+

@@ -1,0 +1,28 @@
+#if($products.notEmpty())
+<form id="formProducts" action="$!action.url('category')" method="get">
+    <input type="hidden" id="categoryCode" name="code" value="$!category.urlCode"/>
+    #shidden('name=productFilter.filterMinPrice' 'id=filterPriceMin')
+    #shidden('name=productFilter.filterMaxPrice' 'id=filterPriceMax')
+    #shidden('name=productFilter.filterManufacturer' 'id=filterManufacturer')
+    #shidden('name=productFilter.filterLabel' 'id=filterLabel')
+    #set($filterAttMap = $productFilter.filterAttributesMap)
+    #foreach($attId in $filterAttMap.keySet())
+        #set($fieldValue = "$!{attId}=$!{filterAttMap.get($attId)}")
+        <input type="hidden" id="filterAttributes$!attId" name="productFilter.filterAttributes" value="$!esc.html($fieldValue)"/>
+    #end
+    <input type="hidden" id="filterAttributesNew" name="productFilter.filterAttributes" value=""/>
+    #control('navigator' $util.map.add('data', $products))
+</form>
+
+    #control('product_list' $util.map.add('_prodList',$products.listado).add('_prodTemplate','category_product'))
+    #control('navigator_bot' $util.map.add('data', $products))
+#else
+<div class="no-products">#label('products.not.founded')</div>
+#end
+<script type="text/javascript">
+    $(function() {
+        var navView = jQuery.cookie('category.navigator.view');
+        if (navView == null || navView == '') navView = "$!action.getStoreProperty('listing.default.style','grid')";
+        setNavigatorView((navView == 'list') ? 'list' : 'grid', false);
+    });
+</script>

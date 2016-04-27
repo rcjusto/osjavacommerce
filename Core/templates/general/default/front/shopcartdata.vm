@@ -1,0 +1,90 @@
+<div id="blockContent" class="shopcart-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        #if($shopCart.getStatus()=='saved')
+            <div class="clearfix">
+                <h1 style="float:left;">#label('saved.cart')</h1>
+                <h1 style="float:right;padding-right:20px;"><span style="font-size:80%">$!util.formatDate($cart.createdDate,$locale.language)</span></h1>
+            </div>
+        #else
+        <div class="clearfix">
+            <h1 style="float:left;">#label('quoted.requested')</h1>
+            <h1 style="float:right;padding-right:20px;"><span style="font-size:80%">$!util.formatDate($cart.createdDate,$locale.language)</span></h1>
+        </div>
+            <div class="property">
+                <span class="label">#label('status'):</span>
+                <span class="value">#label("cart.status.${cart.status}")</span>
+            </div>
+            #if($util.isNotEmpty($!cart.quoteMessage))
+            <div class="property">
+                <span class="label">#label('message'):</span>
+                <span class="value">$!cart.quoteMessage</span>
+            </div>
+            #end
+        #end
+
+        <div class="shopcart-items clearfix">
+            <table>
+                <tr>
+                    <th class="name">#label('shopcart.product')</th>
+                    <th class="quantity">#label('shopcart.quantity')</th>
+                    <th class="price">#label('shopcart.unitary.price')</th>
+                    <th class="price">#label('shopcart.line.price')</th>
+                </tr>
+                #foreach($it in $cart.items)
+                    #set($urlProd = $action.urlProduct($it.beanProd1))
+                    #set($image = $imageResolver.getImageForProduct($it.beanProd1,'list/'))
+                    #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)" )) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                    <tr>
+                        #if($it.beanProd2)
+                            #set($urlProd2 = $action.urlProduct($it.beanProd2))
+                            #set($image2 = $imageResolver.getImageForProduct($it.beanProd2,'list/'))
+                            #if($util.isNotEmpty($image2)) #set($srcImg2 = $!action.storeFile("images/products/list/$!image2" )) #else #set($srcImg2 = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                            <td class="name">
+                                <img src="$srcImg" style="float:left;"/>
+                                <img src="$srcImg2" style="float:left;"/>
+                                <a href="$!urlProd">$!it.code1</a> + <a href="$!urlProd2">$!it.code2</a><br/>
+                                <a href="$!urlProd">$!it.name1</a> + <a href="$!urlProd2">$!it.name2</a>
+                            </td>
+                        #else
+                            <td class="name">
+                                <img src="$srcImg" style="float:left;"/>
+                                <a href="$!urlProd">$!it.code1</a><br/>
+                                <a href="$!urlProd">$!it.name1</a>
+                            </td>
+                        #end
+                        <td class="quantity">$!it.quantity</td>
+                        <td class="price">$!action.formatActualCurrency($it.price)</td>
+                        <td class="price">$!action.formatActualCurrency($it.subtotal)</td>
+                    </tr>
+                #end
+                <tr class="total">
+                    <td colspan="3">#label('total')</td>
+                    <td class="price">$!action.formatActualCurrency($cart.total)</td>
+                </tr>
+            </table>
+
+        </div>
+        <div class="button-bar">
+            <button type="button" style="float:left;" href="$!action.url('shopcartlist')"><span class="back">#label('my.shopping.carts ')</span></button>
+            <button type="button" onclick="printOrder();"><span>#label('printable.version')</span></button>
+            <button type="button" href="$!action.url('shopcartdel','',$util.toMap(['idCart',$cart.id.toString()]))"><span>#label('delete')</span></button>
+            #if($cart.status=='approved' && $cart.canCheckoutToday())
+                <button class="checkout" type="button" href="$!action.url('checkout','',$util.toMap(['idShopCart',$cart.id.toString()]))"><span>#label('shopcart.checkout')</span></button>
+            #else
+                <button type="button" href="$action.url('shopcart_tocart','',$util.toMap(['idCart',$cart.id.toString()]))"><span>#label('add.products.to.cart')</span></button>
+            #end
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var wndPrint = null;
+    function printOrder() {
+        if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+        var url = "$!{action.url('shopcartdata')}?idCart=$!{cart.id}&output=print";
+        wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+        wndPrint.focus();
+    }
+</script>

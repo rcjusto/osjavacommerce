@@ -1,0 +1,24 @@
+    #foreach( $cNode in $menuItem.children() )
+        #set( $filstr = $util.getRepeatString('&nbsp;&nbsp;&nbsp;', $cNode.level) )
+        #set( $m = $cNode.userObject )
+        #if( $m )
+        #set( $hasChild = 0 )
+        #foreach( $cCh in $cNode.children() )
+            #set( $hasChild = 1 )
+        #end
+        <tr id="menu-$!m.id" #if($!m.idParent) class="child-of-menu-$!m.idParent" #end>
+            <td style="text-align:center;"><input type="checkbox" class="selecteds" name="selecteds" value="$!m.id"/></td>
+            <td style="padding-left:24px;"><input type="hidden" name="id" value="$!m.id" />$!m.getLabel($defaultLanguage)</td>
+            <td>$!m.menuType</td>
+            <td>$!m.url</td>
+            <td>$!m.menuOrder</td>
+            <td class="link-bar">
+                #surl('id=urldata' "action=editmenu" "idMenu=$!m.id" )
+                <a href="$!urldata"><span class="edit">#label('admin.modify')</span></a>
+                <a href="#" onclick="deleteMenu($m.id);return false;"><span class="delete">#label('admin.delete')</span></a>
+            </td>
+        </tr>
+            #set( $menuItem = $cNode )
+            #parse( '/WEB-INF/views/admin/menulist_item.vm' )
+        #end
+    #end

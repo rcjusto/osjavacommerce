@@ -1,0 +1,42 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('background.jobs')</h1>
+<div class="listado">
+    #if(!$jobList.isEmpty())
+        <table class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('admin.name')</th>
+                <th>#label('admin.active')</th>
+                <th>#label('admin.job.start.at')</th>
+                <th>#label('admin.job.run.every')</th>
+                <th>#label('admin.last.execution.status')</th>
+                <th>#label('admin.next.execution')</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($map in $jobList)
+                #set($basejob = $map.get('base'))
+                #surl('id=urlEdit' "action=jobproperties" "jobName=$!map.get('base').name")
+                <tr>
+                    <td>#label($map.get('base').name)</td>
+                    <td class="#if($map.get('job').active) chk_true #else chk_false #end ">&nbsp;</td>
+                    <td>#if($map.get('job').active) $!date.format('HH:mm',$map.get('job').beginHour) #else - #end</td>
+                    <td>#if($map.get('job').active) $!map.get('job').intervalNumber $!map.get('job').intervalUnit #else - #end</td>
+                    <td>
+                        $!util.formatDate($map.get('job').lastExecution) $!date.format('HH:mm',$map.get('job').lastExecution)
+                        #if($!map.get('job').executionStatus)
+                            #label('admin.status'): $!map.get('job').executionStatus</td>
+                        #end
+                    <td>#if($map.get('job').active) $!util.formatDate($map.get('trigger').nextFireTime) $!date.format('HH:mm',$map.get('trigger').nextFireTime) #else &nbsp; #end</td>
+                    <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.details')</span></a></td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>#label('admin.jobs.not.found')</h2>
+
+            <p>#label('admin.jobs.not.found.text')</p>
+        </div>
+    #end
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

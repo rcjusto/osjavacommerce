@@ -1,0 +1,23 @@
+#set($_notAjax = $_parameters.get('notAjax'))
+#set($_quantity = $_parameters.get('quantity'))
+#set($_product = $_parameters.get('product'))
+
+#if($_notAjax && $_notAjax=='Y')
+<a class="add-to-cart" href="#" onclick="$('#formAddToCart_$!{_product.idProduct}').submit(); return false;"></a>
+#else
+<a href="#"
+   #if($action.getStoreProperty('enable.ajax.shopcart','N')=='Y')
+        class="add-to-cart ajax-cart" data="$!_product.idProduct"
+   #else
+        class="add-to-cart" onclick="$('#formAddToCart_$!{_product.idProduct}').submit(); return false;"
+   #end>
+</a>
+#end
+<form id="formAddToCart_$!_product.idProduct" action="$!action.url('addtocart','')" method="post" class="form-addtocart" style="display: inline-block;">
+    #if($_quantity)
+        <input type="hidden" name="quantity" value="$!_quantity"/>
+    #else
+        <input type="hidden" name="quantity" value="1"/>
+    #end
+    <input type="hidden" name="idProduct" value="$!_product.idProduct"/>
+</form>

@@ -1,0 +1,35 @@
+#if($util.isNotEmpty($products))
+<div class="listado">
+    <h2>Productos encontrados</h2>
+        <table class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>&nbsp;</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>&nbsp;</th>
+            </tr>
+            #foreach($l in $products)
+                <tr>
+                    <td><input type="checkbox" class="process-url" value="$velocityCount" id="el_$velocityCount"></td>
+                    <td><label for="el_$velocityCount">$!l.code</label></td>
+                    <td><label for="el_$velocityCount">$!l.name</label></td>
+                    <td id="cell_$velocityCount" class="action-url" data="$!l.url" style="width: 120px;">&nbsp;</td>
+                </tr>
+            #end
+        </table>
+        <input type="hidden" id="script" value="$!script"/>
+    <div class="button-bar">
+        <span>Add To Category:</span>
+        #set($catTree = $action.getDao().getCategoryTree(false))
+        <select id="category" class="field myselect string-medium">
+            #categoryOption($catTree 0 0)
+        </select>
+        <button type="button" id="btnProcess"><span>Procesar Seleccionados</span></button>
+    </div>
+</div>
+#else
+    <div class="error">
+        <h2>#label('admin.errors')</h2>
+        <p>#label('admin.products.not.found')</p>
+    </div>
+#end

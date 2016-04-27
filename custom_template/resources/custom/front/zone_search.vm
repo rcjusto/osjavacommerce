@@ -1,0 +1,20 @@
+<div class="block-search template-block" >
+    <form id="formSearch" action="$!action.url('search')" method="get">
+        <div class="search-wraper clearfix">
+            <input type="text" id="querySearch" name="query" value="$!esc.html($query)" class="required" placeholder="$!action.getText('search')"/>
+            <a class="search-button" href="#" onclick="if($('#formSearch').validForm()) $('#formSearch').submit(); else return false;">#label('search.button')</a>
+        </div>
+    </form>
+</div>
+#if('Y'==$action.getStoreProperty('search.autocomplete','N'))
+<script type="text/javascript">
+    $(function(){
+        $("input#querySearch").autocomplete({source:"$!action.url('quicksearch')",html:true,
+            select: function(event, ui) {
+                $('#querySearch').val(ui.item.value);
+                $('#formSearch').submit();
+            }
+        });
+    })
+</script>
+#end

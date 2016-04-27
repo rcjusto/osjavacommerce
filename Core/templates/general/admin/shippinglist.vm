@@ -1,0 +1,114 @@
+#set($menuSelected='configuration')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.carriers.manager')</h1>
+<div class="listado">
+    <div id="tabShipping">
+        #surl('id=urlLive' "action=listcarrierproperty")
+        #surl('id=urlCustom' "action=listcustomship")
+        <ul class="tabs">
+            <li><a href="#tabGeneral">#label('admin.configure.shipping.methods')</a></li>
+            <li><a href="$urlLive">#label('admin.configure.live.carriers')</a></li>
+            <li><a href="$urlCustom">#label('admin.configure.custom.carrier')</a></li>
+        </ul>
+        <div id="tabGeneral">
+            <h2 class="block-title">#label('admin.shipping.method.list')</h2>
+            #surl('id=urlForm1' "action=listshipping")
+            <form action="$urlForm1" method="post">
+                #actionErrors("Error Deleting")
+                #if($util.isNotEmpty($shippingMethods))
+                    <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                            <th>#label('admin.code')</th>
+                            <th>#label('admin.name')</th>
+                            <th style="text-align:center;">#label('admin.active')</th>
+                            <th style="text-align:center;">#label('admin.default')</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        #set( $oldCarrier = '' )
+                        #foreach($s in $shippingMethods)
+                            #surl('id=urlDelete' "action=delshipping" "idMethod=$!s.id")
+                            #if($oldCarrier!=$s.carrierName)
+                                <tr>
+                                    <td colspan="5" style="font-size:11pt;font-weight:bold;">
+                                        $!s.carrierName
+                                    </td>
+                                </tr>
+                                #set($oldCarrier = $s.carrierName)
+                            #end
+                            <tr>
+                                <td style="padding-left:20px;">$!s.methodCode<input type="hidden" name="shippingMethodId" value="$!s.id"/></td>
+                                <td>$!s.getMethodName($defaultLanguage)</td>
+                                <td style="text-align:center;padding:0;">
+                                    #checkbox('shippingMethodActive' $s.active)
+                                </td>
+                                <td style="text-align:center;padding:0;">
+                                    #radiobox('shippingMethodDefault' $s.defaultMethod)
+                                </td>
+                                <td><a class="delete-row" href="$urlDelete"></a></td>
+                            </tr>
+                        #end
+                    </table>
+                #else
+                    <div class="info">
+                        <h2>#label('admin.shipping.live.methods')</h2>
+
+                        <p>#label('admin.shipping.live.methods.not.found')</p>
+                    </div>
+                #end
+                <div class="button-bar">
+                    <button type="submit"><span class="ok">#label('admin.update')</span></button>
+                </div>
+            </form>
+            <div class="formulario">
+                <h2 class="block-title">#label('add.shipping.method')</h2>
+                #surl('id=urlForm2' "action=saveshipping")
+                <form action="$urlForm2" method="post">
+                    #langSelector()
+                    <table class="formulario">
+                        <tr>
+                            <th>#label('admin.select')</th>
+                            <td>
+                                <select name="shippingNew" class="field string-medium">
+                                    #foreach($serv in $services)
+                                        #foreach($m in $serv.shippingMethods)
+                                            <option value="$!serv.name||$!m.code">$!serv.name - $!m.name</option>
+                                        #end
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>#label('admin.custom.name')</th>
+                            <td>
+                                <input type="text" name="vis_methodName" class="multilang field string-medium" value=""/>
+                                #foreach($l in $languages )
+                                    <input type="hidden" class="$l" name="methodName" value=""/>
+                                #end
+                            </td>
+                            <td>
+                                <button type="submit"><span class="ok">#label('add.method')</span></button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#tabShipping').tabs({selected:0,
+            select: function(event, ui) {
+                var url = jQuery.data(ui.tab, 'load.tabs');
+                if (url) {
+                    location.href = url;
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

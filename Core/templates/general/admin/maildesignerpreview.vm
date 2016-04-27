@@ -1,0 +1,5 @@
+#if ($util.isNotEmpty($preview))
+    $!preview
+#else
+    $!error
+#end

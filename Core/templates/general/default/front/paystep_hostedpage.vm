@@ -1,0 +1,30 @@
+#if ($dataMap.containsKey("__iframe"))
+<div id="blockContent" class="paystep-hostedpage">
+    <iframe src="$!{dataMap.get('__iframe')}" width="490" height="565" border="0" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+
+</div>
+#else
+<div id="blockContent" class="paystep-hostedpage">
+
+    <!-- teque sobre la redireccion -->
+    <div class="loading" style="display: block !important;">
+        <h2>#label('redirecting.to.payment.page')</h2>
+        <p>#label('redirecting.to.payment.page.text')</p>
+
+
+        <p>#label('for.manual.redirection.press.button')</p>
+        <form id="paymentForm" action="$!dataMap.get('__url')" method="$!dataMap.get('__method')">
+            #foreach($f in $dataMap.keySet())
+                #if(!$f.startsWith("__"))
+                    <input type="hidden" name="$!f" value="$!dataMap.get($f)"/>
+                #end
+            #end
+            <button type="submit"><span>#label('pay.now')</span></button>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){ $('#paymentForm').submit(); });
+</script>
+#end
+

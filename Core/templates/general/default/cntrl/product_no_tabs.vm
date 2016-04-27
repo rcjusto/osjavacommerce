@@ -1,0 +1,147 @@
+#set($rebate = $product.rebate )
+<div id="productTabs">
+    #if($util.isNotEmpty($productLang.information))
+        <div class="information">
+            <div class="title">#label('information')</div>
+            <div>$!{productLang.information}</div>
+        </div>
+    #end
+    #if($util.isNotEmpty($productLang.features))
+        <div class="features">
+            <div class="title">#label('features')</div>
+            <div>$!{productLang.features}</div>
+        </div>
+    #end
+    #if($productAttributes && $util.isNotEmpty($productAttributes))
+        <div class="specifications">
+            <div class="title">#label('specifications')</div>
+            <div>
+                <table>
+                    #foreach($att in $productAttributes)
+                        <tr>
+                            <th>$!att.attribute.getAttributeName($locale.language)</th>
+                            <td>$!att.propertyValue</td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+        </div>
+    #end
+    #if($rebate)
+        <div id="tabRebate" class="rebate">
+            <div class="title">#label('product.rebate')</div>
+            <div>
+                <h2>$!rebate.getResourceName($locale.language)</h2>
+                <h4>-$!action.formatActualCurrency($rebate.resourceValue)) valid until $!util.formatDate($rebate.resourceDate, $locale.language)</h4>
+
+                <p>$!rebate.getResourceDescription($locale.language)</p>
+                <a href="$!action.url('resource','',$util.toMap(['idResource',$!rebate.id.toString()]))" target="_blank">#label('more.info')</a>
+            </div>
+        </div>
+    #end
+    <div id="tabReviews">
+        <div class="title">#label('reviews')</div>
+        <div class="clearfix">
+            #if($util.isNotEmpty($reviews.listado))
+                <div class="reviews-data">
+                    <div class="reviews-rating">#label('product.customer.rating') $!util.formatNumber($productReviewsAverage,'0.0') / 10</div>
+                    <div class="reviews-total">#label('product.customer.reviews') $!reviews.totalRows</div>
+                </div>
+            #end
+            <div class="reviews-add">
+                <p>#label('product.review.add.text')</p>
+                <a href="#" onclick="return addReview();">#label('product.review.add')</a>
+            </div>
+        </div>
+        #if($util.isNotEmpty($reviews.listado))
+            <div id="productReviewList" class="clearfix">
+                #parse('/WEB-INF/views/front/product_reviews.vm')
+            </div>
+        #end
+    </div>
+    #if($productStaticTexts.get('tabs') && $util.isNotEmpty($productStaticTexts.get('tabs')))
+        #foreach($st in $productStaticTexts.get('tabs'))
+            <div class="$!st.id">
+                <div class="title">$!st.staticText.getTitle($locale.language)</div>
+                <div>$!st.staticText.getLanguage($locale.language).value</div>
+            </div>
+        #end
+    #end
+</div>
+<div id="productReviewNew" class="add-review" style="display:none;">
+    #surl('id=urlFormAddReview' "action=addreview")
+    <form action="$urlFormAddReview" method="post">
+        #stoken()
+        #shidden('name=code' "value=$!product.urlCode")
+        <div class="dialog-header">
+            <h2>#label('product.review.add.title')</h2>
+            <h4>#label('product.review.add.subtitle')</h4>
+        </div>
+        <div class="dialog-data">
+            <table>
+                #set($revCategories = $util.split($action.getParentProperty($product.category,'reviewCategories'),','))
+                #if($revCategories)
+                    #foreach($revC in $revCategories)
+                        <tr>
+                            <th><input type="hidden" name="review_score_name" value="$!revC"/>#label("$revC")</th>
+                            <td>
+                                <div id="stars-$velocityCount" class="stars">
+                                    <input type="radio" value="1"/>
+                                    <input type="radio" value="2"/>
+                                    <input type="radio" value="3"/>
+                                    <input type="radio" value="4"/>
+                                    <input type="radio" value="5"/>
+                                    <input type="radio" value="6"/>
+                                    <input type="radio" value="7"/>
+                                    <input type="radio" value="8"/>
+                                    <input type="radio" value="9"/>
+                                    <input type="radio" value="10"/>
+                                </div>
+                                <span id="cap-stars-$velocityCount" class="review-value"></span>
+                                <input type="hidden" id="input-stars-$velocityCount" name="review_score_value" value="0"/>
+                            </td>
+                        </tr>
+                    #end
+                #else
+                    <tr>
+                        <th>#label('review.score')</th>
+                        <td>
+                            <div id="stars-1" class="stars">
+                                <input type="radio" value="1"/>
+                                <input type="radio" value="2"/>
+                                <input type="radio" value="3"/>
+                                <input type="radio" value="4"/>
+                                <input type="radio" value="5"/>
+                                <input type="radio" value="6"/>
+                                <input type="radio" value="7"/>
+                                <input type="radio" value="8"/>
+                                <input type="radio" value="9"/>
+                                <input type="radio" value="10"/>
+                            </div>
+                            <span id="cap-stars-1" class="review-value"></span>
+                            <input type="hidden" id="input-stars-1" name="review.averageScore" value="0"/>
+                        </td>
+                    </tr>
+                #end
+                #if($frontUser) #else
+                    <tr>
+                        <th>#label('review.username')</th>
+                        <td><input type="text" name="review.userName" value="" class="field string-500"/></td>
+                    </tr>
+                #end
+                <tr>
+                    <th>#label('review.title')</th>
+                    <td><input type="text" name="review.title" value="" class="field string-500"/></td>
+                </tr>
+                <tr>
+                    <th>#label('review.content')</th>
+                    <td><textarea name="review.opinion" class="field string-500" rows="6"></textarea></td>
+                </tr>
+            </table>
+        </div>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('review.send')</span></button>
+            <button type="button" onclick="$('#productReviewNew').dialog('close')"><span class="cancel">#label('cancel')</span></button>
+        </div>
+    </form>
+</div>

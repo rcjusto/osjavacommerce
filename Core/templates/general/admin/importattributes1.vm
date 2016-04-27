@@ -1,0 +1,55 @@
+<div class="dialog-header">
+    <h2>#label('admin.product.import.attributes.step1')</h2>
+    <h4>#label('admin.product.import.attributes.step1.text')</h4>
+</div>
+<div class="dialog-data" style="padding:0 10px;height:340px;">
+    <form id="formImport2" class="validable">
+        <div class="formulario" style="margin-top:8px;">
+            #formErrors()
+            #if($tableToImport && $tableToImport.size()>0)
+                <table class="formulario" cellpadding="0" cellspacing="0" style="border-bottom:1px dotted gray;border-left:1px dotted gray;margin-bottom:8px;">
+                    <tr>
+                        #foreach($index in [1..$tableColumns])
+                        <td style="padding:0!important;border-top:1px dotted gray;border-right:1px dotted gray;">
+                            <select name="fieldAction" class="field" style="width:100%;font-weight:bold;">
+                                <option value="">#label('admin.omit.this.column')</option>
+                                <option value="name" #if($velocityCount==0) selected="selected" #end>#label('admin.attribute.names')</option>
+                                <option value="value" #if($velocityCount==1) selected="selected" #end>#label('admin.attribute.values')</option>
+                            </select>
+                        </td>
+                        #end
+                    </tr>
+                    #foreach($table in $tableToImport)
+                        #foreach($row in $table)
+                            #if($row.size()>1)
+                                <tr>#foreach($index in [0..$math.sub($tableColumns,1)])
+                                        <td style="border-top:1px dotted gray;border-right:1px dotted gray;background-color:#fefefe;">
+                                        #if($row.size()>$index)
+                                            $!list.get($row,$index)
+                                        #else
+                                            &nbsp;
+                                        #end
+                                            <input type="hidden" name="column$index" value="$!list.get($row,$index)" />
+                                        </td>
+                                    #end
+                                </tr>
+                            #end
+                        #end
+                    #end
+                </table>
+            #else
+                <div class="error">
+                    <h2>#label('admin.import.error')</h2>
+                    <p>#label('admin.import.pasted.text.do.not.contains.table')</p>
+                </div>
+            #end
+        </div>
+    </form>
+</div>
+<div class="button-bar">
+    #if($tableToImport && $tableToImport.size()>0)
+    <button id="dialogBtnOk" type="button" onclick="importHtmlStep2();"><span class="next">#label('admin.next.step')</span></button>
+    #end
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+

@@ -1,0 +1,161 @@
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+#set($rebate = $product.rebate )
+
+<div id="blockContent" class="product-page clearfix">
+
+    <div class="product-centercol">
+
+        <!-- Breadcrumb -->
+        #surl('id=urlProduct' "action=product" "code=$!product.urlCode" 'forceAddSchemeHostAndPort=true')
+        <div id="productUrl">#label('visit.this.page') <a href="$!urlProduct">$!urlProduct</a></div>
+
+        <div class="clearfix">
+            #set($image = $imageResolver.getImageForProduct($product,''))
+            #if(!$list.isEmpty($images))
+                <div id="productImages">
+                    <div class="image"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/></div>
+                </div>
+            #end
+
+            <div id="productData" #if(!$list.isEmpty($images)) class="data-to-right" #end>
+                <div class="name">$!{productLang.productName}</div>
+                <div class="code">$!{product.partNumber}</div>
+                #if ($action.canShowStock)
+                <div class="stock">
+                    #if($product.stock>0)
+                        #label('on.stock')
+                    #else
+                        #if($util.isNotEmpty($product.eta))
+                            #label('backorder.until') $!product.eta
+                        #else
+                            #label('out.of.stock')
+                        #end
+                    #end
+                </div>
+                #end
+                <div class="description">$!{productLang.description}</div>
+
+                #if($action.canShowPrices)
+                <div class="prices clearfix">
+
+                    <!-- Old Price -->
+                        <!-- NOT USED IN THIS TEMPLATE
+                        #if($util.isNotEmpty($product.oldPrice))
+                <div class="old-price">#label('product.old.price') $!action.formatActualCurrency($product.oldPrice)</div>
+                        #end
+                        -->
+
+                    #if($priceMap.containsKey('OFFER'))
+                        <!-- Offer -->
+                        <div class="price">
+                            <div class="offer-price">#fancyPrice($action.toActualCurrency($priceMap.get('FINAL_OFFER_PRICE')))</div>
+                            <div class="offer-end">#label('product.offer.until') $!util.formatDate($priceMap.get('OFFER').dateTo, $locale.language)</div>
+                        </div>
+                        <div class="other-prices">
+                            <div class="our-price">#label('product.our.price') $!action.formatActualCurrency($priceMap.get('FINAL_PRICE'))</div>
+                            #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                                <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                                <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST')))</div>
+                            #else
+                                <div class="offer-save">#label('product.offer.save') $!action.formatActualCurrency($priceMap.get('OFFER_DISCOUNT'))</div>
+                            #end
+                        </div>
+                    #else
+                        <!-- Final Price Without Offer -->
+                        <div class="price">$!action.formatActualCurrency($priceMap.get('FINAL_PRICE')))</div>
+                        <!-- List Price -->
+                        <div class="other-prices">
+                            #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                                <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                                <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST'))</div>
+                            #end
+                        </div>
+                    #end
+
+                    <!-- Volume Prices -->
+                    #if($util.isNotEmpty($priceMap.get('VOLUME_LIST')))
+                        <div class="volume-price">
+                            <ul>
+                                #foreach($vp in $priceMap.get('VOLUME_LIST'))
+                                    <li>
+                                        #label('product.volume.buy')
+                            $!vp.volume
+                            #label('product.volume.at')
+                            $!action.formatActualCurrency($vp.unitPrice)
+                            #label('product.volume.eachone')
+                                    </li>
+                                #end
+                            </ul>
+                        </div>
+                    #end
+                </div>
+                #end
+
+                <div class="clearfix">
+
+                    #set($productLabels = $action.getProductLabels($product))
+                    #if($util.isNotEmpty($productLabels))
+                        <div class="labels">
+                            <ul>
+                                #foreach($lab in $productLabels)
+                                    #if($util.isNotEmpty($lab.getContentDetail($locale.language)))
+                                        <li>$!lab.getContentDetail($locale.language)</li>
+                                    #end
+                                #end
+                            </ul>
+                        </div>
+                    #end
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="productTabs">
+
+            #if($util.isNotEmpty($productLang.information))
+                <h2>#label('information')</h2>
+                <div>$!productLang.information</div>
+            #end
+            #if($util.isNotEmpty($productLang.features))
+                <h2>#label('features')</h2>
+                <div>$!productLang.features</div>
+            #end
+            #if($rebate)
+                <h2>#label('product.rebate')</h2>
+                <div>
+                    <h3>$!rebate.getResourceName($locale.language)</h3>
+                    <h4>-$!action.formatActualCurrency($rebate.resourceValue) valid until $!util.formatDate($rebate.resourceDate, $locale.language)</h4>
+                    <p>$!rebate.getResourceDescription($locale.language)</p>
+                </div>
+            #end
+
+            #if($productStaticTexts.get('tabs') && $util.isNotEmpty($productStaticTexts.get('tabs')))
+                #foreach($st in $productStaticTexts.get('tabs'))
+                    <h2>$!st.staticText.getTitle($locale.language)</h2>
+                    <div>$!st.staticText.getLanguage($locale.language).value</div>
+                #end
+            #end
+
+            #if($util.isNotEmpty($reviews.listado))
+                <h2>#label('reviews')</h2>
+                <div id="productReviews">
+                <div class="clearfix">
+                    <div class="reviews-data">
+                        <div class="reviews-rating">#label('product.customer.rating') $!util.formatNumber($product.ratingBy,'0.0') / 10</div>
+                        <div class="reviews-total">#label('product.customer.reviews') $!reviews.totalRows</div>
+                    </div>
+                </div>
+                <div id="productReviewList" class="clearfix">
+                    #parse('/WEB-INF/views/front/product_reviews.vm')
+                </div>
+                </div>
+            #end
+
+        </div>
+
+    </div>
+
+</div>

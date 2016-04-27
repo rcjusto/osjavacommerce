@@ -1,0 +1,83 @@
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>#label('admin.resource.list')</h1>
+<div class="listado">
+    #surl('id=urlformfilter' "action=listresource")
+    <form id="form_filter" action="$urlformfilter" method="post">
+        <div id="filterContainer" class="filters formulario">
+            #formErrors()
+            <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
+                <tr>
+                    <th>#label('admin.resource.type')</th>
+                    <td>
+                        <select name="filterResourceType" class="field string-medium">
+                            <option value="">[ no filter ]</option>
+                            #foreach($opt in ['rebate','other'])
+                                <option #if($filterResourceType==$opt) selected="selected" #end  value="$opt">#label("resource.type.$!{opt}")</option>
+                            #end
+                        </select>
+                    </td>
+                    <th>#label('admin.resource.name')</th>
+                    <td>#stextfield('name=filterResourceName' 'cssClass=field string-medium')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.items.per.page')</th>
+                    <td>
+                        <select onchange="$('#$!{resources.name}_pagerows').val($(this).val());" class="field myselect string-short">
+                            #foreach($opt in [10,20,30,40,50,60,70,80,90,100])
+                                #if($opt==$resources.pageRows)
+                                    <option value="$opt" selected="selected">$opt</option>
+                                #else
+                                    <option value="$opt">$opt</option>
+                                #end
+                            #end
+                        </select>
+                    </td>
+                    <th colspan="2">
+                        <button type="submit"><span class="search">#label('admin.update')</span></button>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        #if($util.isNotEmpty($resources.listado))
+            #set($nav=$resources)
+            #parse('/WEB-INF/views/admin/navigator.vm')
+            <table class="listado" cellspacing="0" cellpadding="0" width="100%">
+                <tr>
+                    <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
+                    <th>#label('admin.id')</th>
+                    <th>#label('admin.type')</th>
+                    <th>#label('admin.name')</th>
+                    <th>#label('admin.filename')</th>
+                    <th>&nbsp;</th>
+                </tr>
+                #foreach($r in $resources.listado)
+                    #surl('id=urlEdit' "action=editresource" "idResource=$!r.id")
+                    <tr>
+                        <td style="text-align:center;"><input type="checkbox" class="selecteds" name="delResources" value="$!r.id" /></td>
+                        <td>$!r.id</td>
+                        <td>#label("resource.type.$!r.resourceType")</td>
+                        <td>$!r.getResourceName($defaultLanguage)</td>
+                        <td>$!r.fileName &nbsp;</td>
+                        <td class="link-bar"><a href="$urlEdit"><span class="edit">#label('admin.modify')</span></a></td>
+                    </tr>
+                #end
+            </table>
+        #else
+            <div class="info">
+                <h2>#label('admin.resources')</h2>
+
+                <p>#label('admin.resources.not.found')</p>
+            </div>
+        #end
+
+    <div class="button-bar">
+        #if($util.isNotEmpty($resources.listado))
+            <button type="submit"><span class="del">#label('admin.remove.selected')</span></button>
+        #end
+        <button type="button" href="$action.url('editresource','admin')"><span class="add">#label('admin.resource.new')</span></button>
+    </div>
+    </form>
+
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

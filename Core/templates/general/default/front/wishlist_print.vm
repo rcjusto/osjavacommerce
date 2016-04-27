@@ -1,0 +1,38 @@
+<div id="wishListProducts">
+
+    #if($wishlist && $util.isNotEmpty($wishlist))
+        <h1>#label('items.in.wishlist')</h1>
+        <table class="listado">
+            #foreach($p in $wishlist)
+                #set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+                #surl('id=urlProd' "action=product" "code=$p.urlCode")
+                #set($image = $imageResolver.getImageForProduct($p,'list/'))
+                #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)" )) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                <tr>
+                    <td class="cellimage"><img src="$srcImg"/></td>
+                    <td class="name">$!p.partNumber<br/>$!p.getProductName($locale.language)</td>
+                    <td class="price">$!action.formatActualCurrency($price)</td>
+                    <td class="status">
+                        #if($p.stock>0)
+                                         #label('on.stock')
+                        #else
+                            #if($util.isNotEmpty($p.eta))
+                                #label('backorder.until') $!p.eta
+                            #else
+                                #label('out.of.stock')
+                            #end
+                        #end
+                    </td>
+                </tr>
+            #end
+        </table>
+    #else
+        <div class="info">
+            <h2>Wish List</h2>
+
+            <p>There's no items in your Wish List.</p>
+        </div>
+    #end
+
+</div>
+

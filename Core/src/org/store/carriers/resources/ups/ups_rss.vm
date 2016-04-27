@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RatingServiceSelectionRequest xml:lang="en-US">
+	<Request>
+		<TransactionReference>
+			<CustomerContext>$!bean.customerContext</CustomerContext>
+			<XpciVersion>$!bean.xpciVersion</XpciVersion>
+		</TransactionReference>
+		<RequestAction>$!bean.requestAction</RequestAction>
+		<RequestOption>$!bean.requestOption</RequestOption>
+	</Request>
+	<PickupType>
+		<Code>$!bean.pickupType</Code>
+	</PickupType>
+	<CustomerClassification>
+		<Code>$!bean.customerClassification</Code>
+	</CustomerClassification>
+	<Shipment>
+		<Shipper>
+			<Name>$!bean.shipper.name</Name>
+			<AttentionName>$!bean.shipper.attentionName</AttentionName>
+			<ShipperNumber>$!bean.shipper.shipperNumber</ShipperNumber>
+			<PhoneNumber>$!bean.shipper.phoneNumber</PhoneNumber>
+            <Address>
+				<AddressLine1>$!bean.shipper.address.addressLine1</AddressLine1>
+				<AddressLine2>$!bean.shipper.address.addressLine2</AddressLine2>
+				<City>$!bean.shipper.address.city</City>
+				<StateProvinceCode>$!bean.shipper.address.stateProvinceCode</StateProvinceCode>
+				<PostalCode>$!bean.shipper.address.postalCode</PostalCode>
+				<CountryCode>$!bean.shipper.address.countryCode</CountryCode>
+			</Address>
+		</Shipper>
+		<ShipTo>
+            <Name>$!tool.escapeXml($bean.shipTo.companyName)</Name>
+            <AttentionName>$!bean.shipTo.attentionName</AttentionName>
+            <StructuredPhoneNumber>
+                <PhoneCountryCode>$!bean.shipTo.phoneNumber.phoneCountryCode</PhoneCountryCode>
+                <PhoneDialPlanNumber>$!bean.shipTo.phoneNumber.phoneDialPlanNumber</PhoneDialPlanNumber>
+                <PhoneLineNumber>$!bean.shipTo.phoneNumber.phoneLineNumber</PhoneLineNumber>
+            </StructuredPhoneNumber>
+			<Address>
+                <AddressLine1>$!bean.shipTo.address.addressLine1</AddressLine1>
+                <AddressLine2>$!bean.shipTo.address.addressLine2</AddressLine2>
+				<City>$!bean.shipTo.address.city</City>
+				<StateProvinceCode>$!bean.shipTo.address.stateProvinceCode</StateProvinceCode>
+				<PostalCode>$!bean.shipTo.address.postalCode</PostalCode>
+				<CountryCode>$!bean.shipTo.address.countryCode</CountryCode>
+			</Address>
+		</ShipTo>
+		<ShipmentWeight>
+			<UnitOfMeasurement>$!bean.packProps.dimensionalWeightUnitOfMeasurementCode</UnitOfMeasurement>
+			<Weight>$!bean.totalWeight</Weight>
+		</ShipmentWeight>
+        #foreach( $pack in $bean.packages )
+        <Package>
+			<PackagingType>
+				<Code>$!bean.packProps.packagingTypeCode</Code>
+			</PackagingType>
+			<Dimensions>
+				<UnitOfMeasurement>
+					<Code>$!bean.packProps.dimensionsUnitOfMeasurementCode</Code>
+				</UnitOfMeasurement>
+				<Length>$!tool.roundToInt($pack.dimensionsLength)</Length>
+				<Width>$!tool.roundToInt($pack.dimensionsWidth)</Width>
+				<Height>$!tool.roundToInt($pack.dimensionsHeight)</Height>
+			</Dimensions>
+			<DimensionalWeight>
+				<UnitOfMeasurement>
+					<Code>$!bean.packProps.dimensionalWeightUnitOfMeasurementCode</Code>
+				</UnitOfMeasurement>
+			</DimensionalWeight>
+			<PackageWeight>
+				<UnitOfMeasurement>
+					<Code>$!bean.packProps.packageWeightUnitOfMeasurementCode</Code>
+				</UnitOfMeasurement>
+				<Weight>$!tool.format($pack.packageWeight, '0.##')</Weight>
+			</PackageWeight>
+			#if( $pack.oversizePackage ) <OversizePackage>$!pack.oversizePackage</OversizePackage> #end
+			<PackageServiceOptions>
+				#if( $!bean.shipTo.address.countryCode=='US' )
+                <DeliveryConfirmation>
+					<DCISType>$!bean.packProps.deliveryConfirmationDCISType</DCISType>
+				</DeliveryConfirmation>
+                #end
+                <InsuredValue>
+					<CurrencyCode>$!pack.currencyCode</CurrencyCode>
+					<MonetaryValue>$!tool.format($pack.insuredValueMonetaryValue, '0.##')</MonetaryValue>
+				</InsuredValue>
+			</PackageServiceOptions>
+		</Package>
+        #end
+        <ShipmentServiceOptions>
+			#if( $bean.saturdayDeliveryIndicator )<SaturdayDeliveryIndicator />#end
+		</ShipmentServiceOptions>
+	</Shipment>
+</RatingServiceSelectionRequest>

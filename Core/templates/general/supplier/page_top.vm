@@ -1,0 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"> 
+<html>
+<head>
+    #parse('/WEB-INF/views/supplier/head.vm')
+</head>
+<body>
+<div id="all">
+    <div id="header">#parse('/WEB-INF/views/supplier/top.vm')</div>
+    <div class="clearfix">
+        <div id="menu">#parse('/WEB-INF/views/supplier/menu.vm')</div>
+        <div id="content">
+            <h1>#label('admin.supplier') $!provider.providerName </h1>
+

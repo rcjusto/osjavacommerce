@@ -1,0 +1,6 @@
+#if($action.getStoreProperty('allow.registrations','Y')=='Y')
+    #set( $contentPage = "/WEB-INF/views/${template}/front/register.vm" )
+#else
+    #set( $contentPage = "/WEB-INF/views/${template}/front/onlylogin.vm" )
+#end
+#parse("/WEB-INF/views/${template}/front/layout_default.vm")

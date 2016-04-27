@@ -1,0 +1,321 @@
+#* @vtlvariable name="decorator" type="org.store.template.TemplateDecorator" *#
+#macro(template_block_element)
+    #parse('/WEB-INF/views/org/store/template/views/template_block_element.vm')
+#end
+#macro(zone $name $params)
+    #if($zoneInfo)
+    <block name="$!name" params="$!params"/>
+    #else
+        #parse("/WEB-INF/views/$!{template}/front/zone_$!{name}.vm")
+    #end
+#end
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    ul {list-style: none inside;margin: 0;padding: 0;}
+    td.column {border: 1px solid #cccccc;background-color: #fbfbfb;vertical-align: top;position: relative;}
+    td.column h3 {padding: 2px 8px 0 8px;margin: 0;font-size: 8pt;font-weight: lighter;color: #035ba9;}
+    .column-header h3 {float: left;}
+    .column-header a {float: right;font-size: 8pt;padding: 2px 8px;}
+    .column-content {display: none;}
+    td.td-left,td.td-right {width: 30%;}
+    td.td-center {width: 40%;}
+    ul.column {margin:0;padding: 0;list-style: none;}
+    td.column button {margin:6px;}
+    ul.column li {margin: 5px;border: 1px solid #cccccc;background: #eeeeee;padding: 4px 12px;}
+    ul.column li a.edit-block {float: right;background: url("/struts/css/images/ui-icons_222222_256x240.png") no-repeat -64px -112px; width: 16px; height: 16px;display: block;margin-right: 0px;margin-top: -3px;}
+    ul.column li a.remove-block {float: right;background: url("/struts/css/images/ui-icons_222222_256x240.png") no-repeat -80px -128px; width: 16px; height: 16px;display: block;margin-right: -10px;margin-top: -3px;}
+    ul.column li h4 {margin: 0;padding: 0;}
+    ul.column li div {font-size: 8pt;}
+    .place-holder {border: 1px dashed #0d8bd7 !important;background: #ffffff none !important;height: 10px;}
+    .all-zones {list-style: none;margin: 0;padding: 0;}
+    .all-zones li {margin: 0;padding: 4px 8px;border-bottom: 1px solid #cccccc;}
+    .all-zones li.hover {background-color: #0d5c9f !important;color: #ffffff;}
+    .all-zones li.hover a {color: #ffffff !important}
+    .all-zones li h4 {padding: 0;margin: 0;}
+    .all-zones li div {display: none;}
+    .all-zones li a.remove-block,.all-zones li a.edit-block {display: none;}
+    td.not-used {width: 1% !important;border: 1px solid #fbfbfb;}
+    td.not-used div.column-header {display: block;}
+    td.not-used h3 {display: block;-webkit-transform: rotate(90deg);-moz-transform: rotate(90deg);-ms-transform: rotate(90deg);-o-transform: rotate(90deg);transform: rotate(90deg);position:absolute;width: 200px;top:116px;right: -100px;color: #aaaaaa;}
+    td.not-used div.block-content {display: none; }
+    div.inline-editor {position: relative; display: none;border: 1px solid #006ab1;background: #ffffff;margin: 0;width: 132px!important;height: 16px !important;}
+    div.inline-editor input {width: 100px;font-size: 9pt;padding:0;margin:0;border: none;position: absolute;height: 14px;}
+    div.inline-editor a.ie-ok {width: 16px;height: 16px;background: url("/struts/css/images/ie_ok.png") no-repeat 0 50%;display: inline-block;position: absolute;right: 16px;top: 0;}
+    div.inline-editor a.ie-cancel {width: 16px;height: 16px;background: url("/struts/css/images/ie_cancel.png") no-repeat 0 50%;display: inline-block;position: absolute;right: 0;top:0;}
+
+    div.popup-help-options {background-color: #333333;border: 1px solid #333333;}
+    div.popup-help-options ul {margin: 0;padding: 0;list-style: none}
+    div.popup-help-options li {margin: 0;padding: 0;border: 0;}
+    div.popup-help-options li a {background-color: #333333;display: block;padding: 2px 8px;font-size: 10pt;color: #ffffff;text-decoration: none;}
+    div.popup-help-options li a:hover {background-color: #ffffff;color: #333333;text-decoration: none}
+    ul.my-tab li {float: left;padding: 8px 20px;background-color: #e0e0e0;margin-right: 6px;}
+    ul.my-tab li.selected {float: left;background-color: #f8f8f8;}
+    ul.my-tab li a {color: #333333;text-decoration: none;}
+</style>
+
+<h1>#label('edit.template'): $!templateConfig.name</h1>
+
+<ul class="my-tab clearfix">
+    <li class="selected">#label('page.layouts')</li>
+    <li><a href="$!action.url('custom_template_edit_skin','admin',$util.map.add('templateCode',$!templateConfig.code))" target="_blank">Skins</a></li>
+</ul>
+<form id="formfilter" action="$!action.url('custom_template_edit_template','admin')" method="post">
+    <input type="hidden" name="templateCode" value="$!templateConfig.code" />
+    <div class="filters formulario">
+        <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="960">
+            <tr>
+                <th>#label('select.page')</th>
+                <td>
+                    <select name="pageName" class="field string-medium reload-form">
+                        #foreach($opt in ['home','listing','detail','shopcart','register','profile','wishlist','orders','order','checkout','rmaorder','rmadetail','payresult','login','anonymous_login','compare'])
+                        <option value="$opt" #if($opt==$pageName) selected="selected" #end>$opt</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</form>
+
+<div class="clearfix" style="width: 900px;">
+    <table cellspacing="10" class="template-editor" width="100%">
+        <tr>
+            <td class="column" colspan="3">
+                <div class="column-header clearfix">
+                    <h3>#label('header.block') #label('common.to.all.pages')</h3>
+                    <a href="#">#label('show.hide')</a>
+                </div>
+                <div class="column-content">
+                   <ul class="column column-top" data="page_header" style="min-height: 100px;">
+                    #foreach($z in $decorator.getZoneContent("page_header"))
+                        #set($zone = $decorator.controls.getZone($!z.name))
+                        #template_block_element()
+                    #end
+                    </ul>
+                    <button type="button" data="column-top" class="add-zone"><span class="add">#label('add.element')</span></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="column" colspan="3">
+                <div class="column-header clearfix">
+                   <h3>#label('top.menu.block') #label('common.to.all.pages')</h3>
+                    <a href="#">#label('show.hide')</a>
+                </div>
+                <div class="column-content">
+                    <ul class="column column-menu" data="page_top_menu" style="min-height: 100px;">
+                    #foreach($z in $decorator.getZoneContent("page_top_menu"))
+                        #set($zone = $decorator.controls.getZone($!z.name))
+                        #template_block_element()
+                    #end
+                </ul>
+                <button type="button" data="column-menu" class="add-zone"><span class="add">#label('add.element')</span></button>
+                </div>
+              </td>
+        </tr>
+        <tr>
+            #foreach($column in ['left','center','right'])
+                #set($zoneContent = $decorator.getZoneContent("$!{pageName}_$!{column}"))
+                <td class="column td-${column}">
+                    <div class="column-header clearfix">
+                        #if($column!='center')<input style="float: right;" class="use-column" type="checkbox" value="$!column" #if($util.isNotEmpty($zoneContent)) checked="checked" #end  title="$!action.getText('check.to.show.column')">#end
+                        <h3>$column #label('column')</h3>
+                    </div>
+                    <div class="block-content">
+                      <ul class="column column_$column" data="$!{pageName}_$!{column}" style="min-height: 300px;">
+                        #foreach($z in $zoneContent)
+                            #set($zone = $decorator.controls.getZone($!z.name))
+                            #template_block_element()
+                        #end
+                    </ul>
+                 <button type="button" data="column_${column}" class="add-zone"><span class="add">#label('add.element')</span></button>
+                 </div>
+                </td>
+            #end
+        </tr>
+        <tr>
+            <td class="column" colspan="3">
+                <div class="column-header clearfix">
+                    <h3>#label('footer.block') #label('common.to.all.pages')</h3>
+                    <a href="#">#label('show.hide')</a>
+                </div>
+                <div class="column-content">
+                    <ul class="column column-footer" data="page_footer" style="min-height: 100px;">
+                    #foreach($z in $decorator.getZoneContent("page_footer"))
+                        #set($zone = $decorator.controls.getZone($!z.name))
+                        #template_block_element()
+                    #end
+                    </ul>
+                    <button type="button" data="column-footer" class="add-zone"><span class="add">#label('add.element')</span></button>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button id="btnSave" type="button" onclick="save()"><span class="ok">#label('admin.save')</span></button>
+        <div id="divSaving" class="loading" style="display: none;">
+            <h2>#label('saving template')</h2>
+            <p>#label('please.wait')</p>
+        </div>
+    </div>
+</div>
+<div id="myDialog" class="dialog" style="display: none;">
+    <div class="dialogContent">
+        <div class="dialog-header">
+            <h2>#label('add.block')</h2>
+            <h4>#label('click.a.block.to.select')</h4>
+        </div>
+        <div class="dialog-data" style="height: 300px;">
+            <ul class="all-zones">
+                #foreach($z in $decorator.controls.controls)
+                    <li class="hoverable #if($util.isNotEmpty($z.pages)) for-page $z.pages.replace(',',' ')  #end" data="$!z.name">
+                        <a style="float: right;" href="#" class="insert-zone">#label('admin.insert')</a>
+                        <a class="remove-block" href="#" title="Remove block"></a>
+                        <a class="edit-block" href="#" title="Edit block"></a>
+                        <h4>$!z.description</h4>
+                        #if($z.parametersArr)
+                            #foreach($p in $z.parametersArr)
+                                <div data="" name="$!p"><span class="label">#label("zone.parameter.${p}")</span>: <a title="$!action.getText('click.to.change.attribute.value')" href="#" class="change-att-value">[$!action.getText('none')]</a><div class="inline-editor"></div></div>
+                            #end
+                        #end
+                    </li>
+                #end
+            </ul>
+        </div>
+        <div class="button-bar">
+            <button type="button" onclick="$('#myDialog').dialog('close');"><span class="cancel">#label('admin.cancel')</span></button>
+        </div>
+
+    </div>
+</div>
+<form id="formSave">
+    <input type="hidden" name="skinName" value="$!skinName"/>
+    <input type="hidden" name="pageName" value="$!pageName"/>
+    <input type="hidden" name="templateCode" value="$!templateConfig.code"/>
+</form>
+<script type="text/javascript" src="/struts/js/jquery.options.js"></script>
+<script type="text/javascript">
+    var ieOptions = $!ieOptions;
+    ieOptions['noOfBanners'] = [1,2,3,4,5,6,7,8,9,10,11,12];
+    $(function(){
+        $('.reload-form').change(function(){ $('#formfilter').submit(); });
+        $( "ul.column" ).sortable({
+            placeholder: "place-holder",
+            helper: 'clone',
+            connectWith: "ul.column",
+            sort: function(event, ui){
+                if (ui.item.hasClass('fixed')) {
+                    return false;
+                }
+            },
+            update: function() {
+                save();
+            }
+        });
+        $( "ul.column > li" ).live('mousedown', function(e){
+            e.preventDefault();
+        });
+        $('.column-header a').click(function(){
+           $(this).parent().parent().find('.column-content').toggle();
+            return false;
+        });
+        $('.remove-block').live('click', function(){
+            if (confirm('Remove this block?')) {
+                $(this).parent().remove();
+                save();
+            }
+        });
+        $('.add-zone').click(function(){
+            $('#myDialog').data('column',$(this).attr('data'));
+            $('li.for-page').hide();
+            if('column_center'==$(this).attr('data')) {
+                $("li.for-page.$!{pageName}").show();
+            }
+            $('#myDialog').dialog({width:600, modal:true});
+            return false;
+        });
+        $('.insert-zone').click(function(){
+            var li = $(this).parent().clone();
+            if (li!=null) {
+                li.find('a.insert-zone').remove();
+                var ul = $('ul.'+$('#myDialog').data('column'));
+                if (ul.size()>0) {
+                    li.appendTo(ul);
+                    save();
+                }
+            }
+            $('#myDialog').dialog('close');
+            return false;
+        });
+        $('.change-att-value').live('click', function(){
+            var link = this;
+            var div = $(link).parent();
+            var inlineEditor = div.children('div.inline-editor');
+            var input = $('<input>').attr('type','text').val(div.attr('data')).keydown(function(e){
+                if (e.keyCode=='13') {
+                    e.preventDefault();
+                    div.attr('data', input.val());
+                    $(link).html(input.val()!=''?input.val():'[none]').show();
+                    inlineEditor.html('').css('display','none');
+                } else if (e.keyCode=='27') {
+                    inlineEditor.html('').css('display','none');
+                    $(link).show();
+                }
+            }).appendTo(inlineEditor);
+            var linkOk = $('<a>').attr('href','#').addClass('ie-ok').click(function(){
+                div.attr('data', input.val());
+                $(link).html(input.val()!=''?input.val():'[none]').show();
+                inlineEditor.html('').css('display','none');
+                save();
+            }).appendTo(inlineEditor);
+            $('<a>').attr('href','#').addClass('ie-cancel').click(function(){
+                inlineEditor.html('').css('display','none');
+                $(link).show();
+            }).appendTo(inlineEditor);
+            $(link).hide();
+            inlineEditor.css('display','inline-block');
+            if (ieOptions[div.attr('name')] && ieOptions[div.attr('name')].length>0)
+                input.helpOptions(ieOptions[div.attr('name')], {onSelect : function() {
+                    linkOk.trigger('click');
+                }});
+            input.focus();
+            return false;
+        });
+        $('.use-column').change(function(){
+            var td = $(this).parent().parent();
+            if ($(this).is(':checked')) td.removeClass('not-used');
+            else td.addClass('not-used');
+        }).trigger('change');
+    });
+    function save() {
+        var data = $('#formSave').serialize();
+        $('ul.column').each(function(){
+            var zone = $(this).attr('data');
+            if ($(this).parent().parent().hasClass('not-used')) {
+                data += '&zones='+zone;
+                data += '&names=';
+                data += '&attrs=';
+            } else {
+                $(this).children('li').each(function(){
+                    var atts = '';
+                    $(this).children('div').each(function(){
+                        if (atts!='') atts += '|';
+                        atts += $(this).attr('data');
+                    });
+                    data += '&zones='+zone;
+                    data += '&names='+$(this).attr('data');
+                    data += '&attrs='+atts;
+                });
+            }
+        });
+        $('#btnSave').hide();
+        $('#divSaving').show();
+        jQuery.post("$!action.url('custom_template_save_template','admin')", data, function(){
+            $('#divSaving').hide();
+            $('#btnSave').show();
+        });
+    }
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

@@ -1,0 +1,42 @@
+#if($util.isNotEmpty($action.getStoreProperty('google.analytics.code','')))
+#set($gaCode = $action.getStoreProperty('google.analytics.code',''))
+<script type="text/javascript">
+//<![CDATA[
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '$!gaCode']);
+    _gaq.push(['_trackPageview']);
+
+    #if($doGoogleTracking && $order)
+        _gaq.push(['_addTrans',
+            '$!order.idOrder',
+            '$!esc.javascript($action.getStoreProperty("site.name",""))',
+            '$!util.formatNumber($order.total,"0.00")',
+            '$!util.formatNumber($order.totalTax,"0.00")',
+            '$!util.formatNumber($order.totalShipping,"0.00")',
+            '$!esc.javascript($order.billingAddress.city)',
+            '$!esc.javascript($order.billingAddress.state.stateName)',
+            '$!order.billingAddress.idCountry'
+        ]);
+        #foreach($oDetail in $order.getOrderDetails())
+            #foreach($oProduct in $oDetail.getOrderDetailProducts())
+            _gaq.push(['_addItem',
+                '$!order.idOrder',
+                '$!esc.javascript($oProduct.product.partNumber)',
+                '$!esc.javascript($oProduct.product.getProductName($locale.language))',
+                '$!esc.javascript($oProduct.product.getCategory().getCategoryName($locale.language))',
+                '$!util.formatNumber($oDetail.price,"0.00")',
+                '$!oDetail.quantity'
+            ]);
+            #end
+        #end
+        _gaq.push(['_trackTrans']);
+    #end
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+    })();
+//]]>
+</script>
+#end

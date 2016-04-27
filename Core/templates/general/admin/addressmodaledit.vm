@@ -1,0 +1,97 @@
+#surl('id=loadStates' "action=countrystates")
+<div class="dialog-header">
+    <h2>
+        #if ($localizedText.id)
+            #label('admin.modal.address.modify')
+        #else
+            #label('admin.modal.address.new')
+        #end
+    </h2>
+    <h4>#label('admin.modal.address.text')</h4>
+</div>
+<div class="dialog-data" style="padding:0 30px;height:340px;">
+    <form id="dialog_editaddress" class="validable">
+        #shidden('name=idUser' "value=$!user.idUser")
+        #shidden('name=idAddress' "value=$!address.idAddress")
+        <div class="formulario" style="margin-top:8px;">
+            #formErrors()
+            <table class="formulario" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th class="required">#label('admin.nickname')</th>
+                    <td>
+                        #stextfield('name=address.code' 'cssClass=field required string-medium')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.contact.title')</th>
+                    <td>#stextfield('name=address.title' 'cssClass=field required string-char')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.contact.firstname')</th>
+                    <td>#stextfield('name=address.firstname' 'cssClass=field required string-medium')</td>
+                </tr>
+                <tr>
+                    <th>#label('admin.contact.lastname')</th>
+                    <td>#stextfield('name=address.lastname' 'cssClass=field required string-medium')</td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.company')</th>
+                    <td>
+                        #stextfield('name=address.company' 'cssClass=field string-medium')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.country')</th>
+                    <td>
+                        #sselect('id=countryCode' 'name=address.idCountry' "list=countries" 'listKey=code' 'listValue=name' "headerKey=0" 'headerValue=(Select a country...)'  'cssClass=myselect field required string-medium')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.state')</th>
+                    <td id="statesContainer">
+                        #label('admin.select.a.country')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.city')</th>
+                    <td>
+                        #stextfield('name=address.city' 'cssClass=field required string-medium')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.postal.code')</th>
+                    <td>
+                        #stextfield('name=address.zipCode' 'cssClass=field required string-short')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.address')</th>
+                    <td>
+                        #stextfield('name=address.address' 'cssClass=field required string-medium')
+                    </td>
+                </tr>
+                <tr>
+                    <th class="required">#label('admin.phone')</th>
+                    <td>
+                        #stextfield('name=address.phone' 'cssClass=field string-medium')
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+<div class="button-bar">
+    <button id="dialogBtnOk" type="button"><span class="ok">#label('admin.save')</span></button>
+    <button type="button" onclick="$('#dialogo').dialog('close');"><span class="cancel">#label('admin.close')</span></button>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#countryCode').change(function() {
+            if ($(this).val() != '0') {
+                $('#statesContainer').load("$loadStates", {countryCode:$(this).val(),idState:"$!{address.state.idState}"});
+            } else {
+                $('#statesContainer').html("$!action.getText('admin.select.a.country','admin.select.a.country')")
+            }
+        }).trigger('change');
+    });
+</script>

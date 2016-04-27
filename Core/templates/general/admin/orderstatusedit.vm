@@ -1,0 +1,66 @@
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<h1>
+    #if ($orderStatus.id)
+        #label('admin.order.status.modify') ID: $!orderStatus.id
+    #else
+        #label('admin.order.status.new')
+    #end
+</h1>
+#surl('id=urlForm' "action=saveorderstatus")
+<form action="$urlForm" method="post" class="validable">
+#shidden('name=idStatus' "value=$!orderStatus.id")
+<div class="formulario">
+    #langSelector()
+    #formErrors()
+<table class="formulario" cellspacing="0" cellpadding="0">
+    <tr>
+        <th class="required">#label('admin.code')</th>
+        <td>
+            #if($orderStatus && $orderStatus.statusCode==$orderStatus.statusType)
+                <input type="text" readonly="readonly" value="$!orderStatus.statusCode" class="field readonly string-medium"/>
+            #else
+                #stextfield('name=orderStatus.statusCode' 'cssClass=field required string-medium')
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.name')</th>
+        <td>
+            <input name="vis_statusName" class="multilang field string-large" value=""/>
+            #foreach($l in $languages )
+                <input type="hidden" class="$l" name="statusName" value="$!orderStatus.getStatusName($l)"/>
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th class="required">#label('admin.type')</th>
+        <td>
+            #set($statusTypes = ['pending','approved','rejected'])
+            <select name="orderStatus.statusType" class="field required string-medium">
+                #foreach($t in $statusTypes)
+                <option value="$t" #if($t==$orderStatus.statusType) selected="selected" #end >$t</option>
+                #end
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.order')</th>
+        <td>
+            #stextfield('name=orderStatus.statusOrder' 'cssClass=field integer')
+        </td>
+    </tr>
+    <tr>
+        <th>#label('admin.send.email')</th>
+        <td>#scheckbox('name=orderStatus.sendEmail')</td>
+    </tr>
+</table>
+
+    <div class="button-bar">
+        <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        #surl('id=urlCancel' "action=listorderstatus" )
+        <button type="button" href="$urlCancel"><span class="cancel">#label('admin.cancel')</span></button>
+    </div>
+</div>
+</form>
+#parse('/WEB-INF/views/admin/page_bot.vm')

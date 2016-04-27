@@ -1,0 +1,53 @@
+<div id="shopCart">
+    #if($cart.status=='saved')
+        <h1>#label('saved.cart')</h1>
+    #else
+        #if($cart.status=='approved')
+            <h1>#label('quoted.approved')</h1>
+        #else
+            <h1>#label('quoted.requested')</h1>
+        #end
+    #end
+
+    <div class="clearfix">
+        <table class="listado">
+            <tr>
+                <th class="name" colspan="2">#label('shopcart.product')</th>
+                <th class="quantity">#label('shopcart.quantity')</th>
+                <th class="price">#label('shopcart.unitary.price')</th>
+                <th class="price">#label('shopcart.line.price')</th>
+            </tr>
+            #foreach($it in $cart.items)
+                #set($urlProd = $action.urlProduct($it.beanProd1))
+                #set($image = $imageResolver.getImageForProduct($it.beanProd1,'list/'))
+                #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)" )) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                <tr>
+                    <td class="cellimage"><img src="$srcImg"/></td>
+                    <td class="name">
+                        <span>$!it.name1 ($!it.code1)</span>
+                        #if($it.beanProd2)
+                            <span> + </span> <span>$!it.name2 ($!it.code2)</span>
+                        #end
+                    </td>
+                    <td class="quantity">$!it.quantity</td>
+                    <td class="price">$!action.formatActualCurrency($it.price)</td>
+                    <td class="price">$!action.formatActualCurrency($it.subtotal)</td>
+                </tr>
+            #end
+            <tr class="total">
+                <td colspan="4">#label('total')</td>
+                <td class="price">$!action.formatActualCurrency($cart.total)</td>
+            </tr>
+        </table>
+
+        #if($util.isNotEmpty($!cart.quoteMessage))
+        <table class="data">
+            <tr>
+                <th nowrap="nowrap">#label('message'):</th>
+                <td>$!cart.quoteMessage</td>
+            </tr>
+        </table>
+        #end
+
+    </div>
+</div>

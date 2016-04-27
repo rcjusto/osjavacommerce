@@ -1,0 +1,27 @@
+<div id="blockSearch" >
+    <form id="formSearch" action="$!action.url('search')" method="post">
+        <div class="search-wraper clearfix">
+            <input type="text" id="querySearch" name="query" value="$!esc.html($query)" class="required" placeholder="$!action.getText('search')"/>
+            <a class="search-button" href="#" onclick="$('#formSearch').submit();return false;">#label('search.button')</a>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('#formSearch').submit(function(){
+            if ($('#formSearch').validForm()) {
+                $('#formSearch').attr('action',"$!{action.url('search')}?q="+$('#querySearch').val());
+                return true;
+            }
+            return false;
+        });
+        #if('Y'==$action.getStoreProperty('search.autocomplete','N'))
+                $("input#querySearch").autocomplete({source:"$!action.url('quicksearch')",html:true,
+                     select: function(event, ui) {
+                         $('#querySearch').val(ui.item.value);
+                         $('#formSearch').submit();
+                     }
+                });
+        #end
+    })
+</script>

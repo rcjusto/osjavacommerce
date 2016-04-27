@@ -1,0 +1,72 @@
+#set($menuSelected='customers')
+#parse('/WEB-INF/views/admin/page_top.vm')
+
+<h1>Vampire Plugin</h1>
+<div class="formulario">
+    <table class="formulario" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>Site</th>
+            <td>
+                <select id="scriptName" class="field string-medium">
+                    #foreach($script in $scripts.entrySet())
+                    <option value="$!script.key">$!script.value.name</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Url</th>
+            <td><input type="text" id="url" class="field string-large"></td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button style="button" id="btnList"><span>FIND PRODUCTS</span></button>
+    </div>
+</div>
+<div id="productList">
+</div>
+
+<script type="text/javascript">
+    var urls = {};
+#foreach($script in $scripts.entrySet())
+    #if($util.isNotEmpty($!script.value.url))
+    urls["$!script.key"] = "$!script.value.url";
+    #end
+#end
+    $(function(){
+        $('#scriptName').change(function(){
+            var url = urls[$(this).val()];
+            if (url!=null && url!=undefined) $('#url').val(url);
+        }).trigger('change');
+        $('#btnList').click(function(){
+            var u = $('#url').val();
+            if (u!=null && u!=undefined && u!='')
+                $('#productList').html('').loading('Parsing URL','Please wait...').load("$!action.url('vampire_process_list','admin')",{script:$('#scriptName').val(),url:u});
+            else {
+                alert('URL is required');
+            }
+        });
+        $('#btnProcess').live('click', function(){
+            $('td.action-url').removeClass('waiting-url');
+            $('input.process-url:checked').each(function(){
+                $('#cell_' + $(this).val()).addClass('waiting-url').html('Waiting...');
+            });
+            $('#btnProcess').hide();
+            processNextUrl();
+        });
+    });
+    function processNextUrl() {
+        var td = $('.waiting-url:first');
+        if (td.size()>0) {
+            td.html('Loading...');
+            jQuery.getJSON("$!action.url('vampire_process_url','admin')",{script:$('#script').val(), url:td.attr('data'), category: $('#category').val()}, function(data){
+                td.removeClass('waiting-url').html(data.result);
+                td.parent().find('input:checked').attr('checked', false);
+                processNextUrl();
+            });
+        } else {
+            $('#btnProcess').show();
+        }
+    }
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

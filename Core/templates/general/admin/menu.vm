@@ -1,0 +1,177 @@
+#macro(adminSubMenu $permisos $actionName $label )
+    #if($isSuperAdmin || $util.contains($permisos,$actionName))
+    <li><a href='#surl("action=${actionName}")'>#label(${label})</a></li>
+    #end
+#end
+#set($isSuperAdmin = $action.getAdminUser().hasRoleCode('superadmin') )
+#set($extraMenus = $action.getAdminMenus())
+#set( $actions = $action.getActionsForUser($action.getAdminUser()) )
+
+<div id="menu_catalog" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'productlist','admin.menu.products')
+        #adminSubMenu($actions, 'categorylist','admin.menu.categories')
+        #adminSubMenu($actions, 'complementgrouplist','admin.menu.complements')
+        #adminSubMenu($actions, 'listprovider','admin.menu.supliers')
+        #adminSubMenu($actions, 'listmanufacturer','admin.menu.manufacturers')
+        #adminSubMenu($actions, 'listcurrency','admin.menu.currencies')
+        #adminSubMenu($actions, 'listprolabel','admin.menu.product.labels')
+        #adminSubMenu($actions, 'listproductatt','admin.menu.product.attributes')
+        #adminSubMenu($actions, 'productproccessimages','admin.menu.massive.upload')
+        #adminSubMenu($actions, 'listpromotions','admin.menu.promotions')
+        #adminSubMenu($actions, 'listbanner','admin.menu.banners')
+        #set( $plCatalog = false )
+        #if($extraMenus.get('catalog'))
+            #foreach($m in $extraMenus.get('catalog'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plCatalog = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="menu_customers" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'customerlist','admin.menu.users')
+        #adminSubMenu($actions, 'listcustomerlevel','admin.menu.user.levels')
+        #adminSubMenu($actions, 'rolelist','admin.menu.adminroles')
+        #adminSubMenu($actions, 'maildesigner','admin.menu.mails.customize')
+        #adminSubMenu($actions, 'listmail','admin.menu.mails')
+        #adminSubMenu($actions, 'listreviews','admin.menu.reviews')
+        #adminSubMenu($actions, 'listcomment','admin.menu.comments')
+        #set( $plCustomers = false )
+        #if($extraMenus.get('customers'))
+            #foreach($m in $extraMenus.get('customers'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plCustomers = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="menu_sales" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'orderlist','admin.menu.orders')
+        #adminSubMenu($actions, 'salesorders','admin.menu.sales.carts')
+        #adminSubMenu($actions, 'orderpaymentlist','admin.menu.order.payments')
+        #adminSubMenu($actions, 'listshopcart','admin.menu.shopping.carts')
+        #adminSubMenu($actions, 'listorderstatus','admin.menu.order.status')
+        #adminSubMenu($actions, 'rmalist','admin.menu.rmas')
+        #adminSubMenu($actions, 'listrmatype','admin.menu.rma.types')
+        #adminSubMenu($actions, 'listrmastatus','admin.menu.rma.status')
+        #set( $plSales = false )
+        #if($extraMenus.get('sales'))
+            #foreach($m in $extraMenus.get('sales'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plSales = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="menu_purchases" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'listpurchase','admin.menu.purchases')
+        #adminSubMenu($actions, 'purchasealerts','admin.menu.purchase.alerts')
+        #set( $plPurchases = false )
+        #if($extraMenus.get('purchases'))
+            #foreach($m in $extraMenus.get('purchases'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plPurchases = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="menu_reports" class="adminsubmenu">
+    <ul class="unique">
+        #if($isSuperAdmin || $util.contains($actions,'reports'))
+            <li><a href="$action.url('report','admin')?className=org.store.core.utils.reports.GroovyStoreReportImpl&code=customers.groovy">#label('admin.report.customers')</a></li>
+            <li><a href="$action.url('report','admin')?className=org.store.core.utils.reports.GroovyStoreReportImpl&code=inventory.groovy">#label('admin.report.inventory')</a></li>
+            <li><a href="$action.url('report','admin')?className=org.store.core.utils.reports.GroovyStoreReportImpl&code=sales.groovy">#label('admin.report.sales')</a></li>
+            <li><a href="$action.url('report','admin')?className=org.store.core.utils.reports.GroovyStoreReportImpl&code=profit.groovy">#label('admin.report.profit')</a></li>
+        #end
+        #set( $plReports = false )
+        #if($extraMenus.get('reports'))
+            #foreach($m in $extraMenus.get('reports'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plReports = true )
+                #end
+            #end
+        #end
+        #adminSubMenu($actions, 'reports','admin.menu.all.reports')
+    </ul>
+</div>
+<div id="menu_cms" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'liststaticnews','admin.menu.static.news')
+        #adminSubMenu($actions, 'liststaticpage','admin.menu.static.pages')
+        #adminSubMenu($actions, 'liststaticblock','admin.menu.static.blocks')
+        #adminSubMenu($actions, 'listresource','admin.menu.resources')
+        #set( $plCMS = false )
+        #if($extraMenus.get('cms'))
+            #foreach($m in $extraMenus.get('cms'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plCMS = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="menu_configuration" class="adminsubmenu">
+    <ul class="unique">
+        #adminSubMenu($actions, 'storeproperties','admin.menu.store.properties')
+        #adminSubMenu($actions, 'showtemplates','admin.menu.templates')
+        #adminSubMenu($actions, 'staticlabels','admin.menu.labels')
+        #adminSubMenu($actions, 'listmenu','admin.menu.menus')
+        #adminSubMenu($actions, 'listshipping','admin.menu.shipping.methods')
+        #adminSubMenu($actions, 'listmerchant','admin.menu.payment.methods')
+        #adminSubMenu($actions, 'liststate','admin.menu.states')
+        #adminSubMenu($actions, 'listfee','admin.menu.fees')
+        #adminSubMenu($actions, 'listtax','admin.menu.taxes')
+        #adminSubMenu($actions, 'listinsurance','admin.menu.insurances')
+        #adminSubMenu($actions, 'listlocation','admin.menu.locations')
+        #adminSubMenu($actions, 'jobpropertieslist','admin.menu.jobs')
+        #set( $plConfiguration = false )
+        #if($extraMenus.get('configuration'))
+            #foreach($m in $extraMenus.get('configuration'))
+                #if($isSuperAdmin || $util.contains($actions,$m.getMenuLabel()))
+                <li><a href="$!m.getMenuUrl($action)">$!m.getMenuName($action)</a></li>
+                    #set( $plConfiguration = true )
+                #end
+            #end
+        #end
+    </ul>
+</div>
+<div id="adminmenu">
+    <ul class="menu-left clearfix">
+        <li #if($menuSelected=='home') class="selected" #end><a href='#surl("action=home")'>#label('admin.menu.dashboard')</a></li>
+        #if($isSuperAdmin || $plCatalog || $util.containsAny($actions,'productlist,categorylist,complementgrouplist,listprovider,listmanufacturer,listcurrency,listprolabel,listproductatt,productproccessimages,listpromotions,listbanner'))
+        <li #if($menuSelected=='catalog') class="selected" #end><a href="#" rel="#menu_catalog">#label('admin.menu.catalog')</a></li>
+        #end
+        #if($isSuperAdmin || $plCustomers || $util.containsAny($actions,'customerlist,listcustomergroup,listcustomerlevel,listcampaign,rolelist'))
+        <li #if($menuSelected=='customers') class="selected" #end><a href="#" rel="#menu_customers">#label('admin.menu.customers')</a></li>
+        #end
+        #if($isSuperAdmin || $plSales || $util.containsAny($actions,'orderlist,listorderstatus,rmalist,listrmatype,listrmastatus'))
+        <li #if($menuSelected=='orders') class="selected" #end><a href="#" rel="#menu_sales">#label('admin.menu.sales')</a></li>
+        #end
+        #if($isSuperAdmin || $plPurchases || $util.containsAny($actions,'listpurchase'))
+        <li #if($menuSelected=='purchases') class="selected" #end><a href="#" rel="#menu_purchases">#label('admin.menu.purchases')</a></li>
+        #end
+        #if($isSuperAdmin || $plReports || $util.containsAny($actions,'report,reports'))
+        <li #if($menuSelected=='reports') class="selected" #end><a href="#" rel="#menu_reports">#label('admin.menu.reports')</a></li>
+        #end
+        #if($isSuperAdmin || $plCMS || $util.containsAny($actions,'liststaticnews,liststaticpage,liststaticblock,listresource'))
+        <li #if($menuSelected=='cms') class="selected" #end><a href="#" rel="#menu_cms">#label('admin.menu.cms')</a></li>
+        #end
+        #if($isSuperAdmin || $plConfiguration || $util.containsAny($actions,'storeproperties,staticlabels,listmenu,listshipping,listmerchant,liststate,listfee,listtax,listinsurance,listlocation,jobproperties'))
+        <li #if($menuSelected=='configuration') class="selected" #end><a href="#" rel="#menu_configuration">#label('admin.menu.store.configuration')</a></li>
+        #end
+    </ul>
+</div>

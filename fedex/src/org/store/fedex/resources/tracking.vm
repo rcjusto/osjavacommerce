@@ -1,0 +1,16 @@
+#* @vtlvariable name="packages" type="java.util.List<org.store.fedex.TrackService.PackageTracking>" *#
+#foreach($p in $packages)
+    <table>
+        <tr>
+            <td colspan="2"><h2>Package # $!p.number</h2></td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>$!p.statusDesc</td>
+        </tr>
+        <tr>
+            <th>Ship date:</th>
+            <td>$!p.shipDate</td>
+        </tr>
+    </table>
+#end

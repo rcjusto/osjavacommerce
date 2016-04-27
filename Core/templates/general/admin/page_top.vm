@@ -1,0 +1,12 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"> 
+<html>
+<head>
+    #parse('/WEB-INF/views/admin/head.vm')
+</head>
+<body>
+<div id="all">
+    <div id="header">#parse('/WEB-INF/views/admin/top.vm')</div>
+    <div class="clearfix">
+    <div id="menu">#parse('/WEB-INF/views/admin/menu.vm')</div>
+    #if(!$breadCrumbs.isEmpty())<div id="breadcrumbs">#parse('/WEB-INF/views/admin/breadcrumbs.vm')</div>#end
+    <div id="content">

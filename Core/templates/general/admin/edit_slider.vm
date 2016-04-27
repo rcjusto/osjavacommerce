@@ -1,0 +1,103 @@
+#set($menuSelected='catalog')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style type="text/css">
+    .slider-item {margin: 5px;border:2px solid #f8f8f8;background: #f8f8f8;padding: 6px;}
+    .slider-item.active {border:2px solid #04a331;background-color: #ECF3DC;}
+    .slider-item label {display: block;margin: 5px;}
+</style>
+<h1>#label('admin.slider.configurator'): $!bannerZone</h1>
+#set($effects = ['fade', 'slideLeft', 'slideRight', 'slideUp', 'slideDown', 'overLeft', 'overRight', 'overUp', 'overDown', 'columnRainLeft', 'columnRainRight', 'columnRainRandom', 'columnUpLeft', 'columnUpRight', 'columnUpRandom', 'columnFadeLeft', 'columnFadeRight', 'columnFadeRandom', 'courtainLeft', 'courtainRight'])
+<form action="$!action.url('saveSlider','admin')" method="post">
+    <input type="hidden" name="bannerZone" value="$!bannerZone"/>
+<div class="formulario">
+    <h2>#label('slider.properties')</h2>
+    <table width="600" class="formulario" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>#label('admin.width')</th>
+            <td><input type="text" name="width" value="$!data.get('width')" class="field integer"/>&nbsp; px</td>
+            <th>#label('admin.height')</th>
+            <td><input type="text" name="height" value="$!data.get('height')" class="field integer"/>&nbsp; px</td>
+            <th>#label('admin.slider.delay')</th>
+            <td><input type="text" name="delay" value="$!data.get('delay')" class="field integer"/>&nbsp; sec</td>
+        </tr>
+    </table>
+    <div class="button-bar">
+        <button type="submit"><span>#label('admin.save')</span></button>
+    </div>
+</div>
+
+<h2>#label('slider.items')</h2>
+<div class="sortable" style="width: 800px;">
+#set($items = $data.get('items'))
+#foreach($elem in $items)
+    #set($banner = $banners.get($elem.get('id')))
+    #if($banner)
+        #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{banner.id}_${locale.language}")))
+        #if(!$imgUrl.endsWith('.swf'))
+        <div class="slider-item clearfix active">
+            <div style="float: left;width: 400px;">
+                <img src="$!imgUrl" alt="" style="max-width: 400px;max-height: 200px;">
+            </div>
+            <div style="float: left;margin-left: 30px;">
+                <label>
+                    <input type="checkbox" value="$!banner.id" class="active-banner" checked="checked"/>
+                    #label('admin.active')
+                </label>
+                <label class="clearfix">
+                    <input type="hidden" name="id" class="id-banner" value="$!banner.id"/>
+                    <span style="float: left;margin: 3px 6px;">#label('admin.effect')</span>
+                    <select name="effect" class="field">
+                        <option value="random">Random</option>
+                        #foreach($ef in $effects)
+                            <option value="$!ef" #if($ef==$elem.get('effect')) selected="selected" #end>$!ef</option>
+                        #end
+                    </select>
+                </label>
+            </div>
+        </div>
+        #end
+        <!-- $!banners.remove($elem.get('id')) -->
+    #end
+#end
+
+#foreach($banner in $banners.values())
+    #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{banner.id}_${locale.language}")))
+    #if(!$imgUrl.endsWith('.swf'))
+    <div class="slider-item clearfix">
+        <div style="float: left;width: 400px;">
+            <img src="$!imgUrl" alt="" style="max-width: 400px;max-height: 200px;">
+        </div>
+        <div style="float: left;margin-left: 30px;">
+            <label>
+                <input type="checkbox" class="active-banner" value="$!banner.id"/>
+                #label('admin.active')
+            </label>
+            <label class="clearfix">
+                <input type="hidden" name="id" class="id-banner" value=""/>
+                <span style="float: left;margin: 3px 6px;">#label('admin.effect')</span>
+                <select name="effect" class="field">
+                    <option value="random">Random</option>
+                    #foreach($ef in $effects)
+                        <option value="$!ef">$!ef</option>
+                    #end
+                </select>
+            </label>
+        </div>
+    </div>
+    #end
+#end
+</div>
+
+</form>
+<script type="text/javascript">
+    $('.sortable').sortable();
+    $('.active-banner').change(function(){
+        var par = $(this).closest('.slider-item');
+        if ($(this).is(':checked')) {
+            par.addClass('active').find('input.id-banner').val($(this).val());
+        } else {
+            par.removeClass('active').find('input.id-banner').val('');
+        }
+    })
+</script>
+#parse('/WEB-INF/views/admin/page_bot.vm')

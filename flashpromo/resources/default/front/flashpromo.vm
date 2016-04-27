@@ -1,0 +1,38 @@
+#* @vtlvariable name="config" type="org.store.flashpromo.beans.FlashPageConfig" *#
+#if($config && $config.active)
+<div id="flashPromo" style="display: none;">
+    <div class="flash-promotion">$!content</div>
+    #if($config.promo.subscription)
+        <div class="flash-subscription">
+            <form id="formSubscription_${config.id}">
+                #if($!config.promo.subscriptionGroup)
+                    <input type="hidden" name="addToGroup" value="$!config.promo.subscriptionGroup"/>
+                #end
+                <div class="flash-subscription-input"><input type="text" name="email" value="" class="required email" placeholder="$!action.getText('fp.subscription.email')"/></div>
+                <div class="flash-subscription-button">
+                    <button type="submit"><span>#label('fp.subscription.send')</span></button>
+                </div>
+            </form>
+        </div>
+    #end
+</div>
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.flashpromo.css"/>
+<script type="text/javascript" src="/struts/js/jquery.flashpromo.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#flashPromo').flashPromo({showAfter:$!config.showAfter,hideAfter:$!config.hideAfter,position:'$!config.promo.horizontal $!config.promo.vertical',showClose:true, cookie:"$!cookieName", width: $!config.promo.width ,modal:#if($config.modal) true #else false #end});
+        $('.close-promo').live('click', function() {$('#flashPromo').flashPromo('close');});
+        $("#formSubscription_${config.id}").live('submit',function() {
+            if ($(this).validForm()) {
+                var params = $("#formSubscription_${config.id}").serialize();
+                $('.flash-subscription').html("$!action.getText('fp.sending.subscription')");
+                jQuery.getJSON("$!action.url('registernewsletter')", params, function(data) {
+                    $('.flash-subscription').html("$!action.getText('fp.registration.ok')");
+                    setTimeout(function() {$('#flashPromo').flashPromo('close');}, 3000);
+                });
+            }
+            return false;
+        });
+    });
+</script>
+#end

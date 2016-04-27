@@ -1,0 +1,23 @@
+#set($menuSelected="$!{service.menuParent}")
+#parse('/WEB-INF/views/admin/page_top.vm')
+#if($service)
+<h1>$!{service.getMenuName($action)}</h1>
+<p style="margin-top:0;margin-left:12px;">$!{service.getDescription($action)}</p>
+    #if($util.isNotEmpty(${plugin_template}))
+        #surl('id=urlformProperties' "action=savepluginproperty")
+        <form id="formProperties" action="$urlformProperties" method="post" enctype="multipart/form-data" class="validable">
+        #shidden('name=plugin')
+        #formErrors()
+         #parse("$!{plugin_template}")
+        </form>
+    #else
+    <div class="info">
+        <p>#label('plugin.configuration.empty.text')</p>
+    </div>
+    #end
+#else
+<div class="info">
+    <p>#label('plugin.not.found.text') $!plugin</p>
+</div>
+#end
+#parse('/WEB-INF/views/admin/page_bot.vm')

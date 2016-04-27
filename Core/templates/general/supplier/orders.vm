@@ -1,0 +1,78 @@
+#* @vtlvariable name="action" type="org.store.core.admin.AdminModuleAction" *#
+#* @vtlvariable name="orders" type="java.util.List<org.store.core.beans.Order>" *#
+
+#set($menuSelected='orders')
+#parse('/WEB-INF/views/supplier/page_top.vm')
+
+<div style="width:800px" class="listado">
+
+    <h2 class="block-title">#label('admin.order.list')</h2>
+    <form id="formOrders" action="$action.url('orders','supplier')">
+    <div id="filterContainer" class="filters formulario">
+        <table class="formulario" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('year')</th>
+                <td style="padding-right: 30px">
+                    <select name="year" class="field string-short" onchange="$('#formOrders').submit();">
+                        #foreach($y in [$firstYear..$lastYear])
+                        <option value="$y" #if($y==$year) selected="selected" #end>$y</option>
+                        #end
+                    </select>
+                </td>
+                <th>#label('month')</th>
+                <td>
+                    <select name="month" class="field string-short" onchange="$('#formOrders').submit();">
+                        <option value="">#label('admin.not.filter')</option>
+                        #foreach($m in [1..12])
+                        <option value="$m" #if($m==$month) selected="selected" #end>$m</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+    </form>
+
+    #if($util.isNotEmpty($orders))
+    #foreach($order in $orders)
+        #set($total = 0)
+        <h4 style="margin-bottom: 4px">#label('order') $!order.idOrder - <span style="font-weight: normal;">$!util.formatDate($order.createdDate)</span></h4>
+        <table width="100%" class="listado" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>#label('product.name')</th>
+                <th>#label('quantity')</th>
+                <th style="text-align: right">#label('cost')</th>
+            </tr>
+            #foreach($detail in $order.orderDetails)
+                #foreach($odp in $detail.orderDetailProducts)
+                    #if($odp.product.getProductProvider($provider))
+                        #if($odp.product.costPrice)
+                            #set($subtotal = $math.mul($odp.product.costPrice, $detail.quantity))
+                        #else
+                            #set($subtotal = 0)
+                        #end
+                        #set($total = $math.add($total,$subtotal))
+                        <tr>
+                            <td width="80%">$!odp.product.getProductName($action.getDefaultLanguage())</td>
+                            <td width="10%" style="text-align: center">$!detail.quantity</td>
+                            <td width="10%" style="text-align: right">$!util.formatNumber($subtotal,'0.00')</td>
+                        </tr>
+                    #end
+                #end
+            #end
+            <tr class="subtotal">
+                <td>TOTAL</td>
+                <td colspan="2" style="text-align: right">$!util.formatNumber($total,'0.00')</td>
+            </tr>
+        </table>
+    #end
+    #else
+        <div class="info">
+            <h2>#label('admin.orders.not.found')</h2>
+            <p>#label('admin.orders.not.found.text')</p>
+        </div>
+    #end
+
+</div>
+
+#parse('/WEB-INF/views/supplier/page_bot.vm')
