@@ -1,0 +1,66 @@
+<project name="Archive Source" default="archive" basedir=".">
+
+    <property name="out.folder" value="out/production"/>
+    <property name="jars.folder" value="web/web/WEB-INF/lib"/>
+
+    <target name="archive">
+
+
+        <copydir src="Core/templates/config" dest="${out.folder}/Core/org/store/config/views"/>
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-config.jar" includes="org/store/config/**"/>
+
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-core.jar" includes="org/store/core/**,org/store/sslplugin/**,struts*"/>
+
+        <copydir src="campaigns/resources" dest="${out.folder}/campaigns"/>
+        <jar basedir="${out.folder}/campaigns" destfile="${jars.folder}/store20-plugin-campaigns.jar" />
+
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-plugin-capost.jar" includes="ca/**"/>
+
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-plugin-carriers.jar" includes="org/store/carriers/**"/>
+
+        <jar basedir="${out.folder}/fedex" destfile="${jars.folder}/store20-plugin-fedex.jar" />
+
+        <copydir src="googletools/resources" dest="${out.folder}/googletools"/>
+        <jar basedir="${out.folder}/googletools" destfile="${jars.folder}/store20-plugin-googletools.jar" />
+
+        <copydir src="importexport/resources" dest="${out.folder}/importexport"/>
+        <jar basedir="${out.folder}/importexport" destfile="${jars.folder}/store20-plugin-impexp.jar" />
+
+        <jar basedir="${out.folder}/ip2country" destfile="${jars.folder}/store20-plugin-ip2c-free.jar" includes="org/store/ip2country/webhosting/**"/>
+        <jar basedir="${out.folder}/ip2country" destfile="${jars.folder}/store20-plugin-ip2c-maxmind.jar" includes="org/store/ip2country/maxmind/**"/>
+
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-plugin-moneris.jar" includes="org/store/merchants/moneris/**"/>
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-plugin-nmi.jar" includes="org/store/merchants/nmi/**"/>
+        <jar basedir="${out.folder}/Core" destfile="${jars.folder}/store20-plugin-paypal.jar" includes="org/store/merchants/paypal/**"/>
+
+        <copydir src="pdfcatalog/resources" dest="${out.folder}/pdfcatalog"/>
+        <jar basedir="${out.folder}/pdfcatalog" destfile="${jars.folder}/store20-plugin-pdfgen.jar" />
+
+        <copydir src="product_registration/resources" dest="${out.folder}/product_registration"/>
+        <jar basedir="${out.folder}/product_registration" destfile="${jars.folder}/store20-plugin-product-registration.jar" />
+
+        <copydir src="flashpromo/resources" dest="${out.folder}/flashpromo"/>
+        <jar basedir="${out.folder}/flashpromo" destfile="${jars.folder}/store20-plugin-promopopup.jar" />
+
+        <copydir src="publicaciones/resources" dest="${out.folder}/publicaciones"/>
+        <jar basedir="${out.folder}/publicaciones" destfile="${jars.folder}/store20-plugin-publications.jar" />
+
+        <copydir src="sage/resources" dest="${out.folder}/sage"/>
+        <jar basedir="${out.folder}/sage" destfile="${jars.folder}/store20-plugin-sage.jar" />
+
+        <jar basedir="${out.folder}/suppliers" destfile="${jars.folder}/store20-plugin-suppliers.jar" />
+
+        <copydir src="custom_template/resources" dest="${out.folder}/custom_template"/>
+        <jar basedir="${out.folder}/custom_template" destfile="${jars.folder}/store20-plugin-template.jar" />
+
+        <copydir src="vampire/resources" dest="${out.folder}/vampire"/>
+        <jar basedir="${out.folder}/vampire" destfile="${jars.folder}/store20-plugin-vampire.jar" />
+
+        <copydir src="xmltools/resources" dest="${out.folder}/xmltools"/>
+        <jar basedir="${out.folder}/xmltools" destfile="${jars.folder}/store20-plugin-xmlcatalog.jar" />
+
+        <jar basedir="Core/resources" destfile="${jars.folder}/store20-resources.jar" />
+        <jar basedir="Core/templates/general" destfile="${jars.folder}/store20-views.jar" />
+
+    </target>
+</project>
