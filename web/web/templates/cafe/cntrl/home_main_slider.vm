@@ -1,0 +1,44 @@
+#set($slider = $action.getBannerSlider('home-top'))
+#if($slider)
+
+<section id="slideshow">
+
+    <ul class="slider regular">
+        #foreach($elem in $slider.get('items'))
+            #set($ban = $action.getBanner($math.toInteger($elem.get('id'))))
+            #if($ban)
+                #surl('id=urlBanner' "action=banner" "idBanner=$ban.id")
+                #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{ban.id}_${locale.language}")))
+                <li>
+                    <h1>$!ban.bannerText</h1>
+                    <a href="$!ban.bannerUrl" target="$!ban.bannerTarget" onclick="jQuery.get('$!urlBanner');return true;">
+                        <img src="$!imgUrl" alt="$!ban.bannerText"/>
+                    </a>
+                </li>
+            #end
+        #end
+    </ul>
+
+    <ul class="slider responsive">
+        #foreach($elem in $slider.get('items'))
+            #set($ban = $action.getBanner($math.toInteger($elem.get('id'))))
+            #if($ban)
+                #surl('id=urlBanner' "action=banner" "idBanner=$ban.id")
+                #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{ban.id}_${locale.language}")))
+                <li>
+                    <h1>$!ban.bannerText</h1>
+                    <a href="$!ban.bannerUrl" target="$!ban.bannerTarget" onclick="jQuery.get('$!urlBanner');return true;">
+                        <img src="$!imgUrl" alt="$!ban.bannerText"/>
+                    </a>
+                </li>
+            #end
+        #end
+    </ul>
+
+    <!-- Slideshow Controls -->
+    <a title="Previous" class="slider-prev">Previous</a>
+    <a title="Next" class="slider-next">Next</a>
+
+</section>
+
+#end

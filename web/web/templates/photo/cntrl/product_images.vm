@@ -1,0 +1,64 @@
+#set($images = $imageResolver.getImagesForProduct($product,''))
+#if(!$list.isEmpty($images))
+
+<section id="slideshow" class="main-image">
+
+    <ul class="#if($images.size()>1) product-slider #end regular ">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a class="fancybox" #if($images.size()>1) rel="gallery1" #end href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    <ul class="#if($images.size()>1) product-slider #end responsive detail">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a class="fancybox" #if($images.size()>1) rel="gallery1" #end href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    #if($images.size()>1)
+    <!-- Slideshow Controls -->
+    <a title="Previous" class="slider-prev">Previous</a>
+    <a title="Next" class="slider-next">Next</a>
+    #end
+
+    <div class="zoom-help clearfix">
+        <div class="enlarge-button">#label('click.image.to.enlarge')</div>
+        #if($action.getStoreProperty('show.pinterest.button','N')=='Y')
+            <div class="pinterest-button"><a href="//www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark" ><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a></div>
+        #end
+    </div>
+</section>
+
+#end
+<link rel="stylesheet" href="/templates/$!{template}/js/fancybox/jquery.fancybox.css?v=2.1.4" type="text/css" media="screen" />
+<script type="text/javascript" src="/templates/$!{template}/js/fancybox/jquery.fancybox.pack.js?v=2.1.4"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".fancybox").fancybox({
+            openEffect	: 'none',
+            closeEffect	: 'none'
+        });
+    });
+</script>
+#if($action.getStoreProperty('show.pinterest.button','N')=='Y')
+<script type="text/javascript">
+    (function(d){
+        var f = d.getElementsByTagName('SCRIPT')[0], p = d.createElement('SCRIPT');
+        p.type = 'text/javascript';
+        p.async = true;
+        p.src = '//assets.pinterest.com/js/pinit.js';
+        f.parentNode.insertBefore(p, f);
+    }(document));
+</script>
+#end
+

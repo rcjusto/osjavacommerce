@@ -1,0 +1,25 @@
+<section id="left-column">
+
+    <section id="main">
+
+        #if($staticText)
+            <h1>$!staticText.getLanguage($locale.language,$defaultLanguage).title</h1>
+            <div class="static-content">$!staticText.getLanguage($locale.language,$defaultLanguage).value</div>
+        #end
+        #if(($code=='Contact-Us' || $staticText.code=='contact.us') && $action.getStoreProperty('mail.contact.us','')!='')
+            #parse("/WEB-INF/views/front/contact_us.vm")
+        #end
+        #if($util.fileExist("/WEB-INF/views/${template}/front/${code}.vm"))
+            #parse("/WEB-INF/views/${template}/front/${code}.vm")
+        #end
+        #if(${code}=='news')
+            #set($news =  $action.getNews(100, 1))
+            #control('news')
+        #end
+
+
+    </section>
+
+</section>
+
+#control('aside')

@@ -1,0 +1,56 @@
+#if($action.canShowPrices)
+<div class="prices clearfix">
+
+    #if($priceMap.containsKey('OFFER'))
+        <!-- Offer -->
+        <div class="final-price">
+            <div class="offer-price">$action.formatActualCurrency($priceMap.get('FINAL_OFFER_PRICE'))</div>
+            <div class="offer-end">#label('product.offer.until') $!util.formatDate($priceMap.get('OFFER').dateTo, $locale.language)</div>
+        </div>
+        <div class="other-prices">
+            <div class="our-price">#label('product.our.price') $!action.formatActualCurrency($priceMap.get('FINAL_PRICE'))</div>
+            #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST'))</div>
+            #else
+                <div class="offer-save">#label('product.offer.save') $!action.formatActualCurrency($priceMap.get('OFFER_DISCOUNT'))</div>
+            #end
+            #if($util.isNotEmpty($product.oldPrice))
+                <del>$!action.formatActualCurrency($product.oldPrice)</del>
+            #end
+        </div>
+    #else
+        <!-- Final Price Without Offer -->
+        <div class="final-price">
+            <div class="our-price">$action.formatActualCurrency($priceMap.get('FINAL_PRICE'))</div>
+        </div>
+        <!-- List Price -->
+        <div class="other-prices">
+            #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST'))</div>
+            #end
+            #if($util.isNotEmpty($product.oldPrice))
+                <del>$!action.formatActualCurrency($product.oldPrice)</del>
+            #end
+        </div>
+    #end
+
+    <!-- Volume Prices -->
+    #if($util.isNotEmpty($priceMap.get('VOLUME_LIST')))
+        <div class="volume-price">
+            <ul>
+                #foreach($vp in $priceMap.get('VOLUME_LIST'))
+                    <li>
+                        #label('product.volume.buy')
+                        $!vp.volume
+                        #label('product.volume.at')
+                        $!action.formatActualCurrency($vp.unitPrice)
+                        #label('product.volume.eachone')
+                    </li>
+                #end
+            </ul>
+        </div>
+    #end
+</div>
+#end

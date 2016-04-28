@@ -1,0 +1,38 @@
+#set($_treeCategories = $action.sortCategories($action.getSubCategories($util.null, true)))
+#if ($_treeCategories && !$_treeCategories.isEmpty())
+    #foreach($cat in $_treeCategories)
+        #if($cat.hasChildrenId($category.idCategory) || $cat.idCategory==$category.idCategory)
+        <div class="left-menu categories">
+            <div class="title">$!cat.name</div>
+            #if($cat.children && !$cat.children.isEmpty())
+                <ul>
+                    #foreach($cat in $cat.children)
+                    #control('category_tree')
+                    #end
+                </ul>
+            #else
+                <ul>
+                    <li>
+                        <a href="$!action.urlCategory($cat)" class="more">#label('show.products')</a>
+                    </li>
+                </ul>
+            #end
+        </div>
+        #end
+    #end
+
+<div class="left-menu categories">
+    <div class="title">#label('otras.categorias')</div>
+    <ul>
+        #foreach($cat in $_treeCategories)
+            #if(!$cat.hasChildrenId($category.idCategory))
+            <li>
+                <a href="$action.urlCategory($cat)">$!cat.name</a>
+            </li>
+            #end
+        #end
+    </ul>
+</div>
+
+#end
+#set($_treeCategories = $util.null)

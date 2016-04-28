@@ -1,0 +1,18 @@
+<div class="product-actions">
+    <ul>
+        <li class="print non-important">#linklabel('product.print.this.page' '#' 'print')</li>
+        <li class="mailtofriend">#linklabel('product.mailToFriend' '#' 'mailtofriend')</li>
+        <li class="wishlist">
+            #if($action.productInWishList($product.idProduct))
+                <span id="wishListAdded" class="action">#label('product.in.wishlist')</span>
+            #else
+                <span id="wishListAdded" class="action" style="display:none;">#label('product.in.wishlist')</span>
+                <span id="wishListLoading" style="display:none;" class="action">#label('loading')</span>
+                <span id="wishListLink" class="action">#linklabel('product.add.to.wishlist' '#' 'addtowishlist')</span>
+            #end
+        </li>
+    </ul>
+</div>
+<div id="divMailProduct">
+    #parse('/WEB-INF/views/front/mailproduct.vm')
+</div>

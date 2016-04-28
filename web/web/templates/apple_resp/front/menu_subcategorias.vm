@@ -1,0 +1,20 @@
+#if($idCategory)
+#set($_treeCategories = $action.sortCategories($action.getSubCategories($idCategory, true)))
+#if($_treeCategories)
+#foreach($cat in $_treeCategories)
+    #set($level = $math.add( $math.add( $idOrder, $cat.level ), 1 ) )
+    <li class="clearfix hoverable $!{level}">
+    <div class="clearfix level$!{level} category${cat.idCategory}">
+        <a class="icon-tree level$!{level} #if($util.isNotEmpty($cat.children)) has-children #end"></a>
+        <a href="$!action.urlCategory($cat)" class="label level$!{level} #if($cat.idCategory==$category.idCategory) selected #end">
+            <span>$!cat.name #if($numProducts.get($cat.idCategory))<span class="num-products">($numProducts.get($cat.idCategory))</span>#end</span>
+        </a>
+    </div>
+    #if($cat.children && !$cat.children.isEmpty())
+        <ul class="clearfix level$!{level} use-ajax unloaded" data="$!cat.idCategory" level="$!level">
+        </ul>
+    #end
+</li>
+#end
+#end
+#end

@@ -1,0 +1,23 @@
+<div id="blockTop" class="clearfix">
+    #control('logo')
+
+    <div id="blockTopRight" class="clearfix">
+        #control('menu_minimun')
+
+        <div id="blockTopMenu" class="clearfix">
+            #set( $treemenu = $action.getTreeMenu('TopBar') )
+            #control('menu_horizontal')
+            #set( $treemenu = $util.null )
+            #control('search')
+        </div>
+
+        <div id="blockTopBar" class="clearfix">
+            #control('top_shopcart')
+        </div>
+    </div>
+</div>
+#if($action.breadCrumbs && !$action.breadCrumbs.isEmpty())
+<div class="page-content-title $!action.breadCrumbs.get(0).type">
+    <span>$!action.breadCrumbs.get(0).name</span>
+</div>
+#end

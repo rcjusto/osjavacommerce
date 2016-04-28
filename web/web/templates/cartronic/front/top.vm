@@ -1,0 +1,96 @@
+<div id="blockTop" class="clearfix">
+    #surl('id=urlHome' "action=home")
+    <a href="http://www.cartronic.es/"><img id="logo" alt="Logo" src="$!action.skinFile('images/[lang]/top_logo.gif')"/></a>
+    <div id="topBannerBlock">#block('top.banner')</div>
+    <div id="topMenuBlock">
+        <div class="clearfix">
+            <ul id="topMenuCart">
+                #surl('id=urlshopcart' "action=shopcart")
+                <li>#linklabel('my.shopping.cart' $urlshopcart 'shopcart')</li>
+            </ul>
+        </div>
+        <div id="topMenuCartDetail" >
+            <span>$!userSession.items.size() #label('shopcart.items')</span>
+            <span>|</span>
+            <span>$!action.formatActualCurrency($userSession.total)</span>
+        </div>
+        <div class="clearfix">
+            <ul id="topMenuCustomer">
+                #if($frontUser && !$frontUser.anonymousCheckout)
+                    <li class="topUserName">$!{frontUser.fullName}:</li>
+                    #surl('id=urlProfile' "action=profile")
+                    <li>#linklabel('my.profile' $urlProfile)</li>
+                    <li>|</li>
+
+                    #surl('id=urlOrders' "action=orders")
+                    <li>#linklabel('my.orders' $urlOrders)</li>
+                    <li>|</li>
+
+                    #surl('id=urlWishlist' "action=wishlist")
+                    <li>#linklabel('my.wishlist' $urlWishlist)</li>
+                    <li>|</li>
+
+                    #surl('id=urllogout' "action=logout")
+                    <li>#linklabel('logout' $urllogout)</li>
+                #else
+                    #surl('id=urlregister' "action=profile")
+                    <li>#linklabel('sign.in' $urlregister)</li>
+                #end
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="blockTopMenu" class="clearfix">
+    <div id="topMenuHome">
+        <a class="home-link" href="$urlHome"></a>
+    </div>
+    <div id="topMenuSearch" style="float:left;">
+        #surl('id=urlSearch' "action=search")
+        <form id="formSearch" action="$urlSearch" method="get">
+            <label>
+                <span>#label('search')</span>
+                <input type="text" id="querySearch" name="query" value="$!esc.html($query)" class="required"/>
+            </label>
+            <a class="search-button" href="#" onclick="if($('#formSearch').validForm()) $('#formSearch').submit(); return false;"></a>
+            <div style="clear:both;"></div>
+        </form>
+    </div>
+
+    #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+    <div id="topMenuSubscribe">
+        <form id="emailSubscribe">
+            <label>
+                <span>#label('deal.alert.register')</span>
+                <input type="text" id="subscribeEmailAddress" class="required email" value=""/>
+            </label>
+            <a href="top.vm#" onclick="$('#emailSubscribe').submit(); return false;" class="search-button"></a>
+            <span class="field_error" style="float:right;display:none;margin-top:7px;margin-left:6px;"></span>
+            <div style="clear:both;"></div>
+        </form>
+    </div>
+    #end
+    
+    <div id="topLangSelector">
+        <ul>
+            #foreach($l in $languages)
+                #if($locale.language!=$l)
+                    #surl('id=urlLang' "action=home" "set_lang=$l")
+                    <li>#linklabel("lang.$!l" $urlLang)</li>
+                #end
+            #end
+        </ul>
+    </div>
+</div>
+<div id="blockTopMenuBottom"></div>
+#if('Y'==$action.getStoreProperty('search.autocomplete','N'))
+<script type="text/javascript">
+    $(function(){
+        $("input#querySearch").autocomplete({source:"$!action.url('quicksearch')",html:true,
+         select: function(event, ui) {
+             $('#querySearch').val(ui.item.value);
+             $('#formSearch').submit();
+         }
+        });
+    })
+</script>
+#end

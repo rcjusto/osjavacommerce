@@ -1,0 +1,52 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'list/')")
+#set( $price = $action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+<div class="product clearfix">
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a></div>
+    #end
+    <div class="data">
+        <div class="code"><a href="$urlDetail">$!p.partNumber</a></div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="desc"><a href="$urlDetail">$!pDesc</a></div>
+        <div class="stock">
+            #if($product.stock>0)
+                #label('on.stock')
+            #else
+                #if($util.isNotEmpty($product.eta))
+                    #label('backorder.until') $!product.eta
+                #else
+                    #label('out.of.stock')
+                #end
+            #end
+        </div>
+        <div class="list-price">#label('list.price') $!action.formatActualCurrency($p.listPrice)</div>
+        <div class="price">#label('our.price') $!price</div>
+    </div>
+
+    <div class="actions clearfix">
+        <div class="labels clearfix">
+            <ul>
+                #foreach($lab in $action.getProductLabels($p))
+                    #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                        <li>$!lab.getContentList($locale.language)</li>
+                    #end
+                #end
+            </ul>
+        </div>
+        <div class="buttons">
+            <div>
+                <a href="$!urlDetail"><img src="$!action.skinFile('images/[lang]/moreinfo.gif')" alt=""/></a>
+            </div>
+        #if($action.canShowPrices)
+            #addToCart($p)
+        #end
+        </div>
+    </div>
+</div>
+

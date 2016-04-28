@@ -1,0 +1,23 @@
+<!-- Header incl. Navigation & Search -->
+<header>
+    <div class="texture">
+        <div class="wrap">
+
+            #set( $treemenu = $action.getTreeMenu('TopBar') )
+            #control('menu_horizontal')
+            #set( $treemenu = $util.null )
+
+            #control('search')
+
+        </div>
+    </div>
+</header>
+
+<!-- Title incl. Logo & Social Media Buttons -->
+<section id="title">
+    <h1>&nbsp;</h1>
+
+    #control('menu_social')
+
+    <a href="$!action.url('home')" title="Logo"><img src="/templates/$!{template}/skins/${skin}/images/logo.png" alt="Logo" /></a>
+</section>

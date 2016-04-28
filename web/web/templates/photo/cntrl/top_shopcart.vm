@@ -1,0 +1,17 @@
+<section id="cart" class="$blockAlign">
+    <h2><a href="$!action.url('shopcart')" title="$!action.getText('view.cart')"><img src="$!action.skinFile('images/icon-cart.png')" alt="Cart"/></a>$!action.getText('top.cart')</h2>
+    #if(!$!userSession.items.isEmpty())
+    <p>Your cart currently contains <b>$!userSession.items.size() Items</b> worth <b>$!action.formatActualCurrency($userSession.total)</b></p>
+    <ul>
+        #foreach($item in $util.reverse($userSession.items))
+            #set($_image = "$imageResolver.getImageForProduct($item.beanProd1,'list/')")
+            <li class="$!alternator.auto('even','odd')">
+                <a href="$!action.urlProduct($item.beanProd1)" title="$!{item.quantity} x $!{item.fullName}"><b>$!item.quantity</b> $!item.fullName</a>
+            </li>
+        #end
+    </ul>
+    <p class="right"><a href="$!action.url('shopcart')" title="View Cart"><b>$!action.getText('view.cart')</b></a></p>
+    #else
+        <p>#label('top.cart.empty')</p>
+    #end
+</section>

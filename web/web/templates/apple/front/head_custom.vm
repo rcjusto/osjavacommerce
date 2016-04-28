@@ -1,0 +1,22 @@
+<link rel="stylesheet" type="text/css" href="/struts/css/jquery.jscrollpane.css"/>
+<script type="text/javascript" src="/struts/js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('a.level0').live('click', function(){
+            var ul = $(this).parent().parent().children('ul');
+            if (ul && ul.size()>0 && !ul.is(':visible')) {
+                $('ul.level0').removeClass('expanded');
+                $('ul.level0').parent().children('.has-children').removeClass('expanded');
+                ul.addClass('expanded');
+                $(this).parent().children('.has-children').addClass('expanded');
+            //    if ($(window).scrollTop()>190) jQuery.scrollTo($(this).parent(), 800);
+                return false;
+            }
+            return true;
+        });
+        $('#linkMenuManufacturer').live('click', function(){
+            $('.filterManufacturers').toggle();
+        });
+    });
+</script>

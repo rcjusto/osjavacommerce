@@ -1,0 +1,9 @@
+#control('quick_login')
+#block('top.right')
+#if($listaBS && !$listaBS.isEmpty()) #else #set($listaBS = $action.getBestSellers(5)) #end
+#if($titleBS && $util.isNotEmpty($titleBS)) #else #set($titleBS = 'best.seller.products') #end
+#control('product_list' $util.map.add('_prodList',$listaBS).add('_prodTemplate','right_product').add('_blockTitle',$titleBS))
+#control('menu_social')
+#banners('right-column')
+##control('comment')
+

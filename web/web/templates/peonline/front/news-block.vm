@@ -1,0 +1,17 @@
+#if($news && $news.listado.size()>0)
+
+    <div class="news">
+        <h2>#label('news.title')</h2>
+        <ul>
+            #foreach($n in $news.listado)
+            <li>
+                <h4>$!n.title</h4>
+                <p class="date">$!util.formatDate($n.date, $locale.language)</p>
+                <p class="resume">$!util.abbreviate($n.resume,300) </p>
+                <p class="link"><a target="_blank" href="$!n.link">#label('news.more')</a></p>
+            </li>
+            #end
+        </ul>
+    </div>
+
+#end

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    #parse('/WEB-INF/views/front/head.vm')
+</head>
+<body>
+    $!extraTopContent
+    <div id="pageContent" class="$!locale.language">
+        #parse('/WEB-INF/views/front/top.vm')
+        #if($util.isNotEmpty($contentPage))<div>#parse($contentPage)</div>#end
+        #parse('/WEB-INF/views/front/bottom.vm')
+    </div>
+    <div id="dialogo"><div id="dialogContent"></div></div>
+    $!extraBottomContent
+</body>
+</html>

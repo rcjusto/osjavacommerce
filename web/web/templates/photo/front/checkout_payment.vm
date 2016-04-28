@@ -1,0 +1,80 @@
+    <div id="checkoutPaymentBlock" class="clearfix">
+        <div class="error" style="display:none;">
+            <h2>#label('error.incorrect.data')</h2>
+            <p>#label('error.must.select.an.option')</p>
+        </div>
+        <div id="paymentSelectMethod">
+            <h3>#label('select.payment.method')</h3>
+            <ul>
+                #foreach($m in $methods)
+                    <li>
+                        <label>
+                            <input type="radio" name="paymentService" #if($paymentService==$m.get('name')) checked="checked" #end id="payment_$!{m.get('id')}" class="serviceName" value="$!m.get('name')">
+                            <span id="label_payment_$!{m.get('id')}">#label("$!m.get('label')")</span>
+                        </label>
+                    </li>
+                #end
+            </ul>
+            #if($rewardsEnabled && $frontUser && $frontUser.rewardPoints>0)
+                <div class="reward-points">
+                <p>$!action.getText('rewards.not.using.info',[$frontUser.rewardPoints, $!action.formatActualCurrency($math.mul($frontUser.rewardPoints,$rewardsRate))])</p>
+                <label><input type="checkbox" name="useRewardPoints" value="Y"/> #label('use.my.reward.points')</label>
+                </div>
+            #end
+        </div>
+
+        <div id="paymentMethodInfo">
+            #foreach($m in $methods)
+                <div id="form_payment_$!{m.get('id')}" class="payment_form" style="display:none;">
+                    #block("$m.label")
+                    <div class="payment-form">$!m.get('form')</div>
+                </div>
+            #end
+
+            <div id="blockCustomData">
+                #if($action.getStoreProperty('allow.order.custom.reference','N')=='Y')
+                    <label>
+                        <span class="label">#label('order.custom.reference')</span>
+                        <input type="text" name="customReference" value="" class="field string-300"/>
+                    </label>
+                #end
+                #if($action.getStoreProperty('allow.order.custom.message','N')=='Y')
+                    <label>
+                        <span class="label">#label('order.custom.message')</span>
+                        <textarea name="customMessage" class="field string-300" rows="3"></textarea>
+                    </label>
+                #end
+            </div>
+        </div>
+    </div>
+    <div class="button-bar clearfix">
+        <button type="button" id="btnPayment"><span class="next">#label('next')</span></button>
+    </div>
+<script type="text/javascript">
+    function reloadNextStep(info) {
+        activateTitle(5);
+        setTitleData(4, info);
+        $('#contOrderConfirm').loadingSmall().show().load("$action.url('checkout_get_confirm')", {idShopCart: $!shopCart.id});
+    }
+    $(function() {
+        $('input.serviceName').click(function() {
+            $('.payment_form').hide();
+            $('#form_' + $(this).attr('id')).show();
+        });
+        $('#btnPayment').click(function(){
+            $('#checkoutPaymentBlock').find('.error').hide();
+            if ($('input.serviceName:checked').size()<1) {
+                $('#checkoutPaymentBlock').find('.error').show();
+                return false;
+            }
+            if ($('#formPaymentConfirm').validForm()) {
+                var titleData = $('#label_'+$('input.serviceName:checked').attr('id')).html();
+                var data = $('#formPaymentConfirm').serialize();
+                jQuery.post("$!action.url('checkout_set_payment')", data, function(res) {
+                    reloadNextStep(titleData +', '+ res.data);
+                });
+            }
+        });
+        $('input.serviceName').click(function(){ $('#checkoutPaymentBlock').find('.error').hide(); });
+    })
+</script>

@@ -1,0 +1,157 @@
+
+<!-- si hay categoria mostrar las subcategorias -->
+#if ($category)
+
+    #set($categoryHierarchyId = $action.getCategoryHierarchyId($category.idCategory))
+    #set($_treeCategories = $action.sortCategories($action.getSubCategories($category.idCategory, true)))
+    #if ($_treeCategories && !$_treeCategories.isEmpty())
+
+    <section id="tags" class="$blockAlign">
+        <h2>$!category.getCategoryName($action.locale.language)</h2>
+        <ul>
+            #foreach($cat in $_treeCategories)
+                <li class="$!alternator.auto('even','odd')">
+                    <a href="$!action.urlCategory($cat)" title="$!cat.name">$!cat.name
+                        <span class="num-products">$!cat.products</span>
+                    </a>
+                </li>
+            #end
+        </ul>
+    </section>
+
+    #end
+    #set($_treeCategories = $util.null)
+
+<!-- filtros aplicados -->
+    #if($util.isNotEmpty($filtersBreadcrumb))
+    <section id="tags" class="$blockAlign">
+        <h2>#label('active.filters')</h2>
+        <ul>
+            #foreach($bc in $filtersBreadcrumb)
+                #if($util.isNotEmpty($bc.close))
+                    <li class="$!alternator.auto('even','odd')">
+                        <span style="display: inline-block;">$!bc.name</span>
+                        <a href="#" class="closefilter-$!{bc.type}" style="display: inline-block;" data="$!bc.close">(X)</a>
+                    </li>
+                #end
+            #end
+        </ul>
+    </section>
+    #end
+
+
+<!-- mostrar el menu de manufacturers -->
+
+    #if($util.isNotEmpty($productFilter.filterManufacturer))
+    #else
+        #set($showManufacters = $math.toInteger($action.getStoreProperty('listing.visible.manufacturers','2')))
+        #set($manufacturers = $extras.get('MANUFACTURER'))
+        #if($util.isNotEmpty($manufacturers))
+
+        <section id="tags" class="$blockAlign">
+            <h2>#label('filter.by.manufacturers')</h2>
+            <ul>
+                #foreach($man in $manufacturers)
+                    <li class="$!alternator.auto('even','odd')" style="#if($velocityCount>=$showManufacters) display: none; #end">
+                        <a href="#" data="$!man.idManufacturer" class="filter-manufacturer" title="$!man.manufacturerName">$!man.manufacturerName
+                            <span class="num-products">$!man.getProperty('NUM_PROD')</span>
+                        </a>
+                    </li>
+                #end
+                #if($manufacturers.size()>$showManufacters)
+                    <li>
+                        <a href="#" class="more-manufacturers">#label('more.manufacturers')</a>
+                    </li>
+                #end
+            </ul>
+        </section>
+        #end
+    #end
+
+<!-- mostrar menu de labels -->
+
+    #if($util.isNotEmpty($productFilter.filterLabel))
+    #else
+        #set($labels = $action.sortMapByValues($extras.get('LABELS')))
+        #if($util.isNotEmpty($labels.keySet()))
+        <section id="tags" class="$blockAlign">
+            <h2>#label('filter.by.options')</h2>
+            <ul>
+                #foreach($labEntry in $labels.entrySet())
+                    <li class="$!alternator.auto('even','odd')">
+                        <a href="#" data="$labEntry.key.code" class="filter-label" title="$!labEntry.key.getName($locale.language)">
+                            $!labEntry.key.getName($locale.language)
+                            <span class="num-products">$!labEntry.value</span>
+                        </a>
+                    </li>
+                #end
+            </ul>
+        </section>
+        #end
+    #end
+
+<!-- menu de precios -->
+    #set($prices = $extras.get('PRICES'))
+    #if($action.canShowPrices && $util.isNotEmpty($prices))
+    <section id="tags" class="$blockAlign">
+        <h2>#label('filter.by.price')</h2>
+        <ul>
+            #foreach($pMap in $prices)
+                #if ($pMap.count && $pMap.count>0)
+                    <li class="$!alternator.auto('even','odd')">
+                        <a href="#" data-min="$!pMap.min" data-max="$!pMap.max" class="filter-price" >
+                            #if($pMap.min)
+                                #if($pMap.max)<span>$!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency()) - $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                                #else<span>#label('over') $!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency())</span>#end
+                            #else
+                                #if($pMap.max)<span>#label('under') $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>#end
+                            #end
+                            <span class="num-products">$!util.formatNumber($pMap.count,'0')</span>
+                        </a>
+                    </li>
+                #end
+            #end
+        </ul>
+    </section>
+    #end
+
+    <!-- menu de atributos -->
+    #set($attributes = $extras.get('ATTRIBUTES'))
+    #if ($util.isNotEmpty($attributes.keySet()))
+        #foreach($cp in $attributes.keySet())
+            #if (!$list.contains($productFilter.propertyAttribute,$!cp.attribute.id))
+
+            <section id="tags" class="$blockAlign">
+                <h2>$!cp.attribute.getAttributeName($locale.language)</h2>
+                <ul>
+                    #foreach($attValue in $attributes.get($cp).keySet())
+                        #if($util.isNotEmpty($attValue))
+                            <li>
+                                <a href="#" class="filter-attribute" data="$!attValue" attr="$!cp.attribute.id">$!attValue</a>
+                                <span class="num-products">$!attributes.get($cp).get($attValue)</span>
+                            </li>
+                        #end
+                    #end
+                </ul>
+            </section>
+            #end
+        #end
+    #end
+
+#end
+
+<!-- Siempre mostrar las categorias de primer nivel -->
+#set($_treeCategories = $action.sortCategories($action.getSubCategories($util.null, true)))
+#if ($_treeCategories && !$_treeCategories.isEmpty())
+
+<section id="tags" class="$blockAlign">
+    <h2>#label('shop.by.categories')</h2>
+    <ul>
+        #foreach($cat in $_treeCategories)
+            <li class="$!alternator.auto('even','odd')"><a href="$!action.urlCategory($cat)" title="$!cat.name">$!cat.name</a></li>
+        #end
+    </ul>
+</section>
+
+#end
+#set($_treeCategories = $util.null)

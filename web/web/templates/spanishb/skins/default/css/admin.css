@@ -1,0 +1,9 @@
+#header {background:url("img/top_back.jpg") repeat-x; color:white;}
+#header a {color:white}
+
+/* Menu superior  */
+#adminmenu ul li a {color:#791101;}
+#adminmenu ul li.selected a {background-color:#720f00 !important;}
+#adminmenu ul li.hover a {background-color:#791101 !important;}
+.adminsubmenu {background-color:#791101;}
+.adminsubmenu ul li {border-bottom:1px dotted #aaa;}

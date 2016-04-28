@@ -1,0 +1,126 @@
+<div id="blockContent" class="listing-page clearfix">
+    #surl('id=urlFormProducts' "action=search")
+    <form id="formProducts" action="$urlFormProducts" method="post">
+        <input type="hidden" id="query" name="query" value="$!query"/>
+
+        <div id="leftColumn">
+            #parse("/WEB-INF/views/${template}/front/left_column.vm")
+        </div>
+
+        <div id="centerColumn">
+            <div class="category-centercol">
+                <h1>$!products.totalRows #label('search.results.for') <span>"$!query"</span></h1>
+                <!-- Zona de banners -->
+                #banners( 'category-top' 1 $category )
+
+                #if($!products.totalRows>0)
+                    <!--Navegador-->
+                    <div id="categoryNavigator" class="list clearfix">
+                        <div style="float:left;margin:3px 0;">
+                            <span class="total-items">$!products.totalRows #label('navigator.item.number')</span>
+
+                            #set($orderOptions = [10,20,40,80])
+                            <label class="items-per-page">
+                                #label('navigator.items.per.page')
+                                <select name="${products.name}.pagerows" class="field reload items-select">
+                                    #foreach($opt in $orderOptions)
+                                        <option value="$opt" #if($opt==$!products.pageRows) selected="selected" #end >$opt</option>
+                                    #end
+                                    <option value="0" #if($!products.pageRows==0) selected="selected" #end>#label('navigator.items.per.page.all')</option>
+                                </select>
+                            </label>
+
+                            <label class="pages">
+                                #label('navigator.page')
+                                <select name="${products.name}.currentpage" class="field reload current-page">
+                                    #foreach($opt in [1..$products.pageCount])
+                                        <option value="$opt" #if($opt==$!products.currentPage) selected="selected" #end >$opt</option>
+                                    #end
+                                </select>
+                            </label>
+                        </div>
+                        #set($viewOptions = ['list','grid'])
+                        <span class="view clearfix">
+                        <a class="grid" href="#"></a>
+                        <a class="list" href="#"></a>
+                    </span>
+                    </div>
+                #else
+                    <div id="blockSearchAgain">
+                        <label>
+                            <span>#label('search.try.again')</span>
+                            <input type="text" id="searchAgain" name="query" value="$!esc.html($query)" class="required field string-200"/>
+                        </label>
+                        <button type="button" onclick="$('#querySearch').val($('#searchAgain').val());$('#formSearch').submit();"><span>#label('search')</span></button>
+                    </div>
+                #end
+
+                <!-- Listado de productos -->
+                #if($util.isNotEmpty($products.listado))
+                    <div id="categoryProducts">
+                        <ul>
+                            #foreach($p in $products.listado)
+                                <li>
+                                    #parse("/WEB-INF/views/${template}/front/category_product.vm")
+                                </li>
+                            #end
+                        </ul>
+                        <div style="clear:both;"></div>
+                    </div>
+                #end
+
+                #if($products.needPagination())
+                    <div id="categoryNavigatorBottom" class="list">
+                        #if($products.isPrevPage())
+                            <a href="#" rel="1" class="gotopage navigator-first"></a>
+                            <a href="#" rel="$!products.getPrevPage()" class="gotopage navigator-prev"></a>
+                        #end
+                        <div class="page">
+                            #label('navigator.page')
+                            <span>$!products.currentPage</span>
+                        </div>
+                        #if($products.isNextPage())
+                            <a href="#" rel="$!products.getNextPage()" class="gotopage navigator-next"></a>
+                            <a href="#" rel="$!products.getPageCount()" class="gotopage navigator-last"></a>
+                        #end
+                        <div style="clear:both;"></div>
+                    </div>
+                #end
+
+            </div>
+        </div>
+
+    </form>
+</div>
+<script type="text/javascript">
+    function setNavigatorView(v) {
+        $('#categoryProducts').attr('class', v);
+        jQuery.cookie('category.navigator.view', v);
+        return false;
+    }
+    $(function() {
+        $('select.reload').change(function() {
+            $('#formProducts').submit();
+        });
+        $('a.grid').click(function() {
+            return setNavigatorView('grid')
+        });
+        $('a.list').click(function() {
+            return setNavigatorView('list')
+        });
+        var navView = jQuery.cookie('category.navigator.view');
+        setNavigatorView((navView == 'grid') ? 'grid' : 'list');
+        $('#searchAgain').keypress(function(event) {
+            if (event.keyCode == '13') {
+                event.preventDefault();
+                $('#querySearch').val($('#searchAgain').val());
+                $('#formSearch').submit();
+            }
+        });
+        $('a.gotopage').click(function() {
+            $('.current-page').val($(this).attr('data'));
+            $('#formProducts').submit();
+            return false;
+        });
+    });
+</script>

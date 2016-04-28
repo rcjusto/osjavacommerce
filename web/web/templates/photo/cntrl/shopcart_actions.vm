@@ -1,0 +1,20 @@
+<div class="right shopcart-actions">
+    #if($shoppingCart.status!='pending' && ($action.getStoreProperty('shopcart.can.quote','')=='Y' || $shoppingCart.needQuote()))
+        <a class="shopcart-save button" href="$!action.url('shopcartsave','',$util.toMap(['output','quote']))"><span>#label('shopcart.request.quote')</span></a>
+    #end
+    #if(!$shoppingCart.needQuote())
+        #if($action.canCheckout)
+            #if($action.getStoreProperty('onepage.checkout','Y')=='Y')
+                <a class="checkout button" href="$!action.url('checkout')"><span>#label('shopcart.checkout')</span></a>
+            #else
+                <a class="checkout button" href="$!action.url('paystepAddress')"><span>#label('shopcart.checkout')</span></a>
+            #end
+            #if($action.allowAnonymousCheckout)
+                <a class="checkout-anonymous button" href="$!action.url('payanonymousform')"><span>#label('shopcart.checkout.anonymous')</span></a>
+            #end
+        #end
+        #foreach($m in $metodos)
+            <a class="payment $!m.get('name') button" href="$!action.url('paystepExternal','',$util.toMap(['paymentService',$!m.get('name')]))"><span>#label("$!m.get('label')")</span></a>
+        #end
+    #end
+</div>

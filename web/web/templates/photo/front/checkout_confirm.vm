@@ -1,0 +1,161 @@
+<div class="confirm-order">
+    #block('confirm.order.top')
+
+    <table class="table-items" width="100%">
+        <tr>
+            <th class="name">#label('shopcart.product')</th>
+            <th class="quantity non-important">#label('quantity')</th>
+            <th class="precio non-important">#label('shopcart.unitary.price')</th>
+            <th class="precio">#label('shopcart.line.price')</th>
+        </tr>
+        #foreach($it in $shopCart.items)
+            <tr class="product">
+                <td class="name"><b class="show-smartphone">$!it.quantity</b> $!it.name1 #if($it.beanProd2)+ $!it.name2 #end</td>
+                <td class="quantity non-important">$!it.quantity</td>
+                <td class="precio non-important">$!action.formatActualCurrency($it.price)</td>
+                <td class="precio">$!action.formatActualCurrency($it.subtotal)</td>
+            </tr>
+            #if($it.fees && !$it.fees.isEmpty())
+                #foreach($fee in $it.fees)
+                    <tr class="fee">
+                        <td class="name">#label('fee') <b class="show-smartphone">$!it.quantity</b> $!fee.fee.getFeeName()</td>
+                        <td class="quantity non-important">$!it.quantity</td>
+                        <td class="precio non-important">$!action.formatActualCurrency($fee.getTotal($it))</td>
+                        <td class="precio">$!action.formatActualCurrency($math.mul($fee.getTotal($it),$it.quantity))</td>
+                    </tr>
+                #end
+            #end
+            #if($it.beanComponent)
+                <tr class="complement">
+                    <td class="name">#label('complement') <b class="show-smartphone">$!it.quantity</b> $!it.beanComponent.getProductName($locale.language)</td>
+                    <td class="quantity non-important">$!it.quantity</td>
+                    <td class="precio non-important">$!action.formatActualCurrency($it.complementPrice)</td>
+                    <td class="precio">$!action.formatActualCurrency($math.mul($it.complementPrice,$it.quantity))</td>
+                </tr>
+            #end
+        #end
+        #foreach($promo in $scu.promotions)
+            #if($promo.type=='product')
+                <tr class="product">
+                    <td>#label('promo') $!promo.code $!promo.name (<b class="show-smartphone">1</b> $!action.getProduct($promo.data).getProductName($locale.language))</td>
+                    <td class="quantity non-important">1</td>
+                    <td class="precio non-important">$!action.formatActualCurrency(0)</td>
+                    <td class="precio">$!action.formatActualCurrency(0)</td>
+                </tr>
+            #end
+        #end
+
+        <tr class="subtotal products">
+            <td>#label('subtotal.products')</td>
+            <td class="non-important">&nbsp;</td>
+            <td class="non-important">&nbsp;</td>
+            <td class="precio">$!action.formatActualCurrency($scu.subtotalProduct)</td>
+        </tr>
+        #if($scu.percentInterest && $scu.percentInterest>0)
+            <tr class="subtotal">
+                <td>#label('percent.interest')
+                    <span class="tax-detail">$!number.format('0.##',$scu.percentInterest) #label('of') $!action.formatActualCurrency($scu.totalWithoutInterest)</span></td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">$!action.formatActualCurrency($scu.subtotalInterest)</td>
+            </tr>
+        #end
+        #if($scu.subtotalFees && $scu.subtotalFees>0)
+            <tr class="subtotal">
+                <td>#label('subtotal.fees')</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">$!action.formatActualCurrency($scu.subtotalFees)</td>
+            </tr>
+        #end
+        #foreach($promo in $scu.promotions)
+            #if($promo.type=='discount')
+                <tr class="subtotal promotion">
+                    <td class="promo">#label('promo'): $promo.get('code') - $!promo.get('name')</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="precio">$!action.formatActualCurrency($promo.get('value'))</td>
+                </tr>
+            #end
+            #if($promo.type=='discount-percent')
+                <tr class="subtotal promotion">
+                    <td class="promo">#label('promo'): $promo.get('code') - $!promo.get('name')</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="precio">$!action.formatActualCurrency($promo.get('value'))</td>
+                </tr>
+            #end
+        #end
+        #if($scu.shippingNeeded)
+            <tr class="subtotal shipping">
+                <td>
+                    #if($scu.isFreeShipping())
+                        #set($promFS = $scu.getFirstPromotionByType('free-shipping'))
+                        #if($promFS)
+                            #label('promo'): $!promFS.code - $!promFS.name
+                        #else
+                            #label('free.shipping')
+                        #end
+                    #else
+                        #label('subtotal.shipping'):
+                        #if($shopCart.pickInStore)
+                            #label('pick.in.store')
+                        #else
+                            #if($shopCart.shippingMethod)
+                                $!shopCart.shippingMethod.getMethodName($locale.language)
+                            #end
+                        #end
+                    #end
+                </td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">$!action.formatActualCurrency($scu.subtotalShipping)</td>
+            </tr>
+        #end
+        #if($scu.insurance)
+            <tr class="subtotal insurance">
+                <td>#label('subtotal.shipping.insurance')</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">$!action.formatActualCurrency($scu.insurance.insuranceValue)</td>
+            </tr>
+        #end
+        #foreach($tax in $scu.taxes)
+            <tr class="subtotal tax">
+                <td>#label('subtotal.tax') $!tax.name
+                    <span class="tax-detail">( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax) )</span></td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">$!action.formatActualCurrency($tax.value)</td>
+            </tr>
+        #end
+        #if($scu.rewardsUsedPoints && $scu.rewardsUsedPoints>0)
+            <tr class="subtotal">
+                <td>#label('used.rewards') $!scu.rewardsUsedPoints #label('reward.points')</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="non-important">&nbsp;</td>
+                <td class="precio">- $!action.formatActualCurrency($scu.rewardsToUse)</td>
+            </tr>
+        #end
+        <tr class="row-total">
+            <td>#label('subtotal.total')</td>
+            <td class="non-important">&nbsp;</td>
+            <td class="non-important">&nbsp;</td>
+            <td class="precio">$!action.formatActualCurrency($scu.total)</td>
+        </tr>
+    </table>
+    <div class="button-bar clearfix">
+        <button type="button" id="btnPayOrder"><span class="pay">#label('confirm.order')</span></button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#btnPayOrder').click(function () {
+            if ($('#formPaymentConfirm').validForm()) {
+                $('#formPaymentConfirm').attr('action', "$!action.url('checkout_save_order')").attr('method', 'post').submit();
+            } else {
+                $('#contPaymentInfo').show();
+            }
+        });
+    })
+</script>

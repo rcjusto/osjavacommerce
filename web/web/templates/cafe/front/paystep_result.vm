@@ -1,0 +1,40 @@
+<section id="left-column">
+
+        #if($blockCode)
+            <section class="block">
+            #block("$blockCode")
+            </section>
+        #end
+
+    <section id="main">
+
+        <div>
+            #parse("/WEB-INF/views/${template}/front/orderinfo.vm")
+        </div>
+
+        <div class="button-bar">
+            <a class="button non-important" onclick="printOrder();return false;"><span>#label('printable.version')</span></a>
+            #surl('id=urlOrders' "action=orders")
+            <a class="button" href="$urlOrders"><span>#label('my.orders')</span></a>
+            #surl('id=urlHome' "action=home")
+            <a class="button" href="$urlHome"><span>#label('buy.again')</span></a>
+        </div>
+
+    </section>
+
+</section>
+
+#control('aside')
+
+<script type="text/javascript">
+    var wndPrint = null;
+    function printOrder() {
+        if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+        var url = "$!action.url('order','',$util.map.add('output','print').add('idOrder',$!order.idOrder.toString()))";
+        wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+        wndPrint.focus();
+    }
+</script>
+#if($googleTracking)
+    #parse('/WEB-INF/views/front/google_ecommerce_tracking.vm')
+#end

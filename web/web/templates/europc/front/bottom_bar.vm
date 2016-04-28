@@ -1,0 +1,99 @@
+#set($friendAmount = $dao.getEarnsFromFriends($frontUser))
+#set($messageCount = $dao.getFriendsMessagesCount($frontUser, true))
+#set($friends = $dao.getUserFriends($frontUser))
+#set($_totalMsg = 0 )
+#foreach($mc in $messageCount.values()) #set($_totalMsg = $math.add($_totalMsg, $mc)) #end
+<div id="rewardsSpacer"></div>
+<div id="rewardsControlPanel">
+    <div id="rewardsControlPanelLogo"></div>
+    <div class="panel-content">
+    <h2>#label('user.panel')</h2>
+    <div class="panel-block send-friend">
+        <div class="arrow"><a href="$!action.url('friendRefer')">#label('send.to.friend')</a></div>
+    </div>
+    <div class="panel-sep"></div>
+    <div class="panel-block user-points">
+        <a href="$!action.url('rewardHistory')">#label('reward.points') $!frontUser.rewardPoints</a>
+        <div>$math.ceil($!math.div(1,$!rewardsRate)) #label('points') = 1 $!action.defaultCurrency.code</div>
+    </div>
+        <div class="panel-sep"></div>
+    <!--div class="panel-block social-sites">
+        #label('follow.us')
+        <a class="facebook" href="#" onclick="return false;"></a>
+        <a class="twiter" href="#" onclick="return false;"></a>
+    </div>
+        <div class="panel-sep"></div-->
+    <div class="panel-block product-report">
+        <a href="$!action.url('friendsSalesReport')">#label('top.products')</a>
+    </div>
+        <div class="panel-sep-full"></div>
+    <div id="rewardsControlPanelBlockFriends" class="panel-block friends has-menu">
+        <a id="rewardsControlPanelFriendsLink" class="link clearfix">
+            <div class="welcome arrow">#label('welcome') $!frontUser.fullName</div>
+            #if($!_totalMsg>0)<div class="messages">$!_totalMsg</div>#end
+        </a>
+        <div id="rewardsControlPanelFriends" class="menu">
+            <div class="clearfix menu-head">
+                <h3>#label('friend.control')</h3>
+                <a class="close-menu" href="#" onclick="$('#rewardsControlPanelBlockFriends').removeClass('active');return false;"></a>
+            </div>
+            <h4>#label('referred.friends')</h4>
+            <ul>
+            #foreach($f in $friends)
+                #if($f.referred)
+                    <li class="clearfix">
+                        <a href="$!{action.url('friendData')}?idUser=$!{f.friend.idUser}" class="#if($messageCount.containsKey($f.friend)) has-message #end referred">$!f.friend.email</a>
+                        <div class="amount">#if($friendAmount.containsKey($f.friend)) $!number.format('0',$friendAmount.get($f.friend)) #label('points') #end</div>
+                    </li>
+                #end
+            #end
+            </ul>
+            <h4>#label('other.friends')</h4>
+            <ul>
+            #foreach($f in $friends)
+                #if(!$f.referred)
+                <li class="clearfix">
+                    #if($f.friend)
+                    <a href="$!{action.url('friendData')}?idUser=$!{f.friend.idUser}" class="registered #if($messageCount.containsKey($f.friend)) has-message #end">$!f.friend.email</a>
+                    #else
+                    <a href="#" onclick="return false;" class="#if($messageCount.containsKey($f.friend)) has-message #end">$!f.friendEmail</a>
+                    #end
+                </li>
+                #end
+            #end
+            #foreach($u in $messageCount.keySet())
+                #if(!$dao.userHasFriend($frontUser,$u))
+                    <li class="clearfix">
+                        <a href="$!{action.url('friendData')}?idUser=$!{u.idUser}" class="registered #if($messageCount.containsKey($u)) has-message #end">$!u.email</a>
+                    </li>
+                #end
+            #end
+            </ul>
+        </div>
+    </div>
+    <div class="panel-block logout">
+        #linklabel('logout' $action.url('logout'))
+    </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#rewardsControlPanel').css({height: 0}).animate({ height: '53' }, 'slow');
+
+        // Hook up menu root click event.
+        $('.has-menu').find('a.link').each(function(){
+            $(this).attr( "href", "javascript:void( 0 )" ).click(function(){
+                $(this).parent().toggleClass('active');
+                $(this).blur();
+                return( false );
+            });
+        });
+
+        $( document ).click(function( event ){
+            if ($( "#rewardsControlPanelFriends" ).is( ":visible" ) && !$( event.target ).closest( "#rewardsControlPanelFriends" ).size()) {
+                $('#rewardsControlPanelBlockFriends').removeClass('active');
+            }
+        });
+
+    });
+</script>

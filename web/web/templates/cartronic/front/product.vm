@@ -1,0 +1,513 @@
+#set($categoryHierarchy = $action.getCategoryHierarchy($category.idParent))
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+#set($rebate = $product.rebate )
+
+<div id="blockContent" class="product-page clearfix">
+
+<div id="leftColumn">
+    #parse("/WEB-INF/views/${template}/front/left_column.vm")
+</div>
+
+<div id="centerColumn">
+
+<div class="product-centercol">
+
+<!-- Breadcrumb -->
+<div id="productBreadcrumb">
+    <ul class="clearfix">
+        #surl( 'id=urlHome' "action=home" )
+        <li class="home"><a href="$urlHome"></a></li>
+        #if($category)
+            #foreach($c in $action.getCategoryHierarchy($category.idCategory))
+                <li class="category"><a href="$!action.urlCategory($c)">$!c.getCategoryName($locale.language)</a></li>
+            #end
+        #end
+        <li class="product"><span>$!util.abbreviate($product.getProductName($locale.language),40)</span></li>
+    </ul>
+</div>
+
+<div class="clearfix">
+    #set($image = $imageResolver.getImageForProduct($product,''))
+    #set($images = $imageResolver.getImagesForProduct($product,''))
+    #if(!$list.isEmpty($images))
+        <div id="productImages">
+            #if($images.size()>1)
+                <div class="image"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/></div>
+                <div class="thumbnails clearfix">
+                    <ul>
+                        #foreach($img in $images)
+                            <li><a class="lightbox" rel="gallery" href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($!img)"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($img)" alt=""/></a></li>
+                        #end
+                    </ul>
+                </div>
+            #else
+                <div class="image"><a class="lightbox" rel="gallery" href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($image)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($image)" alt="$!{productLang.productName}"/></a></div>
+            #end
+        </div>
+    #end
+    <div id="gallery" style="top: 198.1px; position: absolute; width: 500px; height: 258px; left: 580.5px; display: none;"></div>
+
+    <div id="productData" #if(!$list.isEmpty($images)) class="data-to-right" #end>
+        <div class="name">$!{product.getProductName($locale.language)}</div>
+        <div class="code">#label('part.number') $!{product.partNumber}</div>
+        #if($action.canShowStock)
+        <div class="stock">
+            #if($product.stock>0)
+                <span class="in-stock">#label('on.stock')</span>
+            #else
+                #if($util.isNotEmpty($product.eta))
+                    <span class="backorder">#label('backorder.until') $!product.eta</span>
+                #else
+                    <span class="out-of-stock">#label('out.of.stock')</span>
+                    <span class="stock-alert">
+                        #if($frontUser)
+                            #if($frontUser.hasPreference('STOCK_ALERT',"$!product.idProduct"))
+                                <span id="stockAlertAdded" class="action">#label('stock.alert.added')</span>
+                            #else
+                                <span id="stockAlertAdded" class="action" style="display:none;">#label('stock.alert.added')</span>
+                            <span id="stockAlertLoading" style="display:none;" class="action">#label('loading')</span>
+                            <span id="stockAlertLink" class="action">#linklabel('add.stock.alert' '#' 'addtostockalert')</span>
+                            #end
+                        #end
+                    </span>
+                #end
+            #end
+        </div>
+        #end
+        <div class="description">$!{productLang.description}</div>
+
+        #if($action.canShowPrices)
+            <div class="prices clearfix">
+
+                <!-- Old Price -->
+                    <!-- NOT USED IN THIS TEMPLATE
+                    #if($util.isNotEmpty($product.oldPrice))
+                <div class="old-price">#label('product.old.price') $!action.formatActualCurrency($product.oldPrice)</div>
+            #end
+            -->
+
+                #if($priceMap.containsKey('OFFER'))
+                    <!-- Offer -->
+                    <div class="price">
+                        <div class="offer-price">#fancyPrice($action.toActualCurrency($priceMap.get('FINAL_OFFER_PRICE')))</div>
+                        <div class="offer-end">#label('product.offer.until') $!util.formatDate($priceMap.get('OFFER').dateTo, $locale.language)</div>
+                    </div>
+                    <div class="other-prices">
+                        <div class="our-price">#label('product.our.price') $!action.formatActualCurrency($priceMap.get('FINAL_PRICE'))</div>
+                        #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                            <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                            <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST'))</div>
+                        #else
+                            <div class="offer-save">#label('product.offer.save') $!action.formatActualCurrency($priceMap.get('OFFER_DISCOUNT'))</div>
+                        #end
+                    </div>
+                #else
+                    <!-- Final Price Without Offer -->
+                    <div class="price">#fancyPrice($action.toActualCurrency($priceMap.get('FINAL_PRICE')))</div>
+                    <!-- List Price -->
+                    <div class="other-prices">
+                        #if($priceMap.containsKey('SAVE_FROM_LIST'))
+                            <div class="list-price">#label('product.list.price') $!action.formatActualCurrency($product.listPrice)</div>
+                            <div class="save-from-list">#label('product.save.instantly') $!action.formatActualCurrency($priceMap.get('SAVE_FROM_LIST'))</div>
+                        #end
+                    </div>
+                #end
+
+                <!-- Volume Prices -->
+                #if($util.isNotEmpty($priceMap.get('VOLUME_LIST')))
+                    <div class="volume-price">
+                        <ul>
+                            #foreach($vp in $priceMap.get('VOLUME_LIST'))
+                                <li>
+                                    <span class="volume-price-data">
+                                        #label('product.volume.buy') $!vp.volume
+                                        #label('product.volume.at') $!action.formatActualCurrency($vp.unitPrice)
+                                        #label('product.volume.eachone')
+                                    </span>
+                                    <span class="volume-price-text">$!vp.description</span>
+                                </li>
+                            #end
+                        </ul>
+                    </div>
+                #end
+            </div>
+        #end
+
+        <div class="clearfix">
+
+            <!-- form -->
+            <div class="addtocart clearfix">
+                #set($maxCant = $math.sub($product.getMaxToBuy($frontUser), $userSession.getNumProduct($product.idProduct)))
+                #if($maxCant>0 && $action.canShowPrices)
+                    <form id="formBuy" action="$!action.url('addtocart','')" method="post" class="validable">
+                        <input type="hidden" name="idProduct" value="$!product.idProduct"/>
+                        #if($product.dateSelection=='Y')
+                            <div class="dateselection">
+                                #label('date')
+                                <input type="text" value="" class="field date required" readonly="readonly"/>
+                                <input type="hidden" id="selDate" name="selDate" value=""/>
+                                <span class="field_error"></span>
+                            </div>
+                        #end
+                        #if($util.isNotEmpty($productVariations))
+                            <div class="variation">
+                                #label('select')
+                                <select name="variation" class="field string-200">
+                                    #foreach($v in $productVariations)
+                                        #set( $priceInc = $!action.formatActualCurrency($priceMap.get("VARIATION_INC_${v.id}")) )
+                                        #if($priceMap.containsKey("VARIATION_INC_${v.id}"))
+                                            #set($addOpt = "(+ $!priceInc)")
+                                        #else
+                                            #set($addOpt = '')
+                                        #end
+                                        <option value="$v.id">$!v.fullOption $!addOpt</option>
+                                    #end
+                                </select>
+                            </div>
+                        #end
+                        <div class="quantity">
+                            #label('quantity')
+                            <input type="text" name="quantity" value="1" class="field required integer string-50" maxValue="$!maxCant"/>
+                            <span class="field_error"></span>
+                        </div>
+                        <div class="button">
+                            <input type="image" src="$!action.skinFile('images/[lang]/add_cart_button.jpg')" value="Add To Cart"/>
+                        </div>
+                    </form>
+                #end
+            </div>
+
+            #set($productLabels = $action.getProductLabels($product))
+            #if($util.isNotEmpty($productLabels))
+                <div class="labels">
+                    <ul>
+                        #foreach($lab in $productLabels)
+                            #if($util.isNotEmpty($lab.getContentDetail($locale.language)))
+                                <li>$!lab.getContentDetail($locale.language)</li>
+                            #end
+                        #end
+                    </ul>
+                </div>
+            #end
+
+        </div>
+
+        <div class="actions">
+            <span class="action">#linklabel('product.print.this.page' '#' 'print')</span>
+            <span class="action">#linklabel('product.mailToFriend' '#' 'mailtofriend')</span>
+            #if($action.productInWishList($product.idProduct))
+                <span id="wishListAdded" class="action">#label('product.in.wishlist')</span>
+            #else
+                <span id="wishListAdded" class="action" style="display:none;">#label('product.in.wishlist')</span>
+                <span id="wishListLoading" style="display:none;" class="action">#label('loading')</span>
+                <span id="wishListLink" class="action">#linklabel('product.add.to.wishlist' '#' 'addtowishlist')</span>
+            #end
+        </div>
+        <div id="divMailProduct">
+            #parse('/WEB-INF/views/front/mailproduct.vm')
+        </div>
+    </div>
+
+</div>
+
+<div id="productTabs">
+    <ul class="tabs">
+        #if($util.isNotEmpty($productLang.information))
+            <li><a href="#tabInformation">#label('information')</a></li>#end
+        #if($util.isNotEmpty($productLang.features))
+            <li><a href="#tabFeatures">#label('features')</a></li>#end
+        #if($productAttributes && $util.isNotEmpty($productAttributes))
+            <li><a href="#tabSpecifications">#label('specifications')</a></li>#end
+        #if($rebate)
+            <li><a href="#tabRebate">#label('product.rebate')</a></li>#end
+        #if($product.getProductResources() && !$product.getProductResources().isEmpty())
+            <li><a href="#tabResources">#label('product.resources')</a></li>#end
+        <li><a href="#tabReviews">#label('reviews')</a></li>
+        #if($productStaticTexts.get('tabs') && $util.isNotEmpty($productStaticTexts.get('tabs')))
+            #foreach($st in $productStaticTexts.get('tabs'))
+                <li><a href="#tab$!st.id">$!st.staticText.getTitle($locale.language)</a></li>
+            #end
+        #end
+        #if($backlinks && $util.isNotEmpty($backlinks))
+            <li><a href="#tabBackLinks">#label('product.back.links')</a></li>
+        #end
+    </ul>
+    #if($util.isNotEmpty($productLang.information))
+        <div id="tabInformation" class="information">$!{productLang.information}</div>
+    #end
+    #if($util.isNotEmpty($productLang.features))
+        <div id="tabFeatures" class="features">$!{productLang.features}</div>
+    #end
+    #if($productAttributes && $util.isNotEmpty($productAttributes))
+        <div id="tabSpecifications" class="specifications">
+            <table>
+            #foreach($att in $productAttributes)
+                <tr>
+                    <th>$!att.attribute.getAttributeName($locale.language)</th>
+                    <td>$!att.propertyValue</td>
+                </tr>
+            #end
+            </table>
+        </div>
+    #end
+
+    #if($rebate)
+        #surl('id=urlResource' "action=resource" "idResource=$!rebate.id")
+        <div id="tabRebate" class="rebate">
+            
+            <h2>$!rebate.getResourceName($locale.language)</h2>
+            <h4>-$!util.action.formatActualCurrency($rebate.resourceValue) valid until $!util.formatDate($rebate.resourceDate, $locale.language)</h4>
+            <p>$!rebate.getResourceDescription($locale.language)</p>
+            <a href="$!urlResource" target="_blank">#label('more.info')</a>
+        </div>
+    #end
+
+    #if($product.getProductResources() && !$product.getProductResources().isEmpty())
+        <div id="tabResources" class="resources">
+            <ul>
+            #foreach($res in $product.getProductResources())
+                #if($res.valid)
+                #surl('id=urlResource' "action=resource" "idResource=$!res.id")
+                <li>
+                    <h2>$!res.getResourceName($locale.language)</h2>
+                    #if($util.isNotEmpty($!res.getResourceDescription($locale.language)))<p>$!res.getResourceDescription($locale.language)</p>#end
+                    <a href="$!urlResource" target="_blank">$!res.fileName</a>
+                </li>
+                #end
+            #end
+            </ul>
+        </div>
+    #end
+
+    <div id="tabReviews">
+        <div class="clearfix">
+            #if($util.isNotEmpty($reviews.listado))
+                <div class="reviews-data">
+                    <div class="reviews-rating">#label('product.customer.rating') $!util.formatNumber($productReviewsAverage,'0.0') / 10</div>
+                    <div class="reviews-total">#label('product.customer.reviews') $!reviews.totalRows</div>
+                </div>
+            #end
+            #if($action.canAddReview())
+            <div class="reviews-add">
+                <p>#label('product.review.add.text')</p>
+                <a href="#" onclick="return addReview();">#label('product.review.add')</a>
+            </div>
+            #else
+                #if($frontUser) #else #label('register.to.review.this.product') #end
+            #end
+        </div>
+        #if($util.isNotEmpty($reviews.listado))
+            <div id="productReviewList" class="clearfix">
+                #parse('/WEB-INF/views/front/product_reviews.vm')
+            </div>
+        #end
+
+    </div>
+
+    #if($productStaticTexts.get('tabs') && $util.isNotEmpty($productStaticTexts.get('tabs')))
+        #foreach($st in $productStaticTexts.get('tabs'))
+            <div id="tab$!st.id">$!st.staticText.getLanguage($locale.language).value</div>
+        #end
+    #end
+
+    #if($backlinks && $util.isNotEmpty($backlinks))
+        <div id="tabBackLinks">
+            <ul class="clearfix">
+                #foreach($blP in $backlinks)
+                    #if(!$blP.equals($product))
+                    <li><a href="$action.urlProduct($blP)" rel="">$!blP.getProductName($locale.language)</a></li>
+                    #end
+                #end
+            </ul>
+        </div>
+    #end
+</div>
+
+#parse('/WEB-INF/views/front/product_addreview.vm')
+
+
+<!-- POR EL MOMENTO NO PONER NADA FUERA DE LOS TABS
+#if($productStaticTexts.get('[no-place]') && $util.isNotEmpty($productStaticTexts.get('[no-place]')))
+    <div class="static-texts">
+        <ul>
+            #foreach($st in $productStaticTexts.get('[no-place]'))
+                <li>
+                    <h2>$!st.staticText.getLanguage($locale.language, $defaultLanguage).title</h2>
+                    $!st.staticText.getLanguage($locale.language, $defaultLanguage).value
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+-->
+    #set($listRelated = $action.getProductsRelated($product))
+    #if($maxCant>0)
+        #set($listRelatedCombined = $action.getProductsRelatedCombined($listRelated))
+        #if($util.isNotEmpty($listRelatedCombined))
+        <div id="combinedSale" class="clearfix">
+            <h1>#label('product.packs') </h1>
+            <ul>
+                #foreach($r in $listRelatedCombined)
+                    #set($p = $r.related)
+                    #if($p.getMaxToBuy($frontUser)>0)
+                        <li>
+                            #set($relName = $!p.getLanguage($locale.language,$defaultLanguage).productName)
+                            #set($relImage = $imageResolver.getImageForProduct($p,'list/'))
+                            #set( $relPrice = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+                            #surl('id=urlRelatedDetail' "action=product" "code=$!p.urlCode")
+                            <div class="clearfix">
+                                <div class="combined-images">
+                                    #if($util.isNotEmpty($image))
+                                        <img src="$!action.storeFile('images/products/list')/$!image" alt="$!productLang.productName"/>
+                                    #else
+                                        <img src="$!action.skinFile('images/[lang]/not-available.gif')"/>
+                                    #end
+                                    <img style="margin:35px;" src="$!action.skinFile('css/img/plus.png')" alt="+"/>
+                                    #if($util.isNotEmpty($relImage))
+                                        <a href="$urlRelatedDetail"><img src="$!action.storeFile('images/products/list')/$!relImage" alt="$!relName"/></a>
+                                    #else
+                                        <a href="$urlRelatedDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a>
+                                    #end
+                                    <img style="margin:35px;" src="$!action.skinFile('css/img/equals.png')" alt="="/>
+                                </div>
+                                <div class="combined-price">
+                                    #if($action.canShowPrices)
+                                        <div class="price">
+                                            #fancyPrice($r.combinedPrice)
+                                        </div>
+                                    #end
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="combined-names">
+                                    <div>$!productLang.productName + <a href="$urlRelatedDetail">$!relName</a></div>
+                                </div>
+                                <div class="combined-button">
+                                    #if($action.canShowPrices)
+                                        <div>
+                                            <form id="formCombined$velocityCount" action="$!action.url('addtocart','')" method="post" class="validable">
+                                                <input type="hidden" name="idProduct" value="$!product.idProduct"/>
+                                                <input type="hidden" name="idAdd" value="$!r.related.idProduct"/>
+                                                <input type="image" src="$action.skinFile('images/[lang]/add_cart_button.jpg')" value="Add To Cart"/>
+                                            </form>
+                                        </div>
+                                    #end
+                                </div>
+                            </div>
+                        </li>
+                    #end
+                #end
+            </ul>
+        </div>
+        #end
+    #end
+
+    #if($util.isNotEmpty($listRelated))
+    <div id="productRelated" class="clearfix">
+        <h1>#label('product.related')</h1>
+        <ul>
+            #foreach($r in $listRelated)
+                #set($p = $r.related)
+                #if($p.getMaxToBuy($frontUser)>0)
+                    <li>
+                        #parse("/WEB-INF/views/${template}/front/product_relatedproduct.vm")
+                    </li>
+                #end
+            #end
+        </ul>
+    </div>
+    #end
+
+<div class="hidden">$!product.tracePrice</div>
+
+    #if($action.hasRole('superadmin'))
+    <div style="text-align:right;padding:8px;"><a href="$!{action.url('productedit','admin')}?idProduct=$!{product.idProduct}" target="_blank">Edit Product In Administration Module</a></div>
+    #end
+</div>
+</div>
+</div>
+#surl('id=urlReviews' "action=getreviews")
+#surl('id=urlAddWishList' "action=addtowishlist")
+#surl('id=urlAddStockAlert' "action=addstockalert")
+#surl('id=urlSendmail' "action=productmail")
+#surl('id=urlPrintProduct' "action=product" "idProduct=$!product.idProduct")
+<script type="text/javascript">
+    var reviewDialog;
+    function addReview() {
+        //reviewDialog.load();
+        $('#productReviewNew').dialog({width:670,modal:true,resizable:false,position:['center',50]});
+        return false;
+    }
+    function getReviews(page) {
+        $('.reviews-navigator').html('Loading, please wait...');
+        $('#productReviewList').load("$!urlReviews", {code:"$!product.urlCode",'reviews.currentpage':page});
+        return false;
+    }
+    $(function() {
+        $('#productTabs').tabs();
+        $('#formBuy').submit(function() {
+            return $(this).validForm();
+        });
+        $('input.date').datepicker({minDate: 3, maxDate: 100,altField: '#selDate', altFormat: 'mm/dd/yy'});
+        $(".stars").each(function() {
+            var cc = $(this).attr('id');
+            $(this).stars({
+                captionEl: $("#cap-" + cc),
+                callback: function(ui, type, value) {
+                    $("#input-" + cc).val(eval(value) >= 0 ? value : 0);
+                }
+            })
+        });
+        var wndPrint = null;
+        $('a.print').click(function() {
+            if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+            var url = "$!urlPrintProduct" + '&output=print';
+            wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+            wndPrint.focus();
+        });
+        $('a.mailtofriend').click(function() {
+            $('#mailProduct').show();
+            $('#mailSent').hide();
+            return false;
+        });
+        $('a.addtowishlist').click(function() {
+            $('#wishListAdded').hide();
+            $('#wishListLink').hide();
+            $('#wishListLoading').find('span').addClass('loading-min');
+            $('#wishListLoading').show();
+            jQuery.getJSON("$urlAddWishList", {idProduct:$!product.idProduct}, function(data) {
+                $('#wishListLoading').hide();
+                if (data == 'ok') $('#wishListAdded').show();
+                else {
+                    $('#wishListLink').show();
+                }
+            });
+            return false;
+        });
+        $('a.addtostockalert').click(function() {
+            $('#stockAlertAdded').hide();
+            $('#stockAlertLink').hide();
+            $('#stockAlertLoading').find('span').addClass('loading-min');
+            $('#stockAlertLoading').show();
+            jQuery.getJSON("$urlAddStockAlert", {idProduct:$!product.idProduct}, function(data) {
+                $('#stockAlertLoading').hide();
+                if (data == 'ok') $('#stockAlertAdded').show();
+                else {
+                    $('#stockAlertLink').show();
+                }
+            });
+            return false;
+        });
+        $('#sendEmail').click(function() {
+            if ($('#formEmailProduct').validForm()) {
+                var data = $('#formEmailProduct').serialize();
+                $('<div>').loading('Sending Mail', 'Please wait...').appendTo('#divMailProduct');
+                $('#divMailProduct').load("$urlSendmail", data, function() {});
+            }
+            return false;
+        });
+        $(".lightbox").lightbox();
+        // reviewDialog = $('#productReviewNew').overlay({api:true,fixed:false,top:'5%',mask:{color: '#000',loadSpeed: 200,opacity: 0.8}});
+    });
+</script>

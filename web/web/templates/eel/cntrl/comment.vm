@@ -1,0 +1,80 @@
+<a href="#" onclick="$('#dialogComment').dialog({modal: true, width: 565,resizable:false});return false;">Testimonials</a>
+
+<div id="dialogComment" style="display: none">
+    <div class="dialogCommentHeader">
+        <h2>#label('comment.title')</h2>
+        <p>#label('comment.instructions')</p>
+    </div>
+    <div class="form">
+        <form id="formComment" class="validable" onsubmit="return $('#formComment').validForm()">
+            <input name="userComment.commentType" value="testimonial" type="hidden">
+            #if($frontUser) #else
+                <label>
+                    <span class="label required">#label('user.name')</span>
+                    <input name="userComment.userName" value="" id="comment_userName" class="field required string-200" type="text">
+                    <span class="field_error" data-my="right bottom" data-at="right top"></span>
+                </label>
+                <label>
+                    <span class="label required">#label('user.email')</span>
+                    <input name="userComment.userEmail" value="" id="comment_userEmail" class="field email required string-200" type="text">
+                    <span class="field_error" data-my="right bottom" data-at="right top"></span>
+                </label>
+            #end
+            <label>
+                <span class="label required">#label('comment.subject')</span>
+                <input name="userComment.title" value="" id="comment_title" class="field required string-500 vaciar" type="text">
+                <span class="field_error" data-my="right bottom" data-at="right top"></span>
+            </label>
+            <label>
+                <span class="label required">#label('comment.text')</span>
+                <textarea name="userComment.comment" class="field required string-500 vaciar"></textarea>
+                <span class="field_error" data-my="right bottom" data-at="right top"></span>
+            </label>
+            <div class="buttons">
+                <button type="submit"><span class="ok">Save</span></button>
+                <button type="button" onclick="$('#dialogComment').dialog('close');"><span class="cancel">Cancel</span></button>
+            </div>
+        </form>
+    </div>
+    <div class="loading" style="display: none">
+        <h4>#label('comment.saving')</h4>
+        <p>#label('please.wait')</p>
+    </div>
+    <div class="result" style="display: none">
+        <p>#label('comment.thank.you')</p>
+        <div class="buttons">
+            <button type="button" id="btnCommentThank"><span class="cancel">Close</span></button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#formComment').submit(function () {
+            if ($('#formComment').validForm()) {
+                $.getJSON("$!action.url('comment')", $(this).serialize(), function (d) {
+                    if (d.result == 'ok') {
+                        $('#dialogComment').find('.form').hide();
+                        $('#dialogComment').find('.result').show();
+                        $('#dialogComment').find('.loading').hide();
+                    } else {
+                        alert("$action.getText('Error saving comment.')");
+                        $('#dialogComment').find('.result').hide();
+                        $('#dialogComment').find('.loading').hide();
+                        $('#dialogComment').find('.form').show();
+                    }
+                });
+                $('#dialogComment').find('.form').hide();
+                $('#dialogComment').find('.result').hide();
+                $('#dialogComment').find('.loading').show();
+            }
+            return false;
+        });
+        $('#btnCommentThank').click(function(){
+            $('#dialogComment').dialog('close');
+            $('#dialogComment').find('.result').hide();
+            $('#dialogComment').find('.loading').hide();
+            $('#dialogComment').find('.form').show();
+            $('#dialogComment').find('.vaciar').value('');
+        })
+    })
+</script>

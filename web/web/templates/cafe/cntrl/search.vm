@@ -1,0 +1,17 @@
+<form id="formSearch" action="$!action.url('search')" method="post">
+    <div>
+        <input type="text" id="querySearch" name="query" value="$!esc.html($query)" class="search-input required" placeholder="$!action.getText('search')"/>
+        <input type="image" src="/templates/$!{template}/skins/${skin}/images/icon-search.png" class="search-submit" alt="Search"/>
+    </div>
+</form>
+<script type="text/javascript">
+    $(function () {
+        $('#formSearch').submit(function () {
+            if ($('#formSearch').validForm()) {
+                $('#formSearch').attr('action', "$!{action.url('search')}?q=" + $('#querySearch').val());
+                return true;
+            }
+            return false;
+        });
+    })
+</script>

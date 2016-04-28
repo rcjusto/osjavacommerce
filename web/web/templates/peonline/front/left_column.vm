@@ -1,0 +1,77 @@
+<div class="category-leftcol">
+
+    <div id="categorySubcategories">  
+        <h2>#label('categories')</h2>
+        <ul>
+            #foreach($it in $action.sortCategories($action.getSubCategories($util.null, true)))
+                #menucatalog($it, $categoryHierarchy, $category, $categoriesChildren)
+            #end
+        </ul>
+    </div>
+
+    <!-- Filtros -->
+    <div id="categoryFilters">
+        #if($util.isNotEmpty($productFilter.filterManufacturer))
+        #else
+            #set($showManufacters = 6)
+            #set($manufacturers = $extras.get('MANUFACTURER'))
+            #if($util.isNotEmpty($manufacturers))
+                <h2>Manufacturer</h2>
+                <ul class="filterManufacturers">
+                    #foreach($man in $manufacturers)
+                            <li class="#if($velocityCount>=$showManufacters) hidden #end ">
+                                <a href="#" data="$!man.idManufacturer" class="filter-manufacturer">$man.manufacturerName</a>
+                                <span>($!man.getProperty('NUM_PROD'))</span>
+                            </li>
+                    #end
+                    #if($manufacturers.keySet().size()>$showManufacters)
+                        <li><a href="#" class="moreLink">#label('more.manufacturers')</a></li>
+                    #end
+                </ul>
+            #end
+        #end
+
+        #set($prices = $extras.get('PRICES'))
+        #if($action.canShowPrices && $util.isNotEmpty($prices))
+            <h2>#label('filter.by.price')</h2>
+            <ul class="filterPrices">
+                #foreach($pMap in $prices)
+                    #if ($pMap.count && $pMap.count>0)
+                    <li>
+                        <div class="clearfix hoversable">
+                            <div>
+                                <a href="#" data-min="$!pMap.min" data-max="$!pMap.max" class="filter-price">
+                                    #if($pMap.min)
+                                        #if($pMap.max)<span>$!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency()) - $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                                        #else<span>#label('over') $!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency())</span>#end
+                                    #else
+                                        #if($pMap.max)<span>#label('under') $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>#end
+                                    #end
+                                    <span class="num-products">($!util.formatNumber($pMap.count,'0'))</span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    #end
+                #end
+            </ul>
+        #end
+
+        #if($util.isNotEmpty($productFilter.filterLabel))
+        #else
+            #set($labels = $action.sortMapByValues($extras.get('LABELS')))
+            #if($util.isNotEmpty($labels.keySet()))
+                <h2>Options</h2>
+                <ul>
+                    #foreach($labEntry in $labels.entrySet())
+                        <li>
+                            <a href="#" data="$labEntry.key.code" class="filter-label">$labEntry.key.getName($locale.language)</a>
+                            <span>($!labEntry.value)</span>
+                        </li>
+                    #end
+                </ul>
+            #end
+        #end
+
+    </div>
+</div>

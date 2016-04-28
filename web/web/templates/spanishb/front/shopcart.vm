@@ -1,0 +1,34 @@
+#set($priceMap = $userSession.getPriceMap() )
+#set($promotions = $priceMap.get('promotions'))
+
+<div id="blockContent" class="shopcart-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+            <div class="articles">
+                #control('shopcart_alerts')
+                        #actionMessages()
+                        #if($util.isNotEmpty($userSession.items))
+                            <h1>#label('my.shopping.cart')</h1>
+                            #control('shopcart_request_cancel')
+                            #control('shopcart_items')
+                            #control('shopcart_actions')
+                            #control('shopcart_coupons')
+                        #else
+                            #actionErrors()
+                            <div class="info">
+                                <h2>#label('shopping.cart.empty')</h2>
+                                <p>#label('shopping.cart.empty.text')</p>
+                            </div>
+                        #end
+        <div style="clear:both;"></div>
+
+    </div>
+    </div>
+    <div id="blockRight">
+        #set($listaBS = $util.subList($associatedProducts, $!math.toInteger($!action.getStoreProperty('shopcart.related.items', '9'))))
+        #set($titleBS = 'product.related')
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+</div>

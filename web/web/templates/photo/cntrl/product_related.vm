@@ -1,0 +1,22 @@
+#set($listRelated = $action.getProductsRelated($product))
+#if($util.isNotEmpty($listRelated))
+    #set($maxToShow = $math.toInteger($action.getStoreProperty('product.related.items','6')))
+
+    <section class="sale">
+        <h1>#label('related.products')</h1>
+        <ul>
+            <li class="slide">
+                #set($numItems = 0)
+                #foreach($r in $listRelated)
+                    #set($p = $r.related)
+                    #if($p.getMaxToBuy($frontUser)>0 && $numItems<$maxToShow)
+                        #parse("/WEB-INF/views/${template}/front/product_relatedproduct.vm")
+                        #set($numItems = $math.add($numItems,1))
+                    #end
+                #end
+            </li>
+        </ul>
+    </section>
+#end
+
+

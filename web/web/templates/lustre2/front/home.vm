@@ -1,0 +1,11 @@
+<div id="blockContent" class="home-page clearfix">
+
+    <div id="blockTotal">
+        #banners('home-top')
+        #banners('home-bottom')
+
+        <div id="homeTopBlock">#block('home.top')</div>
+
+        <div id="homeBottomBlock">#block('home.bottom')</div>
+    </div>
+</div>

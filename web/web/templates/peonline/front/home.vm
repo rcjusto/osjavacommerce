@@ -1,0 +1,18 @@
+<div id="blockContent" class="home-page" >
+    #actionErrors($action.getText('admin.errors','admin.errors'))
+    <div id="blockHomeTop">#block('home.top')</div>
+    #banners('home-top' 2)
+    <div id="homeTitles" class="clearfix">
+        <div class="title">#label('home.products.title')</span></div>
+        <div class="subtitle">#label('home.products.text')</div>
+    </div>
+    #set($lista = $action.getRandomProducts('label:hot',$!math.toInteger($!action.getStoreProperty('home.hot.items', '15'))))
+    <div id="homeProducts" class="clearfix">
+        <ul class="clearfix">
+        #foreach($p in $lista)
+            <li>#parse("/WEB-INF/views/${template}/front/home_product.vm")</li>
+        #end
+        </ul>
+    </div>
+    <div id="blockHomeBottom">#block('home.bottom')</div>
+</div>

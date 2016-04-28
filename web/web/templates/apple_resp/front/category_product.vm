@@ -1,0 +1,64 @@
+#set($pName = "$!p.getLanguage($locale.language,$defaultLanguage).productName")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'/')")
+
+#set( $urlDetail = $action.urlProduct($p) )
+<div class="product">
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a></div>
+    #end
+    <div class="text">
+        <div class="labels">
+            #foreach($lab in $action.getProductLabels($p))
+                #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                    <span class="label label-$lab.code">$!lab.getContentList($locale.language)</span>
+                #end
+            #end
+            #if($action.canShowPrices)
+            <span class="stock #if($p.stock>0) on-stock #else out-of-stock #end">
+                    #if($p.stock>0)
+                        #label('on.stock')
+                    #else
+                        #if($util.isNotEmpty($p.eta))
+                            #label('backorder.until') $!p.eta
+                        #else
+                            #label('out.of.stock')
+                        #end
+                    #end
+                </span>
+            #end
+        </div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="code"><a href="$urlDetail">#label('part.number') $!p.partNumber</a></div>
+        <div class="desc"><a href="$urlDetail">$!util.left($pDesc,300)</a></div>
+    </div>
+    #if($action.getStoreProperty('show.product.reviews.list','Y')=='Y')
+        <div class="rating clearfix">
+            #if($!p.reviews>0)
+                #control('review_stars_small' $!p.ratingBy)
+                <div> $!p.reviews #label('reviews')</div>
+            #else
+                <div>#label('no.reviews')</div>
+            #end
+        </div>
+    #end
+    #if($canCompare)
+        <div class="compare">
+            <a class="product-compare" href="#" data="$!p.idProduct">#label('compare')</a>
+        </div>
+    #end
+   #if($action.canShowPrices)
+        <div class="price clearfix">#label('price') <span class="value">$!action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1))</span></div>
+        <div class="actions clearfix">
+            #parse("/WEB-INF/views/$!{template}/front/addtocart.vm")
+            <a class="detail" href="$urlDetail">#label('details')</a>
+        </div>
+    #else
+        <div class="actions clearfix">
+            <a class="detail" href="$urlDetail">#label('details')</a>
+        </div>
+    #end
+</div>
+

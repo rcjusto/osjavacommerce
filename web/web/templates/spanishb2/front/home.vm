@@ -1,0 +1,30 @@
+<div id="blockContent" class="home-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column_home.vm")
+    </div>
+    <div id="blockCenter">
+        #actionErrors($action.getText('admin.errors','admin.errors'))
+
+        #banners('home-top')
+
+        <div id="homeTopBlock">#block('home.top')</div>
+
+        #set($lista = $action.getRandomProducts('label:hot', 12))
+        <div id="homeProducts" class="clearfix">
+            #control('product_slider' $util.map.add('_prodList',$lista).add('_items','3').add('_blockTitle','hot.products').add('_linkUrl', $!action.urlLabel('hot')).add('_linkLabel', 'link.hot.products'))
+        </div>
+
+        #set($lista = $action.getRandomProducts('label:special', 12))
+        <div id="homeProducts" class="clearfix">
+            #control('product_slider' $util.map.add('_prodList',$lista).add('_items','3').add('_blockTitle','special.products').add('_linkUrl', $!action.urlLabel('special')).add('_linkLabel', 'link.special.products'))
+        </div>
+
+        #banners('home-central')
+        #banners('home-bottom')
+
+        <div id="homeBottomBlock">#block('home.bottom')</div>
+    </div>
+    <div id="blockRight">
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+</div>

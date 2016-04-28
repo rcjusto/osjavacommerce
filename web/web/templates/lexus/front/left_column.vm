@@ -1,0 +1,126 @@
+#set( $showRootCategories = true )
+<ul id="leftCategories">
+
+    <!-- Subcategorias -->
+    #if($util.isNotEmpty($categoriesChildren))
+        #set( $showRootCategories = false )
+        <li>
+            <div>#label('children.categories')</div>
+            <ul>
+                #foreach($it in $action.sortCategories($categoriesChildren))
+                    <li><a href="#category_link($it)" class="filter-category" data="$!{it.urlCode}">$!{it.name}</a> #if(${it.numProducts}>0)(${it.numProducts})#end</li>
+                #end
+            </ul>
+        </li>
+    #end
+
+    <!-- Siblings-->
+    #if($categoryHierarchy && !$list.isEmpty($categoryHierarchy))
+        #set($categoriesSibling = $action.getSubCategories($util.getElement($categoryHierarchy,-1), false))
+        #if($util.isNotEmpty($categoriesSibling))
+            #set( $showRootCategories = false )
+            <li>
+                <div>#label('sibling.categories')</div>
+                <ul>
+                    #foreach($it in $action.sortCategories($categoriesSibling))
+                        <li><a href="#category_link($it)" class="filter-category" data="$!{it.urlCode}">$!{it.name}</a></li>
+                    #end
+                </ul>
+            </li>
+        #end
+    #end
+
+    <!-- Root Categories -->
+    #set($cats = $action.getSubCategories($util.null,true))
+    #if($showRootCategories)
+        #foreach($c in $action.sortCategories($cats))
+            #set($children = $action.getSubCategories($c,true))
+            <li>
+                <div><a href="#category_link($c)">$!c.name</a></div>
+                <ul>
+                    #foreach($ch in $action.sortCategories($children))
+                        <li><a href="#category_link($ch)" rel="nofollow">$!ch.name</a></li>
+                    #end
+                </ul>
+            </li>
+        #end
+    #else
+        <li>
+            <div>#label('top.categories')</div>
+            <ul>
+                #foreach($ch in $action.sortCategories($cats))
+                    <li><a href="#category_link($ch)" rel="nofollow">$!ch.name</a></li>
+                #end
+            </ul>
+        </li>
+    #end
+
+
+    #if($util.isNotEmpty($productFilter.filterManufacturer))
+    #else
+        #set($showManufacters = 6)
+        #set($manufacturers = $extras.get('MANUFACTURER'))
+        #if($util.isNotEmpty($manufacturers))
+            <li>
+                <div>Manufacturer</div>
+                <ul class="filterManufacturers">
+                    #foreach($man in $manufacturers)
+                            <li class="#if($velocityCount>=$showManufacters) hidden #end ">
+                                <a href="#" data="$!man.idManufacturer" class="filter-manufacturer">$man.manufacturerName</a>
+                                <span>($!man.getProperty('NUM_PROD'))</span>
+                            </li>
+                    #end
+                    #if($manufacturers.keySet().size()>$showManufacters)
+                        <li><a href="#" class="moreLink">#label('more.manufacturers')</a></li>
+                    #end
+                </ul>
+            </li>
+        #end
+    #end
+
+    #set($prices = $extras.get('PRICES'))
+    #if($action.canShowPrices && $util.isNotEmpty($prices))
+    <li>
+        <div>#label('filter.by.price')</div>
+        <ul class="filterPrices">
+            #foreach($pMap in $prices)
+                #if ($pMap.count && $pMap.count>0)
+                <li>
+                            <a href="#" data-min="$!pMap.min" data-max="$!pMap.max" class="filter-price">
+                                #if($pMap.min)
+                                    #if($pMap.max)<span>$!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency()) - $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>
+                                    #else<span>#label('over') $!action.formatActualCurrency($pMap.min,$action.getDefaultCurrency())</span>#end
+                                #else
+                                    #if($pMap.max)<span>#label('under') $!action.formatActualCurrency($pMap.max,$action.getDefaultCurrency())</span>#end
+                                #end
+                                <span class="num-products">($!util.formatNumber($pMap.count,'0'))</span>
+                            </a>
+                </li>
+                #end
+            #end
+        </ul>
+        </li>
+    #end
+
+    #if($util.isNotEmpty($productFilter.filterLabel))
+    #else
+        #set($labels = $action.sortMapByValues($extras.get('LABELS')))
+        #if($util.isNotEmpty($labels.keySet()))
+            <li>
+                <div>Options</div>
+                <ul>
+                    #foreach($labEntry in $labels.entrySet())
+                        <li>
+                            <a href="#" data="$!labEntry.key.code" class="filter-label">$labEntry.key.getName($locale.language)</a>
+                            <span>($!labEntry.value)</span>
+                        </li>
+                    #end
+                </ul>
+            </li>
+        #end
+    #end
+
+
+</ul>
+
+#banners('left-column')

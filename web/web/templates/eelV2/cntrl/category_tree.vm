@@ -1,0 +1,20 @@
+#set($parameters = $util.toMap($_parameters))
+#if($cat)
+#set($opened = $cat.hasChildrenId($category.idCategory) || $cat.idCategory==$category.idCategory)
+<li class="clearfix hoverable $!{cat.level}">
+    <div class="clearfix level$!{cat.level} category${cat.idCategory} #if($cat.idCategory==$category.idCategory) selected #end">
+        <a class="icon-tree level$!{cat.level} #if($util.isNotEmpty($cat.children)) has-children #end #if($opened) expanded #end #if($open_first) expanded-first  #end"></a>
+        <a href="$action.urlCategory($cat)" class="label level$!{cat.level} #if($cat.idCategory==$category.idCategory) selected #end">
+            <span>$!cat.name #if($numProducts.get($cat.idCategory))<span class="num-products">($numProducts.get($cat.idCategory))</span>#end</span>
+        </a>
+    </div>
+    #if($cat.children && !$cat.children.isEmpty())
+        <ul class="clearfix level$!{cat.level} #if($opened) expanded #end ">
+            #foreach($cat in $cat.children)
+                #control('category_tree')
+            #end
+        </ul>
+    #end
+</li>
+#end
+#set($parameters = $util.null)

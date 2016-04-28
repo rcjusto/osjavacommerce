@@ -1,0 +1,43 @@
+#set($maxCant = $math.sub($product.getMaxToBuy($frontUser), $userSession.getNumProduct($product.idProduct)))
+#if($maxCant>0)
+<form id="formBuy" action="$!action.url('addtocart','')" method="post" class="validable">
+    <div class="variants clearfix">
+        <input type="hidden" name="idProduct" value="$!product.idProduct"/>
+        #if($product.dateSelection=='Y')
+            <label class="dateselection">
+                <span class="label">$!action.getText('date')</span>
+                <input type="text" value="" class="field date required" readonly="readonly"/>
+                <input type="hidden" id="selDate" name="selDate" value=""/>
+                <span class="field_error"></span>
+            </label>
+        #end
+        #if($util.isNotEmpty($productVariations))
+            <label class="variation">
+                <span class="label">$!action.getText('select')</span>
+                <select name="variation" class="field string-200">
+                    #foreach($v in $productVariations)
+                        #set( $priceInc = $!action.formatActualCurrency($priceMap.get("VARIATION_INC_${v.id}")) )
+                        #if($priceMap.containsKey("VARIATION_INC_${v.id}"))
+                            #set($addOpt = "(+ $!priceInc)")
+                        #else
+                            #set($addOpt = '')
+                        #end
+                        <option value="$v.id">$!v.fullOption $!addOpt</option>
+                    #end
+                </select>
+            </label>
+        #end
+        <label class="quantity">
+            <span class="label">$!action.getText('quantity')</span>
+            <input type="text" name="quantity" value="1" class="field required integer string-50" maxValue="$!maxCant"/>
+            <span class="field_error"></span>
+        </label>
+    </div>
+    <div class="right">
+        <input type="submit" class="button" value="Add To Cart"/>
+    </div>
+</form>
+#end
+#if($product.productType.equalsIgnoreCase('digital'))
+<div class="product-digital-msg"><span class="icon"></span>#label('product.detail.digital.message')</div>
+#end

@@ -1,0 +1,13 @@
+<aside>
+    #set($blockAlign = $alternator.auto('l-block','r-block'))
+
+    <!-- Cart incl. Summary, Product List & View Cart Link -->
+    #control('top_shopcart')
+
+    <!-- Menu de  Categorias -->
+    #control('menu_categories')
+
+    <!-- Contact Information -->
+    #control('store_info')
+
+</aside>

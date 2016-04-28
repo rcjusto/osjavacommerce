@@ -1,0 +1,71 @@
+<div id="blockContent" class="cartlist-page clearfix">
+    <div id="leftColumn">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="centerColumn">
+        <div id="shopcartList">
+            <h1>#label('my.shopping.carts')</h1>
+
+            <div id="blockOrders">
+                #if($util.isNotEmpty($quotedCarts))
+                    <div class="block">
+                        <h2>#label('quote.requested')</h2>
+
+                        <p>#label('quote.requested.text')</p>
+                        <table class="listado" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>#label('cart.id')</th>
+                                <th>#label('created')</th>
+                                <th>#label('status')</th>
+                                <th>#label('products')</th>
+                                <th class="price">#label('total')</th>
+                                <th class="price">#label('total')</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            #foreach($shopCart in $quotedCarts)
+                                #surl('id=urlEdit' "action=shopcartdata" "idCart=$!shopCart.id")
+                                <tr class="hoverable">
+                                    <td>$!shopCart.id</td>
+                                    <td>$!util.formatDate($shopCart.createdDate, $locale.language)</td>
+                                    <td>#label("cart.status.${shopCart.status}")</td>
+                                    <td>$!shopCart.items.size()</td>
+                                    <td class="price">$!action.formatActualCurrency($shopCart.totalOriginal)</td>
+                                    <td class="price">$!action.formatActualCurrency($shopCart.total)</td>
+                                    <td class="links"><a href="$urlEdit">#label('see.detail')</a></td>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+                #end
+                #if($util.isNotEmpty($savedCarts))
+                    <div class="block">
+                        <h2>#label('saved.carts')</h2>
+
+                        <p>#label('saved.carts.text')</p>
+                        <table class="listado" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>#label('cart.id')</th>
+                                <th>#label('created')</th>
+                                <th>#label('status')</th>
+                                <th>#label('products')</th>
+                                <th class="price">#label('total')</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            #foreach($shopCart in $savedCarts)
+                                #surl('id=urlEdit' "action=shopcartdata" "idCart=$!shopCart.id")
+                                <tr class="hoverable">
+                                    <td>$!shopCart.id</td>
+                                    <td>$!util.formatDate($shopCart.createdDate, $locale.language)</td>
+                                    <td>#label("cart.status.${shopCart.status}")</td>
+                                    <td>$!shopCart.items.size()</td>
+                                    <td class="price">$!action.formatActualCurrency($shopCart.total)</td>
+                                    <td class="links"><a href="$urlEdit">#label('see.detail')</a></td>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+                #end
+            </div>
+        </div>
+    </div>
+</div>

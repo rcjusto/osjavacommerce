@@ -1,0 +1,75 @@
+#surl('id=urlCaptcha' "action=captcha")
+#surl('id=urlComment' "action=sendcomment")
+<div id="blockContactUsForm">
+#if($mailSent=='Y')
+<div id="mailSent" class="info">
+    <h2>#label('mail.contact-us.sent.title')</h2>
+    <p>#label('mail.contact-us.sent.text')</p>
+</div>
+#end
+<div id="mailComment" #if($mailSent && $mailSent=='Y')style="display:none;"#end class="variants">
+<div class="mail-header">
+    <h2>#label('mail.contact-us.title')</h2>
+    <p>#label('mail.contact-us.text')</p>
+</div>
+<form id="formComment">
+    #formErrors($!action.getText('errors.sending.mail'))
+    #if($frontUser)
+    #else
+        <label>
+            <span class="label required">#label('mail.from.name')</span>
+            <input type="text" name="mailFromName" value="$!mailFromName" class="field required string-500">
+            #fieldError("mailFromName")
+        </label>
+        <label>
+            <span class="label required">#label('mail.from')</span>
+            <input type="text" name="mailFrom" value="$!mailFrom" class="field email required string-500">
+            #fieldError("mailFrom")
+        </label>
+    #end
+    <label>
+        <span class="label">#label('mail.subject')</span>
+        <input type="text" name="mailSubject" value="$!mailSubject" class="field string-500">
+        #fieldError("mailTo")
+    </label>
+    <label>
+        <span class="label required">#label('mail.comment')</span>
+        <textarea name="mailComment" class="field required string-500" rows="6">$!mailComment</textarea>
+        #fieldError("mailComment")
+    </label>
+    <label class="clearfix">
+        <div class="captcha-label">#label('enter.captcha')</div>
+        <div class="clearfix captcha-value" >
+            <span id="captchaImgContainer">
+                <img id="captchaImg" src="$urlCaptcha" alt=""/>
+            </span>
+            <div style="margin-bottom:10px;"><a href="contact_us.vm#" onclick="return reloadCaptcha();">#label('another.captcha')</a></div>
+            <input name="captcha" class="field string-200 required" value=""/>
+            #fieldError('captcha')
+        </div>
+    </label>
+    <div>
+        <span class="label">&nbsp;</span>
+        <button type="button" id="sendComment"><span class="mail">#label('send.email')</span></button>
+    </div>
+</form>
+</div>
+</div>
+<script type="text/javascript">
+    function reloadCaptcha() {
+        var url = "$!urlCaptcha" + '?rnd=' + Math.random();
+        $('#captchaImg').attr('src', url);
+        return false;
+    }
+    $(function(){
+        $('#sendComment').live('click',function(){
+            if ($('#formComment').validForm()) {
+                var data = $('#formComment').serialize();
+                $('<div>').loading("$!action.getText('sending.mail')", "$!action.getText('please.wait')").appendTo('#blockContactUsForm');
+                $('#formComment').hide();
+                $('#blockContactUsForm').load("$urlComment",data);
+            }
+        });
+    });
+</script>
+    

@@ -1,0 +1,20 @@
+<div id="blockContent" class="static-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        <div class="block">
+            #if($staticText)
+                <h1>$!staticText.getLanguage($locale.language,$defaultLanguage).title</h1>
+                <div class="static-content">$!staticText.getLanguage($locale.language,$defaultLanguage).value</div>
+            #end
+            #if($code=='Contact-Us' && $action.getStoreProperty('mail.contact.us','')!='')
+                #parse("/WEB-INF/views/front/contact_us.vm")
+            #end
+        </div>
+    </div>
+    <div id="blockRight">
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+
+</div>

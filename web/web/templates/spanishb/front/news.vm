@@ -1,0 +1,51 @@
+<div id="blockContent" class="news-page static-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        <div class="block">
+            <h1>#label('news')</h1>
+
+            #if($news)
+
+                <ul class="news-list">
+                    #foreach($page in $news.listado)
+                        #surl('id=urlEdit' "action=page" "id=$!page.id")
+                        #set($content = $page.getContentValue($locale.language).replaceAll("\<.*?\>",""))
+                        <li>
+                            <h4>$!page.getTitle($locale.language)</h4>
+                            #if($page.contentDate)<div class="date">$!util.formatDate($page.contentDate)</div>#end
+                            <div class="description">$!util.abbreviate($content, 300)</div>
+                            <div class="link"><a href="$!action.urlNews($page)">#label('see.more')</a></div>
+                        </li>
+                    #end
+                </ul>
+
+                <form action="$!action.url('news')" method="post">
+                    #set($fnpr = "$!{news.name}_pagerows")
+                    #set($fncp = "$!{news.name}_currentpage")
+                    #if($news.totalRows>0 && $news.needPagination())
+                        <div class="navigator clearfix">
+                            <input type="hidden" id="$!fnpr" name="$!{news.name}.pagerows" value="$!news.pageRows">
+                            <input type="hidden" id="$!fncp" name="$!{news.name}.currentpage" value="$!news.currentPage">
+                            <ul class="pages clearfix">
+                            #if($news.isPrevPage())
+                                <li><a href="#" onclick="$('#${fncp}').val($news.prevPage);$('#${fncp}').parents('form:first').submit();return false;">Previous Page</a></li>
+                            #end
+                            #if($news.isNextPage())
+                                <li><a href="#" onclick="$('#${fncp}').val($news.nextPage);$('#${fncp}').parents('form:first').submit();return false;">Next Page</a></li>
+                            #end
+                            </ul>
+                        </div>
+                    #else
+                        <input type="hidden" id="$!fnpr" name="$!{news.name}.pagerows" value="$!news.pageRows">
+                    #end
+                </form>
+            #end
+
+        </div>
+    </div>
+    <div id="blockRight">
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+</div>

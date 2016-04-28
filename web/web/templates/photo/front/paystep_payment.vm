@@ -1,0 +1,277 @@
+#set($promotions = $priceMap.get('promotions'))
+<div id="blockContent" class="paystep-payment">
+<div id="blockOrderItems">
+    #block('confirm.order.top')
+    <div class="block">
+        <h1>#label('order.items')</h1>
+
+        <div class="content-data">
+            <table class="table-items">
+                <tr>
+                    <th class="code hide-smartphone">#label('shopcart.code')</th>
+                    <th class="name">#label('shopcart.product')</th>
+                    <th class="quantity">#label('shopcart.quantity')</th>
+                    <th class="price hide-smartphone">#label('shopcart.unitary.price')</th>
+                    <th class="price">#label('shopcart.line.price')</th>
+                </tr>
+                #foreach($it in $userSession.items)
+                    <tr class="product">
+                        <td class="code hide-smartphone">$!it.code1 #if($it.beanProd2)+ $!it.code2 #end</td>
+                        <td class="name">$!it.name1 #if($it.beanProd2)+ $!it.name2 #end</td>
+                        <td class="quantity">$!it.quantity</td>
+                        <td class="price hide-smartphone">$!action.formatActualCurrency($it.price)</td>
+                        <td class="price">$!action.formatActualCurrency($it.subtotal)</td>
+                    </tr>
+                    #if($it.fees && !$it.fees.isEmpty())
+                        #foreach($fee in $it.fees)
+                            <tr class="fee">
+                                <td class=" hide-smartphone">&nbsp;</td>
+                                <td class="name">#label('fee') $!fee.fee.getFeeName()</td>
+                                <td class="quantity">$!it.quantity</td>
+                                <td class="price hide-smartphone">$!action.formatActualCurrency($fee.getTotal($it))</td>
+                                <td class="price">$!action.formatActualCurrency($math.mul($fee.getTotal($it),$it.quantity))</td>
+                            </tr>
+                        #end
+                    #end
+                #end
+                #foreach($promo in $priceMap.promotions)
+                    #if($promo.type=='product')
+                        <tr class="product">
+                            <td>#label('promo') $!promo.code</td>
+                            <td>$!promo.name ($!action.getProduct($promo.data).getProductName($locale.language))</td>
+                            <td class="quantity">1</td>
+                            <td class="price">$!action.formatActualCurrency(0)</td>
+                            <td class="price">$!action.formatActualCurrency(0)</td>
+                        </tr>
+                    #end
+                #end
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="blockPaymentData">
+<!-- REWARDS -->
+#if($rewardsEnabled && $frontUser && $frontUser.rewardPoints>0)
+    <div id="blockPaymentReward" class="block">
+        #if($userSession.useRewards && $priceMap.containsKey('usedRewards'))
+            #surl('id=urlCancelReward' 'action=rewardUse')
+            <form action="$urlCancelReward" method="post">
+                <input type="hidden" name="useRewards" value="N" />
+                <p>
+                    <span>$!action.getText('rewards.using.info',[$priceMap.get('usedRewardsPoints'),$!action.formatActualCurrency($priceMap.get('usedRewards'))]) </span>
+                    <button type="submit"><span>#label('not.use.reward')</span></button>
+                </p>
+            </form>
+        #else
+            #surl('id=urlCancelReward' 'action=rewardUse')
+            <form action="$urlCancelReward" method="post">
+                <input type="hidden" name="useRewards" value="Y" />
+                <p>
+                   <span>$!action.getText('rewards.not.using.info',[$frontUser.rewardPoints, $!action.formatActualCurrency($math.mul($frontUser.rewardPoints,$rewardsRate))]) </span>
+                    <button type="submit"><span>#label('use.reward')</span></button>
+                </p>
+            </form>
+        #end
+    </div>
+#end
+
+    #surl('id=urlNext' "action=paystepSaveOrder")
+    <form id="formNext" action="$urlNext" method="post" class="validable">
+        #stoken()
+        <div class="block">
+            <div class="clearfix">
+                <div id="blockOrderBillingAddress">
+                    <h1>#label('billing.address')</h1>
+
+                    <div class="content-data">
+                        #set($billingAddress = $userSession.billingAddress)
+                        <p>$!billingAddress.titulo $!billingAddress.fullName, $!billingAddress.address,
+                        #if($util.isNotEmpty($billingAddress.address2)) $!billingAddress.address2, #end
+                        $!billingAddress.city, $!billingAddress.stateCode $!billingAddress.zipCode, $!billingAddress.idCountry</p>
+                        #if($util.isNotEmpty($billingAddress.phone))<p>$!billingAddress.phone</p>#end
+                    </div>
+
+                    #if($userSession.needShipping())
+                        #if($userSession.shippingType=='pickinstore')
+                            <h1>#label('pick.in.store')</h1>
+
+                            <div class="content-data">
+                                #set($shippingStore = $userSession.shippingStore)
+                                <p><strong>$!shippingStore.storeName</strong>, $!shippingStore.address,
+                                #if($util.isNotEmpty($shippingStore.address2)) $!shippingStore.address2, #end
+                                $!shippingStore.city, $!shippingStore.stateCode $!shippingStore.zipCode, $!shippingStore.idCountry</p>
+                                #if($util.isNotEmpty($shippingStore.email))<p>$!shippingStore.email</p>#end
+                                #if($util.isNotEmpty($shippingStore.phone))<p>$!shippingStore.phone</p>#end
+                            </div>
+                        #else
+                            <h1>#label('shipping.address')</h1>
+
+                            <div class="content-data">
+                                #set($shippingAddress = $userSession.shippingAddress)
+                                <p>$!shippingAddress.titulo $!shippingAddress.fullName, $!shippingAddress.address,
+                                #if($util.isNotEmpty($shippingAddress.address2)) $!shippingAddress.address2, #end
+                                $!shippingAddress.city, $!shippingAddress.stateCode $!shippingAddress.zipCode, $!shippingAddress.idCountry</p>
+                                #if($util.isNotEmpty($shippingAddress.phone))<p>$!shippingAddress.phone</p>#end
+                            </div>
+                        #end
+                    #end
+                </div>
+
+                <div id="blockOrderBilling">
+                    #if($userSession.shippingMethod)
+                        <div id="blockOrderShippingMethod">
+                            <h1>#label('shipping.method')</h1>
+                            #if($userSession.shippingType=='pickinstore')
+                            <div class="content-data"><p>#label('shipping.type.pickinstore')</p></div>
+                            #else
+                            <div class="content-data">
+                                <p>
+                                    <span>$!userSession.shippingMethod.getMethodName($locale.language)</span>
+                                    <span>$!action.formatActualCurrency($userSession.shippingValue)</span>
+                                    #if($userSession.shippingDate && $util.isNotEmpty($userSession.shippingDate))
+                                        <span>$!userSession.shippingDate $!action.getText('days')</span>
+                                    #end
+                                </p>
+                            </div>
+                            #end    
+                        </div>
+                    #end
+                    <h1>#label('order.sumary')</h1>
+
+                    <div class="content-data">
+                        <table width="100%">
+                            <tr class="subtotal">
+                                <td colspan="4">#label('subtotal.products')</td>
+                                <td class="price">$!action.formatActualCurrency($priceMap.get('subtotal'))</td>
+                            </tr>
+                            #foreach($prom in $userSession.getPromotionsByType($promotions, 'discount-percent'))
+                                <tr class="subtotal">
+                                    <td colspan="4">PROMO: $prom.get('code') - $!prom.get('name')</td>
+                                    <td class="price">$!action.formatActualCurrency($prom.get('value'))</td>
+                                </tr>
+                            #end
+                            #foreach($prom in $userSession.getPromotionsByType($promotions, 'discount'))
+                                <tr class="subtotal">
+                                    <td colspan="4">PROMO: $prom.get('code') - $!prom.get('name')</td>
+                                    <td class="price">$!action.formatActualCurrency($prom.get('value'))</td>
+                                </tr>
+                            #end
+                            #if($priceMap.get('shipping'))
+                                <tr class="subtotal">
+                                    #set($freeShipPromList = $userSession.getPromotionsByType($promotions, 'free-shipping') )
+                                    #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                                        #set( $freeShipProm = $list.get($freeShipPromList,0))
+                                        <td colspan="4">PROMO: $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
+                                    #else
+                                        <td colspan="4">#label('subtotal.shipping')</td>
+                                    #end
+                                    <td class="price">$!action.formatActualCurrency($priceMap.get('shipping'))</td>
+                                </tr>
+                            #end
+                            #if($priceMap.get('insurance'))
+                                <tr class="subtotal">
+                                    <td colspan="4">#label('subtotal.shipping.insurance')</td>
+                                    <td class="price">$!action.formatActualCurrency($priceMap.get('insurance'))</td>
+                                </tr>
+                            #end
+                            #if($priceMap.containsKey('taxInfo'))
+                                #foreach($tax in $priceMap.get('taxInfo'))
+                                    <tr class="subtotal">
+                                        <td colspan="4">#label('subtotal.tax') $!tax.name
+                                            <span class="tax-detail">( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax) )</span>
+                                        </td>
+                                        <td class="price">$!action.formatActualCurrency($tax.value)</td>
+                                    </tr>
+                                #end
+                            #end
+                            #if($priceMap.containsKey('usedRewards'))
+                                <tr class="subtotal">
+                                    <td colspan="4">#label('used.rewards') $priceMap.get('usedRewards')</td>
+                                    <td class="price">- $!action.formatActualCurrency($priceMap.get('usedRewards'))</td>
+                                </tr>
+                            #end
+                            #if($priceMap.get('total'))
+                                <tr class="total">
+                                    <td colspan="4">#label('subtotal.total')</td>
+                                    <td class="price">$!action.formatActualCurrency($priceMap.get('total'))</td>
+                                </tr>
+                            #end
+                        </table>
+                    </div>
+                </div>
+
+                <div id="blockOrderPayment">
+                    <h1>#label('payment.options')</h1>
+                    #actionErrors()
+                    #if($metodos && $metodos.size()>0)
+                        <div class="content-data">
+                            <ul>
+                                #foreach($m in $metodos)
+                                    <li>
+                                        <label>
+                                            <input type="radio" name="paymentService" #if($paymentService==$m.get('name')) checked="checked" #end id="payment_$!{m.get('id')}" class="serviceName #if($m.containsKey('form')) has-form #end " value="$!m.get('name')">
+                                            #label("$!m.get('label')")
+                                        </label>
+                                    </li>
+                                #end
+                            </ul>
+                        </div>
+                    #else
+                        #if($metodoExterno)
+                            <div class="content-data">
+                                <ul>
+                                    <li>#label($!metodoExterno.label)</li>
+                                </ul>
+                            </div>
+                        #end
+                    #end
+
+                    #foreach($m in $metodos)
+                        #if($m.containsKey('form'))
+                            <div id="form_payment_$!{m.get('id')}" class="payment_form" style="display:none;">$m.get('form')</div>
+                        #end
+                    #end
+
+                    <div id="blockCustomData">
+                        #if($action.getStoreProperty('allow.order.custom.reference','N')=='Y')
+                            <div><input type="text" name="customReference" value="" class="field string-300" placeholder="$!action.getText('order.custom.reference')" /></div>
+                        #end
+                        #if($action.getStoreProperty('allow.order.custom.message','N')=='Y')
+                            <div>
+                                <textarea name="customMessage" class="field string-300" rows="3" placeholder="$!action.getText('order.custom.message')"></textarea>
+                            </div>
+                        #end
+                    </div>
+
+                </div>
+            </div>
+            <div id="blockPaymentButtons">
+                #surl('id=urlPaymentAddress' "action=paystepAddress")
+                <button type="button" href="$urlPaymentAddress"><span class="prev">#label('previous')</span></button>
+                <button type="submit"><span class="next">#label('next')</span></button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('input.serviceName').change(function() {
+            $('.payment_form').hide();
+            var selected = $('input.serviceName:checked');
+            if (selected.size() > 0) {
+                if (selected.hasClass('has-form')) $('#form_'+selected.attr('id')).show();
+            }
+        }).trigger('change');
+        $('#formNext').submit(function() {
+            $(this).find('div.validation-error').html('').hide();
+            if ($('input.serviceName').size() == 0) return true;
+            if ($('input.serviceName:checked').size() == 0) {
+                $(this).find('div.validation-error').error("$!action.getText('error.payment.method')", "$!action.getText('error.payment.method.empty')");
+                return false;
+            }
+            return ($(this).validForm());
+        });
+    });
+</script>

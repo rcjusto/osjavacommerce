@@ -1,0 +1,85 @@
+<section id="left-column" class="category">
+
+    <section id="featured" class="category">
+
+        <form id="formProducts" action="$action.url('search')" method="post">
+            <input type="hidden" id="query" name="query" value="$!query"/>
+            #if($!products.totalRows>0)
+
+
+                <h1>$!{products.totalRows} #label('navigator.item.number')
+
+
+                    <span style="float: right;">
+                        <span>#label('navigator.page'): </span>
+                        #set($_navArr = $!products.getPageListLikeGoogle(5))
+                        #foreach($_p in [$list.get($_navArr,0)..$list.get($_navArr,1)])
+                            #if($_p==$products.currentPage)
+                                <b>$!_p</b>
+                            #else
+                                <a href="#" data="$!_p" class="gotopage">$!_p</a>
+                            #end
+                        #end
+                    </span>
+                </h1>
+
+                <input type="hidden" name="${products.name}.pagerows" value="$!products.pageRows"/>
+                <input type="hidden" name="productFilter.sorted" id="filterSort" value="$!productFilter.sorted"/>
+                <input type="hidden" name="${products.name}.currentpage" value="$!products.currentPage" class="nav-page current-page"/>
+
+
+                #set($groups = $util.getRows($products.listado, 6))
+                <ul class="featured">
+                    #foreach($group in $groups)
+                        <!-- Repeatable Area Begin — Each incl. up to 6 Products -->
+                        <li class="slide">
+                            #foreach($p in $group)  #if($p!='')
+                                #set($product = $p)
+                                #parse("/WEB-INF/views/${template}/front/home_product.vm")
+                            #end
+                            #end
+                        </li>
+                    #end
+                    <!-- Repeatable Area End -->
+
+                </ul>
+
+            #else
+                <div style="padding: 20px">
+                    <h2>#label('search.has.not.results')</h2>
+                    <p>#label('search.has.not.result.instructions')</p>
+                    #if($suggestions && $util.isNotEmpty($suggestions))
+                        <p>
+                            #if($suggestions.size()==1) #label('did.you.mean') #else #label('did.you.mean.ome.of') #end
+                            #foreach($s in $suggestions) <a href="#" class="search-again" data="$!s">$!s</a> #end
+                        </p>
+                    #end
+                    #control('search_advanced')
+                </div>
+            #end
+        </form>
+
+    </section>
+</section>
+
+#control('aside')
+
+<script type="text/javascript">
+    $(function () {
+        $('select.reload').change(function () {
+            $('#formProducts').submit();
+        });
+        $('#searchAgain').keypress(function (event) {
+            if (event.keyCode == '13') {
+                event.preventDefault();
+                $('#querySearch').val($('#searchAgain').val());
+                $('#formSearch').submit();
+            }
+        });
+        $('a.gotopage').click(function () {
+            $('.current-page').val($(this).attr('data'));
+            $('#formProducts').submit();
+            return false;
+        });
+    });
+</script>

@@ -1,0 +1,30 @@
+<div id="blockTop" class="clearfix">
+    #control('logo')
+    <div id="blockTopRight" class="clearfix">
+        <div class="clearfix">
+            <div class="block-top-banner" style="">#banners('header')</div>
+            <div class="block-top-banner-right" style="">
+                <div class="menu-top clearfix">
+                    #control('menu_languages')
+                    #control('menu_currencies')
+                </div>
+                #control('menu_social')
+            </div>
+        </div>
+        <div id="blockTopBar" class="clearfix">
+            #control('top_shopcart')
+            #control('menu_minimun')
+            #set($connectedCountry = $action.getCountryConnected().toLowerCase())
+            #if($util.isNotEmpty($connectedCountry)) <div class="country-connected"><img src="$!action.skinFile('css/img/flag/$!{connectedCountry}.png')" alt="$!{connectedCountry}"/></div> #end
+        </div>
+    </div>
+</div>
+
+<div id="blockTopMenu" class="clearfix">
+    <div class="search-label">#label('search.label')</div>
+    #control('search')
+    #set( $treemenu = $action.getTreeMenu('TopBar') )
+    #control('menu_horizontal')
+    #set( $treemenu = $util.null )
+    <div class="phone-number">#label('phone.number')</div>
+</div>

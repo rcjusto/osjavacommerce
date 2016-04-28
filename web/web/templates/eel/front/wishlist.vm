@@ -1,0 +1,99 @@
+<div id="blockContent" class="wishlist-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+
+        <div id="wishListProducts">
+            #if($wishlist && $util.isNotEmpty($wishlist))
+                <h2>#label('items.in.wishlist')</h2>
+
+                <form id="formWishList" action="$!action.url('wishlist')" method="post" class="validable">
+                    #formErrors()
+                    <input type="hidden" id="wishListAction" name="wishListAction" value=""/>
+                    <input type="hidden" id="wishListItem" name="wishListItem" value=""/>
+                    <table width="100%" cellpadding="0" cellspacing="0" class="formulario">
+                        #foreach($p in $wishlist)
+                            #set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+                            #set($urlProd = $action.urlProduct($p))
+                            #set($image = $imageResolver.getImageForProduct($p,'list/'))
+                            #if($util.isNotEmpty($image)) #set($srcImg = "$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" ) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                            <tr>
+                                <td class="cellimage"><img src="$srcImg"/></td>
+                                <td class="name"><a class="code" href="$!urlProd">$!p.partNumber</a> <br/> <a class="name" href="$!urlProd">$!p.getProductName($locale.language)</a></td>
+                                <td class="price">
+                                    <div class="price">$!action.formatActualCurrency($price)</div>
+                                    <div class="status">
+                                        #if($p.stock>0)
+                                            #label('on.stock')
+                                        #else
+                                            #if($util.isNotEmpty($p.eta))
+                                                #label('backorder.until') $!p.eta
+                                            #else
+                                                #label('out.of.stock')
+                                            #end
+                                        #end
+                                    </div>
+                                </td>
+                                <td nowrap="nowrap" class="actions">
+                                    <div>
+                                        <input type="hidden" name="wishListProduct" value="$!p.idProduct"/>
+                                        <input type="text" name="wishListQuantity" value="1" class="field integer required string-50"/>
+                                        <a href="#" onclick="$('#wishListAction').val('move');$('#wishListItem').val($velocityCount);$('#formWishList').submit();return false;">#label('move.to.cart')</a>
+                                    </div>
+                                    <div class="remove"><a href="#" onclick="$('#wishListAction').val('remove');$('#wishListItem').val($velocityCount);$('#formWishList').submit();return false;">#label('remove.from.wishlist')</a></div>
+                                </td>
+                            </tr>
+                        #end
+                    </table>
+                    <div class="button-bar">
+                        <button type="submit" onclick="$('#wishListAction').val('move_all');"><span>#label('move.all.to.cart')</span></button>
+                        <button type="submit" onclick="$('#wishListAction').val('remove_all');"><span>#label('remove.all')</span></button>
+                        <button type="button" onclick="printWishList();"><span>#label('print')</span></button>
+                        <button type="button" onclick="$('#mailWishlist').show();$('#mailSent').hide();"><span>#label('email.to.friend')</span></button>
+                    </div>
+                </form>
+                <div id="divMailWishlist">
+                    #parse('/WEB-INF/views/front/mailwishlist.vm')
+                </div>
+
+
+            #else
+                <div class="info">
+                    <h2>Wish List</h2>
+
+                    <p>There's no items in your Wish List.</p>
+                </div>
+            #end
+        </div>
+
+        #control('shopcart_related' 9)
+    </div>
+
+    <div id="blockRight">
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+</div>
+<script type="text/javascript">
+    var wndPrint = null;
+    function printWishList() {
+        if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+        var url = "$!action.url('wishlist')" + '?output=print';
+        wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+        wndPrint.focus();
+    }
+    $(function () {
+        $('#formWishList').submit(function () {
+            return $('#formWishList').validForm();
+        });
+        $('#sendEmail').click(function () {
+            if ($('#formEmailWishlist').validForm()) {
+                var data = $('#formEmailWishlist').serialize();
+                $('<div>').loading('Sending Mail', 'Please wait...').appendTo('#divMailWishlist');
+                $('#divMailWishlist').load("$!action.url('wishlistmail')", data, function () {
+                });
+            }
+            return false;
+        });
+    });
+</script>

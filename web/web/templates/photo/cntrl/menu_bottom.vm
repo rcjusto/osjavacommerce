@@ -1,0 +1,36 @@
+<section id="latest-tweets">
+#set( $treemenu = $action.getTreeMenu('BottomBar') )
+#foreach($mIt in $treemenu.children() )
+    #set( $m = $mIt.userObject )
+    <div class="bloque">
+    <h2>$!m.getLabel($locale.language)</h2>
+    <div>
+        #if($m.menuContent)
+            <ul class="clearfix">
+                <li>$!m.menuContent.getLanguage($locale.language,$defaultLanguage).value</li>
+            </ul>
+        #else
+            #if($m.showSubcategories)
+                #set($subcats = $action.getSubCategories($m.linkCategory, true))
+                #if($subcats && $subcats.size()>0)
+                    <ul class="clearfix">
+                        #foreach($subcat in $subcats)
+                            <li><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                        #end
+                    </ul>
+                #end
+            #else
+                #if($mIt.children().hasMoreElements())
+                    <ul class="clearfix">
+                        #foreach($sIt in $mIt.children())
+                            #set( $s = $sIt.userObject )
+                            <li><a href="$!s.url">$!s.getLabel($locale.language)</a></li>
+                        #end
+                    </ul>
+                #end
+            #end
+        #end
+    </div>
+    </div>
+#end
+</section>

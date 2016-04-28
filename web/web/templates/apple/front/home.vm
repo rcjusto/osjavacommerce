@@ -1,0 +1,24 @@
+<div id="bannerTotal">
+    #banners('home-top')
+</div>
+<div id="blockContent" class="home-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+
+    <div id="blockCenter">
+
+        <div class="block-title">#label('hot.products')</div>
+        <div id="homeProducts" class="clearfix">
+            #set($lista = $action.getRandomProducts('label:hot', $!math.toInteger($!action.getStoreProperty('home.hot.items', '12'))))
+            <ul class="clearfix">
+            #foreach($p in $lista)
+                <li>#parse("/WEB-INF/views/${template}/front/home_product.vm")</li>
+            #end
+            </ul>
+        </div>
+        <div id="homeTopBlock">#block('home.top')</div>
+        #banners('home-bottom')
+        <div id="homeBottomBlock">#block('home.bottom')</div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+#set($priceMap = $userSession.getPriceMap() )
+#set($promotions = $priceMap.get('promotions'))
+
+<section id="left-column">
+
+    <!-- Main Content Area -->
+    <section id="main">
+        #if($util.isNotEmpty($userSession.items))
+            #control('shopcart_alerts')
+
+            #control('shopcart_items')
+
+            #control('shopcart_coupons')
+            #control('shopcart_actions')
+            #control('shopcart_request_cancel')
+        #else
+            <h2>#label('shopping.cart.empty')</h2>
+            <p>#label('shopping.cart.empty.text')</p>
+
+        #end
+
+    </section>
+
+    <!-- Secondary Feature Area — Useful for Sales -->
+    #control('shopcart_related')
+</section>
+
+#control('aside')

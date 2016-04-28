@@ -1,0 +1,19 @@
+<section id="left-column">
+
+<!-- Banner Slideshow -->
+    #control('home_main_slider')
+
+<!-- Featured Products -->
+    #control('home_hot_products')
+
+<!-- Specials — Please note that a class="last" will be required for the last item in the row -->
+    #control('home_bottom_banner')
+
+<!-- New Products -->
+    #control('home_new_products')
+
+</section>
+
+#control('aside')
+
+

@@ -1,0 +1,56 @@
+<h2>#label('shopcart.items.in.cart')</h2>
+<p>Your cart contains the following items:</p>
+<form id="formshopcart" action="$!action.url('shopcart')" method="post" class="clearfix">
+    #actionErrors()
+    <input type="hidden" id="removeFromCart" name="removeFromCart" value=""/>
+
+    #foreach($it in $userSession.items)
+        #set($urlProd = $action.urlProduct($it.beanProd1))
+        #set($image = $imageResolver.getImageForProduct($it.beanProd1,'list/'))
+        #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)")) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif") ) #end
+
+        <div class="product-cart">
+            <img src="$!srcImg" alt="Product Image" />
+            <h2><a href="$!urlProd">$!it.name1</a></h2>
+            <p>$!it.beanProd1.getLanguage($locale.language).description</p>
+            <label for="amount-product-$velocityCount">Amount <a href="#" class="remove" onclick="$('#removeFromCart').val($velocityCount);$('#formshopcart').submit();return false;" title="$!action.getText('shopcart.remove.item')">(Remove)</a></label>
+            <input type="text"name="quantities" id="amount-product-$velocityCount" value="$!it.quantity" size="2" />
+            <h2 class="item">$!action.formatActualCurrency($it.subtotal)</h2>
+        </div>
+    #end
+
+    #foreach($promo in $priceMap.promotions)
+        #surl('id=urlDelPromo' "action=shopcartPromotion" "code=$!promo.code" 'output=del')
+        #if($promo.type=='discount' || $promo.type=='discount-percent')
+            <div class="product-cart">
+                <h2>#label('promo') $!promo.code</h2>
+                <p>$!promo.name</p>
+                <label for="amount-promo-$velocityCount">Amount <a href="$!urlDelPromo" title="Remove">(Remove)</a></label>
+                <h2 class="item">$!action.formatActualCurrency($promo.value)</h2>
+            </div>
+        #end
+        #if($promo.type=='product')
+            #set($image = $imageResolver.getImageForProduct($!action.getProduct($promo.data),'list/'))
+            #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)")) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif") ) #end
+            <div class="product-cart">
+                <img src="$!srcImg" alt="Product Image" />
+                <h2>#label('promo') $!promo.code - $!promo.name</h2>
+                <p>$!action.getProduct($promo.data).getProductName($locale.language)</p>
+                <label for="amount-promo-$velocityCount">Amount <a href="$!urlDelPromo" title="Remove">(Remove)</a></label>
+                <input type="text"name="quantities" id="amount-promo-$velocityCount" value="1" size="2" />
+                <h2 class="item">0.00</h2>
+            </div>
+        #end
+    #end
+
+    <div class="total">
+        <h3>Total: <b>$!action.formatActualCurrency($priceMap.total)</b></h3>
+    </div>
+    <div class="right">
+        #if($shoppingCart.status!='saved' && $action.getStoreProperty('shopcart.can.save','')=='Y')
+            <a class="button" href="$!action.url('shopcartsave','',$util.toMap(['output','save']))"><span>#label('shopcart.save')</span></a>
+        #end
+
+        <button type="submit"><span>#label('update')</span></button>
+    </div>
+</form>

@@ -1,0 +1,50 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'list/')")
+#set( $price = $action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+<div class="product clearfix #foreach($lab in $action.getProductLabels($p)) label-$!{lab.code} #end ">
+    <span class="label1"></span>
+    <span class="label2"></span>
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail"><img src="$!util.findCacheImage('notavailable',$action.storeFile('images/products/list/not-available'),$action.skinFile('images/[lang]/not-available'))"/></a></div>
+    #end
+    <div class="data">
+        <div class="code"><a href="$urlDetail">$!p.partNumber</a></div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="manufacturer"><a href="$urlDetail">$!p.manufacturer.manufacturerName</a></div>
+        <div class="manufacturer-partnumber">#if($util.isNotEmpty($p.mfgPartnumber))<span class="label">#label('part.number')</span> <a href="$urlDetail">$!p.mfgPartnumber</a>#end</div>
+        <div class="desc"><a href="$urlDetail">$!util.abbreviate($pDesc,400)</a></div>
+        <div class="labels clearfix">
+            <ul>
+                #foreach($lab in $action.getProductLabels($p))
+                    #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                        <li>$!lab.getContentList($locale.language)</li>
+                    #end
+                #end
+            </ul>
+        </div>
+    </div>
+    <div class="rating clearfix">
+        #if($p.reviews>0)
+            #control('review_stars' $p.ratingBy)
+        #else
+            <div class="no-reviews">#label('no.reviews')</div>
+        #end
+    </div>
+    #if($canCompare)
+        <div class="compare">
+            <a class="product-compare" href="#" data="$!p.idProduct">#label('compare')</a>
+        </div>
+    #end
+   <div class="actions clearfix">
+        #if($action.canShowPrices)
+            <div class="price">$price</div>
+            #addToCart($p)
+        #end
+    </div>
+</div>
+

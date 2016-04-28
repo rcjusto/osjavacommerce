@@ -1,0 +1,11 @@
+#if($category)
+    #control('menu_categories')
+    #control('menu_category_filters')
+#else
+    #control('menu_categories_home')
+    #control('menu_manufacturers')
+#end
+
+#news(3)
+
+#banners('left-column')

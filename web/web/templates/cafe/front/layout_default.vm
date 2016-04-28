@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="$!locale.language">
+<head>
+    #parse('/WEB-INF/views/front/head.vm')</head>
+<body>
+    $!extraTopContent
+
+    #parse('/WEB-INF/views/front/top.vm')
+
+    #if($util.isNotEmpty($contentPage))
+    <section id="content">
+        #parse($contentPage)
+    </section>
+    #end
+
+    #parse('/WEB-INF/views/front/bottom.vm')
+
+    $!extraBottomContent
+</body>
+</html>

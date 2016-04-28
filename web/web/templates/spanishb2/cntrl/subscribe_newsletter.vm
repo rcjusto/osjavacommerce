@@ -1,0 +1,11 @@
+<section id="about-us">
+    <form id="emailSubscribe" method="post" action="index.htm" onsubmit="$(this).find('.field_error').hide();">
+    <div>
+        <div class="clearfix">
+            <input type="text" id="subscribeEmailAddress" class="newsletter-input required email" placeholder="Your E-Mail Address" value=""/>
+            <div class="field_error" style="display:none;position: absolute;right: 45px;bottom: 10px;"></div>
+        </div>
+        <a href="#" onclick="if ($('#emailSubscribe').validForm()) $('#emailSubscribe').submit(); return false;" class="newsletter-submit"/>+</a>
+    </div>
+</form>
+</section>

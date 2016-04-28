@@ -1,0 +1,373 @@
+<script type="text/javascript">
+
+    $(function() {
+        $('#formProfile').submit(function() {
+            return $(this).validForm();
+        });
+    });
+</script>
+<div id="blockContent" class="register-page clearfix">
+
+<div id="blockProfile">
+    <div id="registerData" class="block">
+        <h1>#label('profile.page.title')</h1>
+        #surl("action=saveprofile" 'id=urlFormProfile')
+        <form action="$urlFormProfile" id="formProfile" method="post">
+            <div id="userData" class="form">
+                #if($rewardsEnabled && $rewardsRate)
+                    #set( $rewardMoney = $math.mul($rewardsRate,$user.rewardPoints) )
+                    <label>
+                        <span class="label">#label('reward.label.profile')</span>
+                            #set($rewardText = "$!user.rewardPoints $!action.getText('reward.label.points') = $!action.formatActualCurrency($rewardMoney)" )
+                        <input type="text" readonly="readonly" class="field readonly" value="$!rewardText"/>
+                    </label>
+                #end
+                <h2>#label('profile.page.subtitle.id-password')</h2>
+                <p>#label('profile.page.text.id-password')</p>
+                #if($action.getStoreProperty('use.email.as.login','Y')=='Y')
+                    <label>
+                        <span class="label required">#label('email.address')</span>
+                        #stextfield('name=email' "value=$!user.email" 'cssClass=field email required' 'cssErrorClass=invalid')
+                        #fieldError('email')
+                    </label>
+                #else
+                    <label>
+                        <span class="label required">#label('user.id')</span>
+                        #stextfield('name=userId' "value=$!user.userId" 'cssClass=field required' 'cssErrorClass=invalid')
+                        #fieldError('userId')
+                    </label>
+                #end
+                <label>
+                    <span class="label">#label('change.password')</span>
+                    #spassword('name=password' 'cssClass=field string-200' 'cssErrorClass=invalid')
+                    #fieldError('password')
+                </label>
+                <label>
+                    <span class="label">#label('new.password.repeat')</span>
+                    #spassword('name=passwordRepeat' 'cssClass=field string-200' 'cssErrorClass=invalid')
+                    #fieldError('passwordRepeat')
+                </label>
+                #if($action.getStoreProperty('show.user.level','Y')=='Y')
+                    <label>
+                        <span class="label">#label('user.type.current')</span>
+                        <input type="text" readonly="readonly" class="field string-200" value="$!user.level.getName($locale.language)">
+                    </label>
+                    <label>
+                        <span class="label">#label('user.type.requested')</span>
+                        <select name="levelRequested" class="field string-200">
+                            #foreach($l in $userLevelList)
+                                <option #if($user.levelRequested==$l.code) selected="selected" #end  value="$l.code">$!{l.getName($locale.language)}</option> #end
+                        </select>
+                        #fieldError('levelRequested')
+                    </label>
+                #end
+                #if($action.getStoreProperty('use.email.as.login','Y')!='Y')
+                    <label>
+                        <span class="label required">#label('email.address')</span>
+                        #stextfield('name=email' "value=$!user.email" 'cssClass=field email required string-200' 'cssErrorClass=invalid')
+                        #fieldError('email')
+                    </label>
+                #end
+            </div>
+
+
+                #set($questions = $dao.getInquiresForRegister())
+                #if($util.isNotEmpty($questions))
+                <div id="optionsData" class="form">
+                    <h2>#label('register.page.subtitle.optional')</h2>
+                    <p>#label('register.page.text.optional')</p>
+                    #foreach($question in $questions)
+                    <label>
+                        <span class="label">$!question.getQuestion($locale.language)</span>
+                        <input type="hidden" name="preferenceCode" value="$!{question.id}">
+                        <select name="preferenceValue" class="field string-200">
+                            <option value=""></option>
+                            #foreach($answer in $question.answers)
+                                <option value="$answer.id">$!answer.getAnswer($locale.language)</option>
+                            #end
+                        </select>
+                    </label>
+                    #end
+                </div>
+                #end
+
+            #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+            <div id="subscriptionData" class="form">
+                <h2>#label('register.page.subtitle.subscription')</h2>
+                <div class="form-row">
+                    <input type="checkbox" id="registerSubscription" name="registerSubscription" value="yes" #if($user.getPreference('register.subscriptions')=='yes') checked="checked" #end style="float:left;margin:2px 8px 8px 0;"/>
+                    <label style="display: inline;" for="registerSubscription">#label('register.subscriptions')</label>
+                </div>
+            </div>
+            #end
+
+            <div class="button-bar">
+                <button type="submit" onclick="$('.validation-error').hide();"><span class="ok">#label('submit.changes')</span></button>
+            </div>
+            <div>
+                #label('register.bottom.text' )
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    #surl('id=urlSaveAddress' "action=profile_addresssave")
+<div id="blockAddress">
+    <div id="userAddress" class="form block">
+        <h1>#label('profile.address.title')</h1>
+        #foreach($add in $user.addressList)
+            <div class="address-data">
+                <div id="addressEdit$velocityCount" class="address-edit" style="display:none;">
+                    <h2>#label('modify.address') $math.add($velocityCount,1)</h2>
+                    <form action="$urlSaveAddress" method="post" class="validable" onsubmit="return $(this).validForm();">
+                        #formErrors()
+                        #set($countryList = $action.getCountries(true))
+                        <input type="hidden" name="idAddress" value="$!add.idAddress"/>
+                        #if($action.getStoreProperty('address.show.name','Y')=='Y')
+                        <label>
+                            <span class="label">#label('salutation')</span>
+                            #sselect("name=address.title" "value=$!add.title" 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+                        </label>
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+                            #stextfield("name=address.firstname" "value=$add.firstname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.firstname")
+                        </label>
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+                            #stextfield("name=address.lastname" "value=$!add.lastname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.lastname")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.company','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+                            #stextfield("name=address.company" "value=$!add.company" "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.company")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address')</span>
+                            #stextfield("name=address.address" "value=$!add.address" "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.address")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">&nbsp;</span>
+                            #stextfield("name=address.address2" "value=$!add.address2" "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.address2")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.city','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+                            #stextfield("name=address.city" "value=$!add.city" "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.city")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+                        #if($countryList && $countryList.size()>1)
+                            #if($add && $util.isNotEmpty($add.idCountry))
+                                #set( $selCountry = $add.idCountry)
+                            #else
+                                #set( $selCountry = $action.getStoreProperty('country.default',''))
+                            #end
+                            <label>
+                                <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                                <select name="address.idCountry" id="address_idCountry$velocityCount" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                                    #foreach($c in $countryList)
+                                        <option value="$!c.code" #if($c.code==$selCountry) selected="selected" #end>$!c.name</option>  #end
+                                </select>
+                                #fieldError("address.idCountry")
+                            </label>
+                        #end
+                        #if($countryList && $countryList.size()==1)
+                            <input type="hidden" id="address_idCountry$velocityCount" name="address.idCountry" value="$countryList.get(0).code">
+                        #end
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+                            #sselect("id=addressState$velocityCount" "name=addressState" "value=$!add.state.idState" "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("addressState")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+                            #stextfield("name=address.zipCode" "value=$!add.zipCode" "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.zipCode")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+                            #stextfield("name=address.phone" "value=$!add.phone" "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("address.phone")
+                        </label>
+                        #end
+                        #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+                            <label>
+                                <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('fax')</span>
+                                #stextfield("name=address.fax" "value=$!add.phone" "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                                #fieldError("address.fax")
+                            </label>
+                        #end
+                        <div class="form-row">
+                            #scheckbox("name=address.shipping" "value=$!add.shipping" "id=address_shipping_$!{add.idAddress}")
+                            <label style="display: inline;" for="address_shipping_$!{add.idAddress}">#label('use.for.shipping')</label>
+                        </div>
+                        <div class="form-row">
+                            #scheckbox("name=address.billing" "value=$!add.billing" "id=address_billing_$!{add.idAddress}")
+                            <label style="display: inline;" for="address_billing_$!{add.idAddress}">#label('use.for.billing')</label>
+                        </div>
+                        <div class="buttons">
+                            <button type="submit"><span class="ok">#label('save')</span></button>
+                            <button type="button" onclick="$('#addressEdit$velocityCount').hide();$('#addressInfo$velocityCount').show();"><span class="cancel">#label('cancel')</span></button>
+                        </div>
+                        <script type="text/javascript">
+                            countryState("address_idCountry$velocityCount", "addressState$velocityCount", "$!add.state.idState");
+                        </script>
+                    </form>
+                </div>
+                <div id="addressInfo$velocityCount" class="address-show clearfix">
+                    <button style="float:right;vertical-align:bottom;" type="button" onclick="$('.address-edit').hide();$('.address-show').show();$('#addressInfo$velocityCount').hide();$('#addressEdit$velocityCount').show();"><span class="edit">#label('edit')</span></button>
+                    <div style="float:left;">
+                        <h2>#label('address') $math.add($velocityCount,1)</h2>
+                        #if($util.isNotEmpty($add.company))<p>$!add.company</p>#end
+                        <p>$!add.fullName</p>
+                        <p>$!add.address</p>
+                        #if($util.isNotEmpty($add.address2))<p>$!add.address2</p>#end
+                        <p>$!add.city $!add.stateCode $!add.zipCode $!add.idCountry</p>
+                        #if($util.isNotEmpty($add.phone))<p>$!add.phone</p>#end
+                    </div>
+                </div>
+            </div>
+        #end
+
+
+        <div id="addressButtonNew" class="address-show">
+            <button type="button" onclick="$('.address-edit').hide();$('.address-show').show();$('#addressButtonNew').hide();$('#addressEditNew').show();"><span>#label('new.address')</span></button>
+        </div>
+        <div class="address-edit" id="addressEditNew" style="display:none;">
+            <h2>#label('new.address') </h2>
+            <div>
+                <form action="$urlSaveAddress" method="post" class="validable" onsubmit="return $(this).validForm();">
+                    #formErrors()
+                    #set($countryList = $action.getCountries(true))
+                    <input type="hidden" name="idAddress" value=""/>
+                    #if($action.getStoreProperty('address.show.name','Y')=='Y')
+                    <label>
+                        <span class="label">#label('salutation')</span>
+                        #sselect("name=address.title" 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+                        #stextfield("name=address.firstname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.firstname")
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+                        #stextfield("name=address.lastname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.lastname")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.company','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+                        #stextfield("name=address.company" "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.company")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address')</span>
+                        #stextfield("name=address.address" "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.address")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">&nbsp;</span>
+                        #stextfield("name=address.address2" "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.address2")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.city','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+                        #stextfield("name=address.city" "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.city")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+                    #if($countryList && $countryList.size()>1)
+                        #if($address && $util.isNotEmpty($address.idCountry))
+                            #set( $selCountry = $address.idCountry)
+                        #else
+                            #set( $selCountry = $action.getStoreProperty('country.default',''))
+                        #end
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                            <select name="address.idCountry" id="address_idCountry" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                                #foreach($c in $countryList)
+                                    <option value="$!c.code" #if($c.code==$selCountry) selected="selected" #end >$!c.name</option>  #end
+                            </select>
+                            #fieldError("address.idCountry")
+                        </label>
+                    #end
+                    #if($countryList && $countryList.size()==1)
+                        <input type="hidden" id="address_idCountry" name="address.idCountry" value="$countryList.get(0).code">
+                    #end
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+                        #sselect("id=addressState" "name=addressState" "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("addressState")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+                        #stextfield("name=address.zipCode" "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.zipCode")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+                        #stextfield("name=address.phone" "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.phone")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('fax')</span>
+                        #stextfield("name=address.fax" "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("address.fax")
+                    </label>
+                    #end
+                    <div class="form-row">
+                        #scheckbox("name=address.shipping" )
+                        <label style="display: inline;" for="address_shipping">#label('use.for.shipping')</label>
+                    </div>
+                    <div class="form-row">
+                        #scheckbox("name=address.billing" )
+                        <label style="display: inline;" for="address_billing">#label('use.for.billing')</label>
+                    </div>
+                    <div class="buttons">
+                        <button type="submit"><span class="ok">#label('save')</span></button>
+                        <button type="button" onclick="$('#addressEditNew').hide();$('#addressButtonNew').show();"><span class="cancel">#label('cancel')</span></button>
+                    </div>
+                    <script type="text/javascript">
+                        countryState("address_idCountry", "addressState", "$!add.state.idState");
+                    </script>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</div>

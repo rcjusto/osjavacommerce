@@ -1,0 +1,18 @@
+#if($util.isNotEmpty($associatedProducts))
+
+    <section class="sale">
+        <h1>#label('product.related')</h1>
+        <ul>
+            <li class="slide">
+                #set($numItems = 0)
+                #foreach($p in $associatedProducts)
+                    #if($p.getMaxToBuy($frontUser)>0)
+                        #parse("/WEB-INF/views/${template}/front/product_relatedproduct.vm")
+                    #end
+                #end
+            </li>
+        </ul>
+    </section>
+#end
+
+

@@ -1,0 +1,19 @@
+#linklabel('category.menu','#','mobile-category-menu')
+<div class="column-wraper">
+#control('menu_categories')
+#if($category)
+    #control('menu_category_filters')
+#else
+    #control('menu_manufacturers')
+#end
+
+#banners('left-column')
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.mobile-category-menu').click(function(){
+            $('.column-wraper').toggle();
+            return false;
+        })
+    })
+</script>

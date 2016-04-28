@@ -1,0 +1,28 @@
+#* @vtlvariable name="testimonials" type="java.util.List<org.store.core.beans.UserComment>" *#
+#set($testimonials = $action.getComments('testimonial',5))
+#if(!$testimonials.isEmpty())
+    #set($_id = $util.getId('slider'))
+<div class="testimonials slider-wrapper lateral">
+    <div class="title">#label('testimonials')</div>
+    <div id="testimonials_$!{_id}" class="my-slider">
+        <div class="slider">
+            #foreach($t in $testimonials)
+                <div class="slide">
+                    <div class="slide-wraper">
+                    <div class="testimonial-title">$!t.title</div>
+                    <div class="testimonial-comment">$!util.abbreviate($t.comment,210)</div>
+                    <div class="testimonial-user">$!t.userName</div>
+                        <div class="testimonial-date">$!util.formatDate($t.created)</div>
+                    </div>
+                </div>
+            #end
+        </div>
+    </div>
+    <div class="footer">
+        <a href="$!action.url('comments')">See all testimonials</a>
+    </div>
+</div>
+#end
+<script type="text/javascript">
+    $("#testimonials_$!{_id}").rcSlider({autoPlay: true, interval:4000, width: 200, height: 200, effect: 'fade', controlsOpacity: 1, controlsInParent: true, hideControlsInAnimation: false})
+</script>

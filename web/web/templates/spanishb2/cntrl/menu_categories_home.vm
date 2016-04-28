@@ -1,0 +1,31 @@
+#set($_treeCategories = $action.sortCategories($action.getSubCategories($util.null, true)))
+#if ($_treeCategories && !$_treeCategories.isEmpty())
+#foreach($cat in $_treeCategories)
+<div class="left-menu categories">
+    <div class="title">$!cat.name</div>
+    <ul>
+        #if($cat.children && !$cat.children.isEmpty())
+        #foreach($subcat in $cat.children)
+            #if($velocityCount<8)
+            <li>
+            <a href="$!action.urlCategory($subcat)" class="label level$!{subcat.level} #if($ubcat.idCategory==$category.idCategory) selected #end">
+                <span>$!subcat.name #if($util.isNotEmpty($numProducts) && $numProducts.get($subcat.idCategory))<span class="num-products">($!numProducts.get($ubcat.idCategory))</span>#end</span>
+            </a>
+            </li>
+            #end
+        #end
+        #if($cat.children.size()>8)
+            <li>
+                <a href="$!action.urlCategory($cat)" class="more">#label('show.more')</a>
+            </li>
+        #end
+        #else
+            <li>
+                <a href="$!action.urlCategory($cat)" class="more">#label('show.products')</a>
+            </li>
+        #end
+    </ul>
+</div>
+#end
+#end
+#set($_treeCategories = $util.null)

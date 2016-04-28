@@ -1,0 +1,33 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'list/')")
+
+#set( $urlDetail = $action.urlProduct($p) )
+<div class="product">
+    #if($util.isNotEmpty($image))
+        <div class="image"><a href="$urlDetail"><img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/></a></div>
+    #else
+        <div class="image"><a href="$urlDetail"><img src="$!action.skinFile('images/[lang]/not-available.gif')"/></a></div>
+    #end
+    <div class="data">
+        <div class="code"><a href="$urlDetail">#label('part.number') $!p.partNumber</a></div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="desc"><a href="$urlDetail">$!util.left($pDesc,300)</a></div>
+        <div class="labels">
+            <ul>
+                #foreach($lab in $action.getProductLabels($p))
+                    #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                        <li>$!lab.getContentList($locale.language)</li>
+                    #end
+                #end
+            </ul>
+        </div>
+    </div>
+    <div class="actions">
+        #if($action.canShowPrices)
+        <div class="price">$!action.formatActualCurrency($p.getFinalPrice($frontUserLevel,1))</div>
+        #addToCart($p)
+        #end
+    </div>
+</div>
+

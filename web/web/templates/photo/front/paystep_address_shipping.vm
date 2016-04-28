@@ -1,0 +1,362 @@
+#set($priceMap = $userSession.getPriceMap())
+#if($canChangeShippingAddress)
+<div id="shippingTypeEdit">
+    <form id="formShippingType">
+        <input type="hidden" name="output" value="type"/>
+        #if($canPickInStore)
+            #if($canDeliver)
+                #set($typeList = ['pickinstore','billing','shipping'])
+            #else
+                #set($typeList = ['pickinstore'])
+            #end
+        #else
+            #if($canDeliver)
+                #set($typeList = ['billing','shipping'])
+            #else
+                #set($typeList = [])
+            #end
+        #end
+        <select name="shippingType" class="shippingType">
+        #foreach($opt in $typeList)
+            <option value="$opt" #if($userSession.shippingType==$opt) selected="selected" #end >$!action.getText("shipping.type.$opt")</option>
+        #end
+        </select>
+    </form>
+</div>               
+#end
+<div id="shippingTypeShow">
+    #if($!userSession.shippingType=='pickinstore')
+    <div id="shippingBlock_pickinstore" class="shippingBlock">
+        #set($shippingStore = $userSession.shippingStore)
+        <div id="shippingStoreShow" class="clearfix">
+            <div class="addressData">
+                <p><strong>$!shippingStore.storeName</strong>
+                $!shippingStore.address,
+                #if($util.isNotEmpty($shippingStore.address2)) $!shippingStore.address2, #end
+                $!shippingStore.city, $!shippingStore.stateCode $!shippingStore.zipCode, $!shippingStore.idCountry</p>
+                #if($util.isNotEmpty($shippingStore.email))<p>$!shippingStore.email</p>#end
+                #if($util.isNotEmpty($shippingStore.phone))<p>$!shippingStore.phone</p>#end
+            </div>
+            #if($canChangeShippingAddress)
+                <div class="buttons">
+                    #if($locationStoreList && $locationStoreList.size()>1)
+                        <button type="button" onclick="$('#nextButton').hide();$('#shippingStoreShow').hide();$('#shippingStoreChange').show();$('#nextButton').show();"><span class="change">#label('change.store')</span></button>
+                    #end
+                </div>
+            #end
+        </div>
+        #if($canChangeShippingAddress)
+            <div id="shippingStoreChange" style="display:none;" class="clearfix">
+                <form id="formShippingStoreChange">
+                    <input type="hidden" name="output" value="store"/>
+                    <select name="idStore" class="field string-400">
+                        #foreach($opt in $locationStoreList)
+                            <option value="$opt.id"  #if($userSession.shippingStore==$opt) selected="selected" #end>
+                                $!opt.storeName $!opt.address $!opt.city $!opt.stateCode $!opt.zipCode $!opt.idCountry
+                            </option>
+                        #end
+                    </select>
+
+                    <div class="buttons">
+                        <button type="submit"><span class="ok">#label('ok')</span></button>
+                        <button type="button" onclick="$('#nextButton').hide();$('#shippingStoreChange').hide();$('#shippingStoreShow').show();$('#nextButton').show();"><span class="cancel">#label('cancel')</span></button>
+                    </div>
+                </form>
+            </div>
+        #end
+    </div>
+    #end
+
+    #if($!userSession.shippingType=='billing')
+        #set($shippingAddress = $userSession.shippingAddress)
+    <div id="shippingBlock_shipping" class="shippingBlock">
+        #if($shippingAddress)
+            <div id="shippingShow" class="clearfix">
+                <div class="addressData">
+                    <p>$!shippingAddress.titulo $!shippingAddress.fullName,
+                    $!shippingAddress.address,
+                    #if($util.isNotEmpty($shippingAddress.address2)) $!shippingAddress.address2, #end
+                    $!shippingAddress.city, $!shippingAddress.stateCode $!shippingAddress.zipCode, $!shippingAddress.idCountry</p>
+                    #if($util.isNotEmpty($shippingAddress.phone))<p>$!shippingAddress.phone</p>#end
+                </div>
+            </div>
+        #end
+    </div>
+    #end
+
+    #if($!userSession.shippingType=='shipping')
+        #set($shippingAddress = $userSession.shippingAddress)
+    <div id="shippingBlock_shipping" class="shippingBlock">
+        #if($canChangeShippingAddress)
+            <div id="shippingChange" style="display:none;" class="clearfix">
+                <form id="formShippingChange">
+                    <input type="hidden" name="output" value="change"/>
+                    <select class="field string-400" name="idShipping">
+                        #foreach($add in $frontUser.addressList)
+                            <option value="$add.idAddress" #if($add==$shippingAddress) selected="selected" #end >
+                                $!add.address $!add.city $!add.stateCode $!add.zipCode $!add.idCountry
+                            </option>
+                        #end
+                    </select>
+
+                    <div class="buttons">
+                        <button type="submit"><span class="ok">#label('ok')</span></button>
+                        <button type="button" onclick="$('#nextButton').hide();$('#shippingChange').hide();$('#shippingShow').show();$('#nextButton').show();"><span class="cancel">#label('cancel')</span></button>
+                    </div>
+                </form>
+            </div>
+        #end
+        <div id="shippingShow" class="clearfix">
+            <div class="addressData">
+                <p>$!shippingAddress.titulo $!shippingAddress.fullName,
+                $!shippingAddress.address,
+                #if($util.isNotEmpty($shippingAddress.address2)) $!shippingAddress.address2, #end
+                $!shippingAddress.city, $!shippingAddress.stateCode $!shippingAddress.zipCode, $!shippingAddress.idCountry</p>
+                #if($util.isNotEmpty($shippingAddress.phone))<p>$!shippingAddress.phone</p>#end
+            </div>
+            #if($canChangeShippingAddress)
+                <div class="buttons">
+                    <button id="btnEditShippingAddress" type="button" onclick="$('#nextButton').hide();$('#shippingShow').hide();$('#shippingEdit').show();$('#nextButton').show();"><span class="edit">#label('edit')</span></button>
+                    #if($frontUser.addressList && $frontUser.addressList.size()>1)
+                        <button type="button" onclick="$('#nextButton').hide();$('#shippingShow').hide();$('#shippingChange').show();$('#nextButton').show();"><span class="change">#label('change.address')</span></button>
+                    #end
+                    #if($shippingAddress)
+                        <button type="button" id="btnNewShippingAddress"><span class="new">#label('new.address')</span></button>
+                    #end
+                </div>
+                #if(!$shippingAddress)
+                    <script type="text/javascript">
+                        $(function(){$('#btnEditShippingAddress').trigger('click');});
+                    </script>
+                #end
+            #end
+        </div>
+        #if($canChangeShippingAddress)
+            <div id="shippingEdit" style="display:none;">
+                <form id="formShippingEdit">
+                    #set($countryList = $action.getCountries(true))
+                    <input type="hidden" name="output" value="edit"/>
+                    <input type="hidden" name="idShipping" value="$!shippingAddress.idAddress"/>
+                    <input type="hidden" name="shippingAddress.idAddress" value="$!shippingAddress.idAddress"/>
+                    #if($action.getStoreProperty('address.show.name','Y')=='Y')
+                    <label>
+                        <span class="label">#label('salutation')</span>
+                        #sselect("name=shippingAddress.title" "value=$!shippingAddress.title" 'cssClass=field' "list=#{'Mr.':'Mr.','Miss':'Miss','Mrs.':'Mrs.','Ms.':'Ms.'}" )
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('firstname')</span>
+                        #stextfield("name=shippingAddress.firstname" "value=$!shippingAddress.firstname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.firstname")
+                    </label>
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end">#label('lastname')</span>
+                        #stextfield("name=shippingAddress.lastname" "value=$!shippingAddress.lastname" "cssClass=field #if($action.getStoreProperty('address.required.name','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.lastname")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.company','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end">#label('company')</span>
+                        #stextfield("name=shippingAddress.company" "value=$!shippingAddress.company" "cssClass=field #if($action.getStoreProperty('address.required.company','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.company")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address1','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end">#label('address.1')</span>
+                        #stextfield("name=shippingAddress.address" "value=$!shippingAddress.address" "cssClass=field #if($action.getStoreProperty('address.required.address1','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.address")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.address2','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end">#label('address.2')</span>
+                        #stextfield("name=shippingAddress.address2" "value=$!shippingAddress.address2" "cssClass=field #if($action.getStoreProperty('address.required.address2','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.address2")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.city','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end">#label('city')</span>
+                        #stextfield("name=shippingAddress.city" "value=$!shippingAddress.city" "cssClass=field #if($action.getStoreProperty('address.required.city','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.city")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.state_province','Y')=='Y')
+                    #if($countryList && $countryList.size()>1)
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('country')</span>
+                            <select name="shippingAddress.idCountry" id="shippingAddress_idCountry" class="field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200">
+                                #foreach($c in $countryList)
+                                    <option value="$!c.code" #if($c.code==$shippingAddress.idCountry) selected="selected" #end>$!c.name</option>  #end
+                            </select>
+                            #fieldError("shippingAddress.idCountry")
+                        </label>
+                    #end
+                    #if($countryList && $countryList.size()==1)
+                        <input type="hidden" id="shippingAddress_idCountry" name="shippingAddress.idCountry" value="$countryList.get(0).code">
+                    #end
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end">#label('state')</span>
+                        #sselect("id=shippingAddressState" "name=shippingAddressState" "value=$!shippingAddress.state.idState" "cssClass=field #if($action.getStoreProperty('address.required.state_province','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddressState")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.postal_code','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end">#label('postal.code')</span>
+                        #stextfield("name=shippingAddress.zipCode" "value=$!shippingAddress.zipCode" "cssClass=field #if($action.getStoreProperty('address.required.postal_code','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.zipCode")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.phone','Y')=='Y')
+                    <label>
+                        <span class="label #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end">#label('phone')</span>
+                        #stextfield("name=shippingAddress.phone" "value=$!shippingAddress.phone" "cssClass=field #if($action.getStoreProperty('address.required.phone','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                        #fieldError("shippingAddress.phone")
+                    </label>
+                    #end
+                    #if($action.getStoreProperty('address.show.fax','Y')=='Y')
+                        <label>
+                            <span class="label #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end">#label('fax')</span>
+                            #stextfield("name=shippingAddress.fax" "value=$!shippingAddress.fax" "cssClass=field #if($action.getStoreProperty('address.required.fax','Y')=='Y') required #end string-200" 'cssErrorClass=invalid')
+                            #fieldError("shippingAddress.fax")
+                        </label>
+                    #end
+                    <div class="buttons">
+                        <button type="submit"><span class="ok">#label('save')</span></button>
+                        #if($shippingAddress)
+                        <button type="button" onclick="$('#nextButton').hide();$('#shippingEdit').hide();$('#shippingShow').show();$('#nextButton').show();"><span class="cancel">#label('cancel')</span></button>
+                        #end
+                    </div>
+                </form>
+            </div>
+        #end
+    </div>
+    #end
+
+<div id="shippingCost">
+    #if($userSession.shippingMethod)
+        <h2>#label('shipping.method')</h2>
+
+        <p>
+            <span>$!userSession.shippingMethod.getMethodName($locale.language)</span>
+            <span>$!action.formatActualCurrency($userSession.shippingValue)</span>
+            #if($userSession.shippingDate && $util.isNotEmpty($userSession.shippingDate))
+                <span>$!userSession.shippingDate $!action.getText('days')</span>
+            #end
+        </p>
+    #else
+        #if($priceMap.containsKey('services'))
+            <form id="formSelectService">
+                <input type="hidden" name="output" value="select"/>
+
+                <h2>#label('select.shipping.method')</h2>
+                <table class="listado" style="width: auto;">
+                    <tr>
+                        <th class="name" colspan="2">#label('method')</th>
+                        <th class="ship-price">#label('cost')</th>
+                        <th class="days">#label('days.to.deliver')</th>
+                    </tr>
+                    #foreach($mapServices in $priceMap.get('services'))
+                        <tr>
+                            <td class="selector"><input id="selectedShippingMethod$velocityCount" type="radio" name="selectedShippingMethod" value="$!mapServices.get('id')"/></td>
+                            <td class="name"><label for="selectedShippingMethod$velocityCount">$!mapServices.get('name')</label></td>
+                            <td class="ship-price">$!action.formatActualCurrency($mapServices.get('value'))</td>
+                            <td class="days">
+                                #if($mapServices.get('days') && $util.isNotEmpty($mapServices.get('days')))
+                                    #if($mapServices.get('days')=='1') 1 #label('day') #else $!mapServices.get('days') #label('days') #end
+                                #end
+                            </td>
+                        </tr>
+                    #end
+                </table>
+                <div class="buttons">
+                    <button type="submit"><span class="ok">#label('select.shipping')</span></button>
+                </div>
+            </form>
+        #end
+        #if($priceMap.containsKey("shippingErrors"))
+            <div id="shippingErrors" style="display:none;">
+                #foreach($sErr in $priceMap.get("shippingErrors")) $!sErr #end
+            </div>
+        #end
+    #end
+</div>
+</div>
+
+#surl('id=urlNext' "action=paystepPayment")
+<form id="formNext" action="$urlNext">
+#if($!userSession.shippingType!='pickinstore')
+#set( $insurances =  $action.getInsuranceList())
+#if($insurances && !$insurances.isEmpty())
+<div id="blockShippingInsurance">
+    <h1>#label('shipping.insurance.title')</h1>
+    <div>
+        <ul>
+            #foreach($ins in $insurances)
+                <li>
+                    <label>
+                        <input type="radio" name="idInsurance" value="$!ins.id"/>
+                        <span class="price">$!action.formatActualCurrency($ins.insuranceValue)</span>
+                        <span>$!ins.getText($locale.language)</span>
+                    </label>
+                </li>
+            #end
+            <li>
+                <label>
+                    <input type="radio" name="idInsurance" value=""/>
+                    <span>#label('insurance.select.none')</span>
+                </label>
+            </li>
+        </ul>
+    </div>
+</div>
+#end
+#end
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('select.shippingType').change(function(){$('#formShippingType').submit();});
+        countryState("shippingAddress_idCountry", "shippingAddressState", "$!shippingAddress.state.idState");
+        countryState("shippingAddress_idCountry", "shippingAddressState", "$!shippingAddress.state.idState");
+        $('#formShippingEdit').submit(function() {
+            if ($('#formShippingEdit').validForm()) {
+                updateShipping($('#formShippingEdit').serialize());
+            }
+            return false;
+        });
+        $('#formShippingChange').submit(function() {
+            if ($('#formShippingChange').validForm()) {
+                updateShipping($('#formShippingChange').serialize());
+            }
+            return false;
+        });
+        $('#formShippingStoreChange').submit(function() {
+            if ($('#formShippingStoreChange').validForm()) {
+                updateShipping($('#formShippingStoreChange').serialize());
+            }
+            return false;
+        });
+        $('#formShippingType').submit(function() {
+            if ($('#formShippingType').validForm()) {
+                updateShipping($('#formShippingType').serialize());
+            }
+            return false;
+        });
+        $('#formSelectService').submit(function() {
+            if ($("input[name='selectedShippingMethod']:checked").size() > 0) {
+                updateShipping($('#formSelectService').serialize());
+            }
+            return false;
+        });
+        $('#btnNewShippingAddress').click(function(){
+            updateShipping('output=new');
+            return false;
+        });
+        $('button').button();
+        $('#nextButton').show();
+        $('#canContinue').val("$!userSession.readyToPay");
+    });
+</script>

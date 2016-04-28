@@ -1,0 +1,23 @@
+<div id="blockTop" class="clearfix">
+    #control('logo')
+    <div id="blockTopRight" class="clearfix">
+        #control('menu_currencies')
+        #control('menu_languages')
+        #control('menu_social')
+        #if($frontUser)
+        <div id="welcomeUser">#label('welcome') $!frontUser.fullName</div>
+        #end
+    </div>
+</div>
+
+<div id="blockTopMenu" class="clearfix">
+#set( $treemenu = $action.getTreeMenu('TopBar') )
+#control('menu_horizontal')
+#set( $treemenu = $util.null )
+</div>
+
+<div id="blockTopBar" class="clearfix">
+    #control('search')
+    #control('top_shopcart')
+    #control('menu_minimun')
+</div>

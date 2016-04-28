@@ -1,0 +1,42 @@
+#if($mailSent=='Y')
+<div id="mailSent" class="info">
+    <h2>Mail Sent Successfully</h2>
+    <p>You have send this page by email to $!mailTo.</p>
+</div>
+#end
+<div id="mailWishlist" #if(!$mailSent || $mailSent=='Y')style="display:none;"#end class="variants">
+<div class="mail-header">
+    <h2>#label('wishlist.email.friend.title')</h2>
+    <p>#label('wishlist.email.friend.text')</p>
+</div>
+<form id="formEmailWishlist" action="" class="validable">
+    #formErrors()
+    #if($frontUser)
+    #else
+        <label>
+            <span class="label required">#label('mail.from.name')</span>
+            <input type="text" name="mailFromName" value="$!mailFromName" class="field email required string-500">
+            #fieldError("mailFromName")
+        </label>
+        <label>
+            <span class="label required">#label('mail.from')</span>
+            <input type="text" name="mailFrom" value="$!mailFrom" class="field required string-500">
+            #fieldError("mailFrom")
+        </label>
+    #end
+    <label>
+        <span class="label required">#label('mail.to')</span>
+        <input type="text" name="mailTo" value="$!mailTo" class="field email required string-500">
+        #fieldError("mailTo")
+    </label>
+    <label>
+        <span class="label">#label('mail.comment')</span>
+        <textarea name="mailComment" class="field string-500" rows="3">$!mailComment</textarea>
+    </label>
+    <div>
+        <span class="label">&nbsp;</span>
+        <button type="button" id="sendEmail"><span class="mail">#label('send.email')</span></button>
+        <button type="button" onclick="$('#mailWishlist').hide();"><span class="cancel">#label('cancel')</span></button>
+    </div>
+</form>
+</div>

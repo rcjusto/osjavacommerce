@@ -1,0 +1,85 @@
+#set($groups = $util.getRows($products.listado, 6))
+
+<section id="category" class="category">
+    <form id="formProducts" action="$!action.url('category')" method="get">
+        <h1>$!{products.totalRows} #label('navigator.item.number')
+
+            <span class="sort-navigator" style="">
+                <a>Sort</a>
+
+                <div>
+                    <ul>
+                        #foreach($opt in $sortOptions)
+                            <li>
+                            #if($opt==$productFilter.sorted)
+                                <b>$!action.getText("navigator.sort.$opt")</b>
+                            #else
+                                <a data="$opt" href="#" class="filter-sort">$!action.getText("navigator.sort.$opt")</a>
+                            #end
+                        </li>
+                        #end
+                    </ul>
+                </div>
+
+            </span>
+
+            <span class="items-navigator" style="">
+                <a>Items</a>
+
+                <div>
+                    <ul>
+                        #foreach($opt in $pageItemsOptions)
+                            <li>
+                            #if($opt==$!products.pageRows)
+                                <b>$opt $!action.getText('items.per.page')</b>
+                            #else
+                                <a data="$opt" href="#" class="filter-items">$opt $!action.getText('items.per.page')</a>
+                            #end
+                        </li>
+                        #end
+                    </ul>
+                </div>
+
+            </span>
+
+            <span style="float: right;">
+                <span>#label('navigator.page'): </span>
+                #set($_navArr = $!products.getPageListLikeGoogle(5))
+                #foreach($_p in [$list.get($_navArr,0)..$list.get($_navArr,1)])
+                    #if($_p==$products.currentPage)
+                        <b>$!_p</b>
+                    #else
+                        <a href="#" data="$!_p" class="gotopage">$!_p</a>
+                    #end
+                #end
+            </span>
+        </h1>
+
+        <input type="hidden" id="categoryCode" name="code" value="$!category.urlCode"/>
+        <input type="hidden" name="${products.name}.pagerows" id="filterItems" value="$!products.pageRows" />
+        <input type="hidden" name="productFilter.sorted" id="filterSort" value="$!productFilter.sorted" />
+        <input type="hidden" name="${products.name}.currentpage" value="$!products.currentPage" class="nav-page current-page"/>
+        #shidden('name=productFilter.filterMinPrice' 'id=filterPriceMin')
+        #shidden('name=productFilter.filterMaxPrice' 'id=filterPriceMax')
+        #shidden('name=productFilter.filterManufacturer' 'id=filterManufacturer')
+        #shidden('name=productFilter.filterLabel' 'id=filterLabel')
+        #set($filterAttMap = $productFilter.filterAttributesMap)
+        #foreach($attId in $filterAttMap.keySet())
+            #set($fieldValue = "$!{attId}=$!{filterAttMap.get($attId)}")
+            <input type="hidden" id="filterAttributes$!attId" name="productFilter.filterAttributes" value="$!esc.html($fieldValue)"/>
+        #end
+        <input type="hidden" id="filterAttributesNew" name="productFilter.filterAttributes" value=""/>
+    </form>
+    <ul class="category">
+        #foreach($p in $products.listado)
+            <li class="item-product">
+            #if($p!='')
+                #set($product = $p)
+                #parse("/WEB-INF/views/${template}/front/category_product.vm")
+            #end
+            </li>
+        #end
+    </ul>
+
+</section>
+<div id="quickView" style="position:absolute;display: none;" class="clearfix"></div>

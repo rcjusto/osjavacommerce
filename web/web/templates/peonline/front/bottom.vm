@@ -1,0 +1,42 @@
+<div id="blockBottomBar" class="clearfix">
+    #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+    <div id="blockEmailSubscribe">
+        <form id="emailSubscribe">
+            <label for="subscribeEmailAddress">#label('deal.alert.by.email')</label>
+            <input type="text" id="subscribeEmailAddress" class="required email" value=""/>
+            <a href="#" onclick="$('#emailSubscribe').submit(); return false;"><span>Subscribe</span></a>
+            <span class="field_error" style="float:left;display:none;margin-top:7px;margin-left:6px;"></span>
+        </form>
+    </div>
+    #end    
+</div>
+#set( $treebmenu = $action.getTreeMenu('BottomBar') )
+<div id="blockBottomMenu" class="clearfix">
+    #foreach($mIt in $treebmenu.children() )
+        #set( $m = $mIt.userObject )
+        <ul>
+            <li class="bottom-menu_$velocityCount">
+                #if($mIt.children().hasMoreElements())
+                    <a href="$!m.url" rel="#botmenu${m.id}">$!m.getLabel($locale.language)</a>
+                    <ul>
+                        #foreach($sIt in $mIt.children())
+                            #set( $s = $sIt.userObject )
+                            <li>
+                                <a href="$!s.url">$!s.getLabel($locale.language)</a>
+                            </li>
+                        #end
+                    </ul>
+                #end
+                #if($m.menuContent)
+                    <div id="topmenu${m.id}">
+                        #block($m.menuContent.code)
+                    </div>
+                #end
+            </li>
+        </ul>
+    #end
+    <div id="bottom-menu-contactus">#block('bottom.contact.us')</div>
+</div>
+<div id="blockStoreBottom">#block('bottom.bar')</div>
+<div id="blockBottomCopyright">#label('copyright')</div>
+

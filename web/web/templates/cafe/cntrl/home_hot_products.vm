@@ -1,0 +1,71 @@
+#set($lista = $action.getRandomProducts('label:hot', $!math.toInteger($!action.getStoreProperty('home.hot.items', '18'))))
+#if($lista.size()>5)
+
+<section id="featured">
+    <h1><img src="$!action.skinFile('images/icon-featured.png')" alt="Featured"/>#label('featured.products')</h1>
+    <ul class="featured regular">
+
+        <li class="slide">
+            #foreach($index in [0..5])
+                #set($product = $list.get($lista, $index))
+                #parse("/WEB-INF/views/${template}/front/home_product.vm")
+            #end
+        </li>
+
+        #if($lista.size()>11)
+            <li class="slide">
+                #foreach($index in [6..11])
+                    #set($product = $list.get($lista, $index))
+                    #parse("/WEB-INF/views/${template}/front/home_product.vm")
+                #end
+            </li>
+        #end
+
+        #if($lista.size()>17)
+            <li class="slide">
+                #foreach($index in [12..17])
+                    #set($product = $list.get($lista, $index))
+                    #parse("/WEB-INF/views/${template}/front/home_product.vm")
+                #end
+            </li>
+        #end
+
+    </ul>
+
+    <ul class="featured responsive">
+
+        <li class="slide">
+            #foreach($index in [0..5])
+                #set($product = $list.get($lista, $index))
+                #parse("/WEB-INF/views/${template}/front/home_product.vm")
+            #end
+        </li>
+
+        #if($lista.size()>11)
+            <li class="slide">
+                #foreach($index in [6..11])
+                    #set($product = $list.get($lista, $index))
+                    #parse("/WEB-INF/views/${template}/front/home_product.vm")
+                #end
+            </li>
+        #end
+
+        #if($lista.size()>17)
+            <li class="slide">
+                #foreach($index in [12..17])
+                    #set($product = $list.get($lista, $index))
+                    #parse("/WEB-INF/views/${template}/front/home_product.vm")
+                #end
+            </li>
+        #end
+
+    </ul>
+
+    <!-- Featured Products Controls -->
+    <a title="Previous" class="featured-prev">Previous</a>
+    <a title="Next" class="featured-next">Next</a>
+
+</section>
+
+#end
+

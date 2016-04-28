@@ -1,0 +1,52 @@
+#set($pName = "$!p.getProductName($locale.language)")
+#set($pDesc = "$!p.getLanguage($locale.language,$defaultLanguage).description")
+#set($image = "$imageResolver.getImageForProduct($p,'list/')")
+#set( $price = $action.toActualCurrency($p.getFinalPrice($frontUserLevel,1)) )
+
+#set($urlDetail = $action.urlProduct($p))
+#set($urlQuickView = $action.url("quickProduct", "", $util.map.add("idProduct",$!p.idProduct), false))
+<div class="product clearfix">
+    <div class="image">
+    #if($util.isNotEmpty($image))
+        <img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/>
+    #else
+        <img src="$!action.skinFile('images/[lang]/not-available.gif')"/>
+    #end
+        <a href="$urlDetail" class="detail-view" ><span> </span></a>
+        <a href="$urlQuickView" class="quick-view" ><span></span</a>
+    </div>
+    <div class="data">
+        <div class="code"><a href="$urlDetail">$!p.partNumber</a></div>
+        <div class="name"><a href="$urlDetail">$!pName</a></div>
+        <div class="desc"><a href="$urlDetail">$!util.abbreviate($pDesc,400)</a></div>
+        <div class="labels clearfix">
+            <ul>
+                #foreach($lab in $p.labels)
+                    #if($util.isNotEmpty($lab.getContentList($locale.language)))
+                        <li>$!lab.getContentList($locale.language)</li>
+                    #end
+                #end
+            </ul>
+        </div>
+    </div>
+    #if($canCompare)
+        <div class="compare">
+            <a class="product-compare" href="#" data="$!p.idProduct">#label('compare')</a>
+        </div>
+    #end
+    <div class="actions clearfix">
+        #if($action.canShowPrices)
+            <div class="price"><span class="prefix">#label('listing.price.prefix')</span> #fancyPrice($price) <span class="suffix">#label('listing.price.suffix')</span></div>
+
+            <div class="add-to-cart">
+                <a href="#" #if($action.getStoreProperty('enable.ajax.shopcart','N')=='Y') class="ajax-cart" data="$!p.idProduct" #else onclick="$('#formAddToCart_$!{p.idProduct}').submit(); return false;" #end>Add To Cart</a>
+            </div>
+            <form id="formAddToCart_$!p.idProduct" action="$!action.url('addtocart','')" method="post" class="form-addtocart" style="display: inline-block;">
+                <input type="hidden" name="quantity" value="1"/>
+                <input type="hidden" name="idProduct" value="$!p.idProduct"/>
+            </form>
+
+        #end
+    </div>
+</div>
+

@@ -1,0 +1,13 @@
+<section id="about-us">
+    <form id="emailSubscribe" method="post" action="index.htm">
+    <div>
+        <h2>#label('deal.alert.by.email')</h2>
+        <div class="clearfix">
+            <label for="subscribeEmailAddress">Stay informed about exclusive offers with our weekly Newsletter</label>
+            <input type="text" id="subscribeEmailAddress" class="newsletter-input required email" value="Your E-Mail Address"/>
+            <div class="field_error" style="display:none;position: absolute;right: 45px;bottom: 10px;"></div>
+        </div>
+        <button type="button" onclick="$('#emailSubscribe').submit();" class="newsletter-submit"/>Submit</button>
+    </div>
+</form>
+</section>

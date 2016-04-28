@@ -1,0 +1,89 @@
+<div class="shopcart-items clearfix">
+    <h2>#label('shopcart.items.in.cart')</h2>
+    <form id="formshopcart" action="$!action.url('shopcart')" method="post">
+        #actionErrors()
+        <input type="hidden" id="removeFromCart" name="removeFromCart" value=""/>
+
+        <div class="items-row items-header clearfix">
+            <span class="name">&nbsp;#label('shopcart.product')</span>
+            <span class="quantity">#label('shopcart.quantity')</span>
+            <span class="price">#label('shopcart.unitary.price')</span>
+            <span class="price-row">#label('shopcart.line.price')</span>
+            <span class="delete"></span>
+        </div>
+
+
+        #set($rowClass = $alternator.auto(['even','odd']))
+        #foreach($it in $userSession.items)
+            #set($urlProd = $action.urlProduct($it.beanProd1))
+            #set($image = $imageResolver.getImageForProduct($it.beanProd1,'list/'))
+            #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)")) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif") ) #end
+            <div class="$!rowClass items-row clearfix">
+                #if($it.beanProd2)
+                    #set($urlProd2 = $action.urlProduct($it.beanProd2))
+                    #set($image2 = $imageResolver.getImageForProduct($it.beanProd2,'list/'))
+                    #if($util.isNotEmpty($image2)) #set($srcImg2 = $!action.storeFile("images/products/list/$!image2")) #else #set($srcImg2 = $!action.skinFile("images/[lang]/not-available.gif") ) #end
+                    <span class="name">
+                        <img src="$srcImg" style="float:left;"/>
+                        <img src="$srcImg2" style="float:left;"/>
+                        <span class="code"><a href="$!urlProd">$!it.code1</a> + <a href="$!urlProd2">$!it.code2</a></span>
+                        <a href="$!urlProd">$!it.name1</a> + <a href="$!urlProd2">$!it.name2</a>
+                        #if($it.beanProd1.productType.equalsIgnoreCase('digital'))
+                            <div class="product-digital-msg"><span class="icon"></span>$!{action.getText('shopcart.digital.message','This product is for download')}</div>
+                        #end
+                    </span>
+                #else
+                    <span class="name">
+                        <img src="$srcImg" style="float:left;"/>
+                        <a href="$!urlProd"><span class="code">$!it.code1</span>$!it.name1</a>
+                        #if($it.beanProd1.productType.equalsIgnoreCase('digital'))
+                            <div class="product-digital-msg"><span class="icon"></span>#label('shopcart.digital.message')</div>
+                        #end
+                    </span>
+                #end
+                <span class="data-form">
+                <span class="quantity"><input type="text" name="quantities" value="$!it.quantity" class="field integer string-50"/></span>
+                <span class="price">$!action.formatActualCurrency($it.price)</span>
+                <span class="price-row">$!action.formatActualCurrency($it.subtotal)</span>
+                </span>
+                <span class="delete"><a href="#" class="remove" onclick="$('#removeFromCart').val($velocityCount);$('#formshopcart').submit();return false;" title="$!action.getText('shopcart.remove.item')"></a></span>
+            </div>
+        #end
+
+        #foreach($promo in $priceMap.promotions)
+            #surl('id=urlDelPromo' "action=shopcartPromotion" "code=$!promo.code" 'output=del')
+            #if($promo.type=='discount')
+                <div class="items-row promo clearfix $!rowClass">
+                    <span class="name-2"><span class="image"></span>#label('promo') $!promo.code - $!promo.name</span>
+                    <span class="price-promo">$!action.formatActualCurrency($promo.value)</span>
+                    <span class="delete"><a href="$!urlDelPromo" class="remove"></a></span>
+                </div>
+            #end
+            #if($promo.type=='discount-percent')
+                <div class="items-row promo clearfix $!rowClass">
+                    <span class="name-2"><span class="image"></span>#label('promo') $!promo.code - $!promo.name</span>
+                    <span class="price-promo">$!action.formatActualCurrency($promo.value)</span>
+                    <span class="delete"><a href="$!urlDelPromo" class="remove"></a></span>
+                </div>
+            #end
+            #if($promo.type=='product')
+                <div class="items-row promo clearfix $!rowClass">
+                    <span class="name-3"><span class="image"></span>#label('promo') $!promo.code - $!promo.name ($!action.getProduct($promo.data).getProductName($locale.language))</span>
+                    <span class="delete"><a href="$!urlDelPromo" class="remove"></a></span>
+                </div>
+            #end
+        #end
+        <div class="items-total">
+            <span class="name">
+                #if($shoppingCart.status!='saved' && $action.getStoreProperty('shopcart.can.save','')=='Y')
+                    <button type="button" href="$!action.url('shopcartsave','',$util.toMap(['output','save']))"><span>#label('shopcart.save')</span></button>
+                #else
+                    <span>&nbsp;</span>
+                #end
+            </span>
+            <span class="quantity"><div><button type="submit"><span>#label('update')</span></button></div></span>
+            <span class="price subtotal" colspan="2">$!action.formatActualCurrency($priceMap.total) $!actualCurrency.code</span>
+        </div>
+
+    </form>
+</div>

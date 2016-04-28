@@ -1,0 +1,2 @@
+#set($_dataNavigator = $_parameters.get('data'))
+#set($_dataNavigator = $util.null)

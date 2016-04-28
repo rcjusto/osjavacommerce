@@ -1,0 +1,23 @@
+<div id="blockBottom" class="clearfix">
+    <div id="blockBottomLeft" class="clearfix">
+        <div class="customContent">#block('bottom.left')</div>
+        #set( $treemenu = $action.getTreeMenu('BottomBar') )
+        #control('menu_classic')
+    </div>
+    <div id="blockBottomRight" class="clearfix">
+        #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+            <div id="blockBottomSubscribe" class="clearfix">#control('subscribe_newsletter')</div>
+        #end
+		<div id="blockBottomPhone" class="clearfix">
+			<span class="phone-label">#label('phone.label')</span>
+			<span class="phone-number">#label('phone.number')</span>
+		</div>
+        <div class="customContent">#block('bottom.right')</div>
+    </div>
+</div>
+<div id="blockBottomCopyright" class="clearfix">
+    #block('copyright')
+</div>
+
+
+

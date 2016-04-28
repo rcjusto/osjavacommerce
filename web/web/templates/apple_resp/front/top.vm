@@ -1,0 +1,17 @@
+<div id="blockTop" class="clearfix">
+    #control('logo')
+    #control('menu_currencies')
+    #control('menu_languages')
+    #control('menu_minimun')
+    #control('top_shopcart')
+    #if($frontUser && !$frontUser.anonymousCheckout)
+    <div class="welcome-msg">#label('welcome.message') $!frontUser.getFullName() </div>
+    #end
+</div>
+
+<div id="blockTopMenu" class="clearfix">
+#set( $treemenu = $action.getTreeMenu('TopBar') )
+#control('menu_horizontal')
+#set( $treemenu = $util.null )
+#control('search')
+</div>

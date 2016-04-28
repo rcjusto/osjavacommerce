@@ -1,0 +1,21 @@
+<div class="page-content">
+    <div id="blockTop" class="clearfix">
+        #control('logo')
+
+        <div id="blockTopBar" class="clearfix">
+            #control('search')
+        #control('menu_minimun')
+        </div>
+    </div>
+</div>
+
+<div id="blockTopMenu" class="clearfix">
+    <div class="page-content">
+        #set( $treemenu = $action.getTreeMenu('TopBar') )
+    #control('menu_horizontal')
+    #set( $treemenu = $util.null )
+    #control('top_shopcart')
+    </div>
+</div>
+
+

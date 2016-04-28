@@ -1,0 +1,62 @@
+<div id="blockContent" class="listing-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        #control('breadcrumb')
+        <form id="formProducts" action="$action.url('search')" method="post">
+            <input type="hidden" id="query" name="query" value="$!query"/>
+            #if($!products.totalRows>0)
+                #control('navigator_small' $util.map.add('data', $products))
+            #else
+                <div class="info">
+                    <h2>#label('search.has.not.results')</h2>
+                    <p>#label('search.has.not.result.instructions')</p>
+                </div>
+                #control('search_advanced')
+            #end
+            #control('product_list' $util.map.add('_prodList',$products.listado).add('_prodTemplate','category_product'))
+        </form>
+    </div>
+
+    <div id="blockRight">
+        #parse("/WEB-INF/views/${template}/front/right_column.vm")
+    </div>
+
+    #surl('id=urlFormProducts' "action=search")
+
+</div>
+<script type="text/javascript">
+    function setNavigatorView(v) {
+        $('.category_product').removeClass('grid');
+        $('.category_product').removeClass('list');
+        $('.category_product').addClass(v);
+        jQuery.cookie('category.navigator.view', v);
+        return false;
+    }
+    $(function() {
+        $('select.reload').change(function() {
+            $('#formProducts').submit();
+        });
+        $('a.grid').click(function() {
+            return setNavigatorView('grid')
+        });
+        $('a.list').click(function() {
+            return setNavigatorView('list')
+        });
+        var navView = jQuery.cookie('category.navigator.view');
+        setNavigatorView((navView == 'grid') ? 'grid' : 'list');
+        $('#searchAgain').keypress(function(event) {
+            if (event.keyCode == '13') {
+                event.preventDefault();
+                $('#querySearch').val($('#searchAgain').val());
+                $('#formSearch').submit();
+            }
+        });
+        $('a.gotopage').click(function() {
+            $('.current-page').val($(this).attr('data'));
+            $('#formProducts').submit();
+            return false;
+        });
+    });
+</script>

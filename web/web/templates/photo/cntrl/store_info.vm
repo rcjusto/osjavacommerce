@@ -1,0 +1,21 @@
+#set($locations = $action.dao.getLocationStores(false))
+#set($al = $alternator.auto('even','odd'))
+#foreach($loc in $locations)
+    #if($loc.main)
+
+    <section id="contact" class="$blockAlign">
+        <h2>Get in Touch</h2>
+        <ul>
+            <li class="$al web">$!loc.storeName</li>
+            <li class="$al address">$!loc.address, $!loc.zipCode, $!loc.city</li>
+            #if($util.isNotEmpty($loc.phone))
+            <li class="$al phone"><a href="tel:$!loc.phone" title="Phone">$!loc.phone</a></li>
+            #end
+            #if($util.isNotEmpty($loc.email))
+            <li class="$al email"><a href="mailto:$!loc.email" title="E-Mail">$!loc.email</a></li>
+            #end
+        </ul>
+    </section>
+
+    #end
+#end

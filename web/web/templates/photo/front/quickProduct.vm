@@ -1,0 +1,32 @@
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+
+    <div class="clearfix" style="width:900px">
+
+        <div style="width:600px;float: left">
+        #control('quickproduct_images')
+        </div>
+
+        <div style="width:280px;float: right;text-align: left">
+            #control('product_data')
+            #control('product_labels')
+            #control('product_prices')
+            #control('product_form')
+        </div>
+
+    </div>
+
+
+    <!-- Product Slideshow -->
+
+
+    <!-- Main Content Area -->
+
+<script type="text/javascript">
+    $(function() {
+        $('#formBuy').submit(function() {
+            return $(this).validForm();
+        });
+        $('input.date').datepicker({minDate: 3, maxDate: 100,altField: '#selDate', altFormat: 'mm/dd/yy'});
+    });
+</script>

@@ -1,0 +1,15 @@
+#set($banners = $action.getRandomBanners('home-bottom', 3))
+#if($util.isNotEmpty($banners) )
+#set($classes = ['first','second','third'])
+
+<section id="specials">
+    <ul>
+        #foreach($ban in $banners)
+            #surl('id=urlBanner' "action=banner" "idBanner=$ban.id")
+            #set( $imgUrl = $util.findImage($!action.storeFile("images/b/$!{ban.id}_${locale.language}")))
+            <li class="$list.get($classes,$velocityCount)"><a href="$!ban.bannerUrl" title="$!ban.bannerText" target="$!ban.bannerTarget"><img src="$!imgUrl" alt="$!ban.bannerText"/></a></li>
+        #end
+    </ul>
+</section>
+
+#end

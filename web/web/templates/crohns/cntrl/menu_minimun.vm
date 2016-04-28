@@ -1,0 +1,7 @@
+<ul class="menu-minimun clearfix hoverable">
+    #if($frontUser && !$frontUser.anonymousCheckout)
+        <li class="profile">#linklabel('my.profile' $!action.url('profile'))</li>
+        <li class="orders">#linklabel('my.orders' $!action.url('orders'))</li>
+        <li class="wishlist">#linklabel('my.wishlist' $!action.url('wishlist'))</li>
+    #end
+</ul>

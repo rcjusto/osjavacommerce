@@ -1,0 +1,9 @@
+#if($na && $na=='Y')
+    <div class="add-to-cart"><a href="#" onclick="$('#formAddToCart_$!{p.idProduct}').submit(); return false;">#label('add.to.cart')</a></div>
+#else
+    <div class="add-to-cart"><a href="#" #if($action.getStoreProperty('enable.ajax.shopcart','N')=='Y') class="ajax-cart" data="$!p.idProduct" #else onclick="$('#formAddToCart_$!{p.idProduct}').submit(); return false;" #end>#label('add.to.cart')</a></div>
+#end
+<form id="formAddToCart_$!p.idProduct" action="$!action.url('addtocart','')" method="post" class="form-addtocart" style="display: none;">
+    #if($q)<input type="hidden" name="quantity" value="$q"/>#else<input type="hidden" name="quantity" value="1"/>#end
+    <input type="hidden" name="idProduct" value="$!p.idProduct"/>
+</form>

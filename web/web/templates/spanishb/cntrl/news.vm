@@ -1,0 +1,13 @@
+#if($news && $news.listado.size()>0)
+<div class="news">
+    <div class="title clearfix">
+        <h4>#label('news')</h4>
+        #linklabel('all.news' $action.url('news') )
+    </div>
+    <ul>
+        #foreach($n in $news.listado)
+            <li>$!n.title <a target="_blank" href="$!n.link">more</a></li>
+        #end
+    </ul>
+</div>
+#end

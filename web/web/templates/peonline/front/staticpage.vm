@@ -1,0 +1,11 @@
+<div id="blockContent" class="clearfix">
+    <div class="statictext-centercol">
+        #if($staticText)
+            <h1>$!staticText.getLanguage($locale.language,$defaultLanguage).title</h1>
+            $!staticText.getLanguage($locale.language,$defaultLanguage).value
+        #end
+        #if($code=='Contact-Us' && $action.getStoreProperty('mail.contact.us','')!='')
+            #parse("/WEB-INF/views/front/contact_us.vm")
+        #end
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<div id="blockBottomBar" class="clearfix">
+    <div id="blockBottomBarLeft">
+        #block('bottom.bar')
+    </div>
+    <div id="blockBottomBarRight">
+        <ul>
+            <li>#label('follow.us')</li>
+            <li><a target="_blank" class="facebook" href="http://www.facebook.com/pages/Cartronic-Group/122584594449881?ref=sgm"></a></li>
+            <li><a target="_blank" class="twitter" href="http://twitter.com/cartronic"></a></li>
+            <li><a target="_blank" class="in" href="http://www.linkedin.com/company/cartronic-s.a.?trk=fc_badge"></a></li>
+        </ul>
+    </div>
+</div>
+#set( $treebmenu = $action.getTreeMenu('BottomBar') )
+<div id="blockBottomMenu" class="clearfix">
+<ul class="clearfix" style="float:left;">
+    #foreach($mIt in $treebmenu.children() )
+        #set( $m = $mIt.userObject )
+            <li class="bottom-menu_$velocityCount">
+            #if($mIt.children().hasMoreElements())
+                <a href="$!m.url" rel="#botmenu${m.id}">$!m.getLabel($locale.language)</a>
+                <ul>
+                    #foreach($sIt in $mIt.children())
+                        #set( $s = $sIt.userObject )
+                        <li>
+                            <a href="$!s.url">$!s.getLabel($locale.language)</a>
+                        </li>
+                    #end
+                </ul>
+            #end
+            #if($m.menuContent)
+                <div id="topmenu${m.id}" >
+                    #block($m.menuContent.code)
+                </div>
+            #end
+            </li>
+    #end
+</ul>
+    <div id="bottom-menu-contactus" >
+         #block('bottom.contact.us')
+    </div>
+</div>
+<div id="blockBottomCopyright">
+    #label('copyright')
+</div>
+

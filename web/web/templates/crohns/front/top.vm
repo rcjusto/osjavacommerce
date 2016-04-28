@@ -1,0 +1,27 @@
+<div id="blockTop" class="clearfix">
+    #control('logo')
+    <div id="block-top-banner">#banners('header')</div>
+    <div id="blockTopRight" class="clearfix">
+        #control('top_shopcart')
+       <div id="menu-minimun"> #control('menu_minimun')</div>
+    </div>
+</div>
+
+<div id="blockTopMenu" class="clearfix">
+
+#set( $treemenu = $action.getTreeMenu('TopBar') )
+#control('menu_horizontal')
+#set( $treemenu = $util.null )
+</div>
+
+<div id="blockTopBar" class="clearfix">
+     #if($frontUser && !$frontUser.anonymousCheckout)
+        <div id="logout">#linklabel('logout' $!action.url('logout'))</div>
+    #else
+        <div id="register">#linklabel('sign.in' $!action.url('profile'))</div>
+    #end
+    #control('search')
+    <div id="custom-info">#block('top.bar')</div>
+    #control('menu_languages')
+    <div id="phone-number">#block('top.bar.phone')</div>
+</div>

@@ -1,0 +1,38 @@
+#set($images = $imageResolver.getImagesForProduct($product,''))
+#if(!$list.isEmpty($images))
+
+<section id="slideshow">
+
+    <ul class="#if($images.size()>1) product-slider #end regular ">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a #if($images.size()>1) #end href="$!action.urlProduct($!product)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    <ul class="#if($images.size()>1) product-slider #end responsive detail">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a #if($images.size()>1) #end href="$!action.urlProduct($!product)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    #if($images.size()>1)
+    <!-- Slideshow Controls -->
+    <a title="Previous" class="slider-prev">Previous</a>
+    <a title="Next" class="slider-next">Next</a>
+    #end
+
+</section>
+
+#end
+
+

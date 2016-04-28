@@ -1,0 +1,25 @@
+#set($pName = "$!product.getLanguage($locale.language,$defaultLanguage).productName")
+#set($image = "$imageResolver.getImageForProduct($product,'list/')")
+#set( $price = $action.toActualCurrency($product.getFinalPrice($frontUserLevel,1)) )
+#set($priceArr = $number.format('0.00',$price).split('[.]'))
+#set( $oldPrice = $action.toActualCurrency($product.oldPrice) )
+
+<div class="product">
+    #if($util.isNotEmpty($image))
+        <img src="$!action.storeFile('images/products/list')/$!util.encodeUrl($image)" alt="$!pName"/>
+    #else
+        <img src="$!action.skinFile('images/[lang]/not-available.jpg')" alt="Product Image"/>
+    #end
+    <div class="overlay">
+        <div class="price">
+            <h2>$!pName</h2>
+            <ul>
+                <li><b>$!list.get($priceArr,0)</b>.$!{list.get($priceArr,1)}</li>
+                #if($oldPrice && $oldPrice>$price)
+                    <del>$oldPrice</del>
+                #end
+                <li class="details"><a href="$!action.urlProduct($product)" title="More Details">More Details</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

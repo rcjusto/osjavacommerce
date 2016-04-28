@@ -1,0 +1,84 @@
+<section id="left-column">
+
+    <section id="main">
+
+        <div class="block" id="blockRewards">
+            <div class="clearfix">
+                <h1>#label('rewards.history')</h1>
+                <div class="current-rewards">
+                    #label('current.rewards') <span class="points">$!frontUser.rewardPoints</span>
+                    #if($rewardsRate)
+                        <span class="points"> = </span>
+                        <span class="points">$!action.formatActualCurrency($math.mul($frontUser.rewardPoints,$rewardsRate))</span>
+                    #end
+                </div>
+            </div>
+            #if($rewards)
+                <form action="$!action.url('rewardHistory')" method="post">
+                    #set($fnpr = "$!{rewards.name}_pagerows")
+                    #set($fncp = "$!{rewards.name}_currentpage")
+                    #if($orders.totalRows>0)
+                        <div class="navigator clearfix">
+                            #set($minMax = $rewards.getPageListLikeGoogle(10))
+                            <input type="hidden" id="$!fnpr" name="$!{rewards.name}.pagerows" value="$!rewards.pageRows">
+                            <input type="hidden" id="$!fncp" name="$!{rewards.name}.currentpage" value="$!rewards.currentPage">
+                            <span class="results">#label('showing') $!rewards.listado.size() #label('of') $!rewards.totalRows</span>
+                            <ul class="pages clearfix">
+                                #foreach($p in [$minMax.get(0)..$minMax.get(1)])
+                                    #if($p==$rewards.currentPage)
+                                        <li class="selected"><span>$!p</span></li>
+                                    #else
+                                        <li><a href="#" onclick="$('#${fncp}').val($p);$('#${fncp}').parents('form:first').submit();return false;">$!p</a></li>
+                                    #end
+                                #end
+                            </ul>
+                        </div>
+                    #else
+                        <input type="hidden" id="$!fnpr" name="$!{rewards.name}.pagerows" value="$!rewards.pageRows">
+                    #end
+                </form>
+            #end
+
+            <table id="tablaOrders" class="listado" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>#label('created')</th>
+                    <th>#label('description')</th>
+                    <th class="reward">#label('rewards')</th>
+                    #if($rewardsRate)
+                        <th class="price">#label('amount')</th>
+                    #end
+                </tr>
+                #foreach($reward in $rewards.listado)
+                    <tr class="hoverable">
+                        <td>$!util.formatDate($reward.created, $locale.language)</td>
+                        <td>
+                            #label("reward.type.$!reward.type")
+                            #if($!reward.type=='purchase') <a class="order" href="$!{action.url('order')}?idOrder=$!{reward.idOrder}">#label('order') $!reward.idOrder</a> #end
+                            #if($!reward.type=='purchase_cancellation') <a class="order" href="$!{action.url('order')}?idOrder=$!{reward.idOrder}">#label('order') $!reward.idOrder</a> #end
+                            #if($!reward.type=='friend_purchase') <a class="friend" href="$!{action.url('friendData')}?idUser=$!{reward.friend.idUser}">$!reward.friend.email</a>, #label('order') $!reward.idOrder #end
+                            #if($!reward.type=='friend_registering') <a class="friend" href="$!{action.url('friendData')}?idUser=$!{reward.friend.idUser}">$!reward.friend.email</a> #end
+                        </td>
+                        <td class="reward">$!util.formatNumber($!reward.amount,'0')</td>
+                        #if($rewardsRate)
+                            <td class="price">$!action.formatActualCurrency($math.mul($reward.amount,$rewardsRate))</td>
+                        #end
+                    </tr>
+                #end
+            </table>
+        </div>
+
+    </section>
+
+</section>
+
+#control('aside')
+
+
+<link href="/struts/css/jquery.jscrollpane.css" type="text/css" rel="stylesheet">
+<script src="/struts/js/jquery.mousewheel.js" type="text/javascript"></script>
+<script src="/struts/js/jquery.jscrollpane.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+       $('.scroll-pane').jScrollPane();
+    });
+</script>

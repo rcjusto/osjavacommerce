@@ -1,0 +1,20 @@
+<div id="blockBottom" class="clearfix">
+    <div id="blockBottomLeft" class="clearfix">
+        <div class="customContent">#block('bottom.left')</div>
+        #set( $treemenu = $action.getTreeMenu('BottomBar') )
+        #control('menu_classic')
+    </div>
+    <div id="blockBottomRight" class="clearfix">
+        <div class="customContent">#block('bottom.right')</div>
+        #control('menu_social')
+        #if($action.getStoreProperty('allow.newsletters','Y')=='Y')
+            #control('subscribe_newsletter')
+        #end
+    </div>
+    <div id="blockBottomCopyright" class="clearfix">
+        #block('copyright')
+    </div>
+</div>
+#if($frontUser && $rewardsEnabled)
+    #parse("/WEB-INF/views/$!{template}/front/bottom_bar.vm")
+#end

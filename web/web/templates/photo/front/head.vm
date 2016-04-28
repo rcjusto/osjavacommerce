@@ -1,0 +1,57 @@
+<title>$!pageTitle</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="abstract" CONTENT="$!metaAbstract">
+<meta name="description" CONTENT="$!metaDescription">
+<meta name="keywords" CONTENT="$!metaKeywords">
+<meta name="distribution" CONTENT="Global">
+<meta name="revisit-after" CONTENT="1 days">
+<meta name="copyright" CONTENT="Copyright &copy; 2013 DEWCommerce">
+<meta name="robots" CONTENT="FOLLOW,INDEX">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="/templates/$!{template}/skins/${skin}/css/style.css" media="screen"/>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script type="text/javascript" src="/struts/js/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ck.js"></script>
+<script src="/templates/$!{template}/js/slider.js"></script>
+<script type="text/javascript" src="/struts/js/jquery.ui.stars.min.js"></script>
+<script src="/templates/$!{template}/js/scripts.js"></script>
+#if($action.adminUser)
+<script type="text/javascript" src="/struts/js/ckeditor/ckeditor.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/struts/js/ckeditor/adapters/jquery.js" charset="UTF-8"></script>
+#end
+<script type="text/javascript">
+    var params = {
+        urlBase: "$!util.siteUrl",
+        language: "$!locale.language",
+        urls: {
+            reg_newsletter: "$!action.url('registernewsletter')",
+            add_cart: "$!action.url('addtocart')",
+            label_edit: "$!action.url('staticlabeledit','admin')",
+            block_edit: "$!action.url('blockedit')",
+            country_states: "$!action.url('countrystates')",
+            menu_subcategories: "$!action.url('menuSubcategories')",
+            compare_product:"$!action.url('compareAdd')",
+            compare_remove:"$!action.url('compareDel')"
+        },
+        errors: {
+            required:"$!action.getText('error.empty.field')",
+            integer:"$!action.getText('error.invalid.integer')",
+            email:"$!action.getText('error.invalid.email')",
+            decimal:"$!action.getText('error.invalid.decimal')",
+            gt:"$!action.getText('error.invalid.gt')",
+            lt:"$!action.getText('error.invalid.lt')"
+        },
+        texts: {
+            loading:"$!action.getText('loading','Loading')",
+            please_wait:"$!action.getText('please.wait','Please wait...')"
+        }
+    };
+</script>
+#parse("/WEB-INF/views/front/head_custom.vm")
+#parse("/WEB-INF/views/front/head_google_analytics.vm")

@@ -1,0 +1,22 @@
+#if($news && $news.listado.size()>0)
+
+<div id="recent-news" class="left-menu">
+    <div class="title">#label('news')</div>
+    <ul>
+    #foreach($n in $news.listado)
+        <li class="clearfix">
+            <div class="date">
+                <span class="day">$!date.format('d',$n.date)</span><span class="month">$!date.format('MMM',$n.date)</span>
+            </div>
+            <div class="details">
+                $!n.title<br/>
+                <a target="_blank" href="$!n.link" title="Comments">$!action.getText('ver.detalles')</a>
+            </div>
+        </li>
+    #end
+        <li class="see-all">#linklabel('see.all.news',$!action.url('news'))</li>
+    </ul>
+</div>
+
+
+#end

@@ -1,0 +1,15 @@
+#if($news && $news.listado.size()>0)
+
+    <div>
+        <h2>News</h2>
+        <ul>
+            #foreach($n in $news.listado)
+            <li>
+                <strong>$!n.title</strong><br>
+                <p>$!n.resume <a target="_blank" href="$!n.link">more</a></p>
+            </li>
+            #end
+        </ul>
+    </div>
+
+#end

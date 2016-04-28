@@ -1,0 +1,19 @@
+#set($lista = $action.getRandomProducts('label:new', $!math.toInteger($!action.getStoreProperty('home.new.items', '6'))))
+#if($lista.size()>5)
+
+<section class="sale">
+    <h1>#label('new.products') <a href="$!action.urlLabel('new')" title="See All Products">$!action.getText('see.all.products')</a></h1>
+    <ul>
+
+        <li class="slide">
+            #foreach($index in [0..5])
+                #set($product = $list.get($lista, $index))
+                #parse("/WEB-INF/views/${template}/front/home_product.vm")
+            #end
+        </li>
+
+    </ul>
+</section>
+
+#end
+

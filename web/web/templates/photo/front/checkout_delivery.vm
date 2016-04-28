@@ -1,0 +1,160 @@
+#if($scu.shippingNeedSelection && $util.isNotEmpty($scu.shippingServices))
+<form id="formSelectMethod">
+    <input type="hidden" name="idShopCart" value="$!shopCart.id"/>
+
+    <div class="clearfix">
+        <div id="blockShippingMethod" class="form-table">
+            <div class="error" style="display:none;">
+                <h2>#label('error.incorrect.data')</h2>
+                <p>#label('error.must.select.an.option')</p>
+            </div>
+            <h3>#label('select.shipping.method')</h3>
+            #foreach($map in $scu.shippingServices)
+                <div class="clearfix" id="shippingMethodOptions">
+                    <input type="radio" id="dm$!{map.get('id')}" class="selectedMethod" name="selectedMethod" value="$!map.get('id')"/>
+                    <label for="dm$!{map.get('id')}">
+                        <span class="name">$!map.get('name')</span>
+                        <span class="precio">$!action.formatActualCurrency($map.get('value'))</span>
+                        <span class="days">#if($map.containsKey('days') && $util.isNotEmpty($map.get('days'))) $!map.get('days') #label('days') #end</span>
+                    </label>
+                </div>
+            #end
+            #if($util.isNotEmpty($scu.shippingErrors))
+                <div class="info" style="display: none;">
+                    <h2>#label('order.shipping.error')</h2>
+                    #foreach($se in $scu.shippingErrors)
+                        <p>$!se</p>
+                    #end
+                </div>
+            #end
+        </div>
+        #set( $insurances =  $dao.getInsurancesFor($shopCart.total))
+        #if($insurances && !$insurances.isEmpty())
+            <div id="blockShippingInsurance" class="form-table">
+                <h3>#label('shipping.insurance.title')</h3>
+                #foreach($ins in $insurances)
+                    <div class="clearfix shippingInsuranceOption">
+                        <input type="radio" id="insurance_$!ins.id" name="idInsurance" value="$!ins.id"/>
+                        <label for="insurance_$!ins.id">
+                            <span class="name">$!ins.getText($locale.language)</span>
+                            <span class="cost">$!action.formatActualCurrency($ins.insuranceValue)</span>
+                        </label>
+                    </div>
+                #end
+                <div class="clearfix shippingInsuranceOption">
+                    <input type="radio" id="insurance" name="idInsurance" value=""/>
+                    <label for="insurance">
+                        <span class="name">#label('insurance.select.none')</span>
+                        <span class="cost">$!action.formatActualCurrency(0)</span>
+                    </label>
+                </div>
+            </div>
+        #end
+    </div>
+    <div class="button-bar clearfix">
+        <button type="submit"><span class="next">#label('next')</span></button>
+    </div>
+</form>
+#else
+<form id="formDefaultMethod">
+    <input type="hidden" name="idShopCart" value="$!shopCart.id"/>
+    #if($shopCart.pickInStore)
+        #label('pick.in.store'), #label('shipping.cost'): <span class="">$!action.formatActualCurrency($scu.subtotalShipping)</span>
+        <div class="button-bar clearfix">
+            <button type="submit"><span class="next">#label('next')</span></button>
+        </div>
+    #else
+        #if($scu.shippingMethod)
+            <input type="hidden" name="selectedMethod" value="$!scu.shippingMethod.id"/>
+
+            <div class="clearfix">
+                <div id="blockShippingMethod">
+                    <div>$!scu.shippingMethod.getMethodName($locale.language) &nbsp; <span class="">$!action.formatActualCurrency($scu.subtotalShipping)</span></div>
+
+                    #if($util.isNotEmpty($scu.shippingErrors))
+                        <div class="error" style="display: none;">
+                            <h2>#label('order.shipping.error')</h2>
+                            #foreach($se in $scu.shippingErrors)
+                                <p>$!se</p>
+                            #end
+                        </div>
+                    #end
+                </div>
+                #set( $insurances =  $dao.getInsurancesFor($shopCart.total))
+                #if($insurances && !$insurances.isEmpty())
+                    <div id="blockShippingInsurance" class="form-table">
+                        <h3>#label('shipping.insurance.title')</h3>
+                        #foreach($ins in $insurances)
+                            <div class="clearfix shippingInsuranceOption">
+                                <input type="radio" id="insurance_$!ins.id" name="idInsurance" value="$!ins.id"/>
+                                <label for="insurance_$!ins.id">
+                                    <span class="name">$!ins.getText($locale.language)</span>
+                                    <span class="cost">$!action.formatActualCurrency($ins.insuranceValue)</span>
+                                </label>
+                            </div>
+                        #end
+                        <div class="clearfix shippingInsuranceOption">
+                            <input type="radio" id="insurance" name="idInsurance" value=""/>
+                            <label for="insurance">
+                                <span class="name">#label('insurance.select.none')</span>
+                                <span class="cost">$!action.formatActualCurrency(0)</span>
+                            </label>
+                        </div>
+                    </div>
+                #end
+            </div>
+            <div class="button-bar clearfix">
+                <button type="submit"><span class="next">#label('next')</span></button>
+            </div>
+        #else
+            #if($util.isNotEmpty($scu.shippingErrors))
+                <div class="info">
+                    <h2>#label('order.shipping.error')</h2>
+                    #foreach($se in $scu.shippingErrors)
+                        <p>$!se</p>
+                    #end
+                </div>
+            #else
+                <div class="info">
+                    <h2>#label('order.shipping.error')</h2>
+                    <p>#label('order.shipping.unavailable.address')</p>
+                </div>
+            #end
+        #end
+    #end
+</form>
+#end
+<script type="text/javascript">
+    function reloadNextStep(info) {
+        activateTitle(4);
+        setTitleData(3, info.data);
+        $('#contPaymentInfo').loadingSmall().show().load("$!action.url('checkout_get_payment')", {idShopCart: $!shopCart.id});
+    }
+    $(function() {
+        $('button').button();
+        $('#formSelectMethod').submit(function() {
+            $('#formSelectMethod').find('.error').hide();
+            if ($('input.selectedMethod:checked').size() > 0) {
+                var data = $('#formSelectMethod').serialize();
+                jQuery.post("$!action.url('checkout_set_method')", data, function(res) {
+                    if (res.result == 'OK') reloadNextStep(res);
+                    else alert(res.error);
+                });
+            } else {
+                $('#formSelectMethod').find('.error').show();
+            }
+            return false;
+        });
+        $('#formDefaultMethod').submit(function() {
+            var data = $('#formDefaultMethod').serialize();
+            jQuery.post("$!action.url('checkout_set_method')", data, function(res) {
+                if (res.result == 'OK') reloadNextStep(res);
+                else alert(res.error);
+            });
+            return false;
+        });
+        $('input.selectedMethod').click(function() {
+            $('#formSelectMethod').find('.error').hide();
+        });
+    })
+</script>

@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    $(function(){
+        $('a.label.level0').click(function(e){
+            var ul = $(this).parent().parent().children('ul');
+            if (ul && ul.size()>0){
+                ul.toggleClass('expanded');
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>

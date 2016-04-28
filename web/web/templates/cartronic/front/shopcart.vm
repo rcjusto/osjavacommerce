@@ -1,0 +1,217 @@
+<div id="blockContent" class="shopcart-page clearfix">
+    <div id="leftColumn">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+
+    #set($priceMap = $userSession.getPriceMap() )
+    #set($promotions = $priceMap.get('promotions'))
+    #surl('id=urlShopCartSave' "action=shopcartsave")
+    <div id="centerColumn">
+        <div class="product-centercol">
+            <div class="block">
+                #control('shopcart_alerts')
+                #actionMessages()
+                <div id="shopcartProducts">
+                    <h1>#label('shopcart.items.in.cart')</h1>
+                    #actionErrors()
+                    #if($util.isNotEmpty($userSession.items))
+                        #surl('id=urlShopCart' "action=shopcart")
+                        <form id="formshopcart" action="$urlShopCart" method="post">
+                            <input type="hidden" id="removeFromCart" name="removeFromCart" value=""/>
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <th class="name">#label('shopcart.product')</th>
+                                    <th class="quantity">#label('shopcart.quantity')</th>
+                                    <th class="price">#label('shopcart.unitary.price')</th>
+                                    <th class="price">#label('shopcart.line.price')</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                                #foreach($it in $userSession.items)
+                                    #set($urlProd = $action.urlProduct($it.beanProd1))
+                                    #set($image = $imageResolver.getImageForProduct($it.beanProd1,'list/'))
+                                    #if($util.isNotEmpty($image)) #set($srcImg = $!action.storeFile("images/products/list/$!util.encodeUrl($image)" )) #else #set($srcImg = $!action.skinFile("images/[lang]/not-available.gif" )) #end
+                                    <tr>
+                                        #if($it.beanProd2)
+                                            #set($urlProd2 = $action.urlProduct($it.beanProd2))
+                                            #set($image2 = $imageResolver.getImageForProduct($it.beanProd2,'list/'))
+                                            #if($util.isNotEmpty($image2)) #set($srcImg2 = $!action.storeFile("images/products/list/$!util.encodeUrl($image2)" )) #else #set($srcImg2 = $!action.storeFile("images/[lang]/not-available.gif")) #end
+                                            <td class="name clearfix">
+                                                <img src="$srcImg" style="float:left;"/>
+                                                <img src="$srcImg2" style="float:left;"/>
+                                                <a href="$!urlProd">$!it.code1</a> + <a href="$!urlProd2">$!it.code2</a><br/>
+                                                <a href="$!urlProd">$!it.name1</a> + <a href="$!urlProd2">$!it.name2</a>
+                                            </td>
+                                        #else
+                                            <td class="name clearfix">
+                                                <img src="$srcImg" style="float:left;"/>
+                                                <a href="$!urlProd">$!it.code1</a><br/>
+                                                <a href="$!urlProd">$!it.name1</a>
+                                            </td>
+                                        #end
+                                        <td class="quantity"><input type="text" name="quantities" value="$!it.quantity" class="field integer string-50"/></td>
+                                        <td class="price">$!action.formatActualCurrency($it.price)</td>
+                                        <td class="price">$!action.formatActualCurrency($it.subtotal)</td>
+                                        <td class="delete"><a href="#" class="remove" onclick="$('#removeFromCart').val($velocityCount);$('#formshopcart').submit();return false;" title="$!action.getText('shopcart.remove.item')"></a></td>
+                                    </tr>
+                                #end
+                                #foreach($promo in $priceMap.promotions)
+                                    #surl('id=urlDelPromo' "action=shopcartPromotion" "code=$!promo.code" 'output=del')
+                                    #if($promo.type=='discount')
+                                        <tr>
+                                            <td colspan="3">#label('promo') $!promo.code - $!promo.name</td>
+                                            <td class="price">$!action.formatActualCurrency($promo.value)</td>
+                                            <td class="delete"><a href="$!urlDelPromo" class="remove"></a></td>
+                                        </tr>
+                                    #end
+                                    #if($promo.type=='discount-percent')
+                                        <tr>
+                                            <td colspan="3">#label('promo') $!promo.code - $!promo.name</td>
+                                            <td class="price">$!action.formatActualCurrency($promo.value)</td>
+                                            <td class="delete"><a href="$!urlDelPromo" class="remove"></a></td>
+                                        </tr>
+                                    #end
+                                    #if($promo.type=='product')
+                                        <tr>
+                                            <td colspan="4">#label('promo') $!promo.code - $!promo.name ($!action.getProduct($promo.data).getProductName($locale.language))</td>
+                                            <td class="delete"><a href="$!urlDelPromo" class="remove"></a></td>
+                                        </tr>
+                                    #end
+                                #end
+                                <tr>
+                                    <td>
+                                        #if($shoppingCart.status!='saved' && $action.getStoreProperty('shopcart.can.save','')=='Y')
+                                            <button type="button" href="${urlShopCartSave}?output=save"><span>#label('shopcart.save')</span></button>
+                                        #end
+                                        &nbsp;
+                                    </td>
+                                    <td class="quantity">
+                                        <button type="submit"><span>#label('update')</span></button>
+                                    </td>
+                                    <td class="price subtotal" colspan="2">$!action.formatActualCurrency($userSession.total)</td>
+                                    <td class="subtotal">$!actualCurrency.code</td>
+                                </tr>
+                            </table>
+                        </form>
+                    #else
+                        <div class="info">
+                            <h2>#label('shopping.cart.empty')</h2>
+
+                            <p>#label('shopping.cart.empty.text')</p>
+                        </div>
+                    #end
+                </div>
+            </div>
+            #if($util.isNotEmpty($userSession.items))
+                <div class="clearfix" style="margin-top:6px;">
+                    #if($maxPromoCodes>0)
+                        #if($promotions) #set($numPromotions=$promotions.size()) #else #set($numPromotions=0) #end
+                        <div id="shopcartCoupons" class="block">
+                            <h1>#label('coupons')</h1>
+                            #fieldErrors('promotions' "$!action.getText('error')")
+                            #surl('id=urlPromotion' "action=shopcartPromotion")
+                            #if($maxPromoCodes>$numPromotions)
+                                <h2>#label('have.coupon')</h2>
+
+                                <form id="formaddpromotion" action="$urlPromotion" method="post">
+                                    <input type="hidden" name="output" value="add"/>
+                                    <label>
+                                        <input type="text" name="code" class="field string-200 required"/>
+                                    </label>
+                                    <button type="submit"><span class="ok">#label('apply.coupon')</span></button>
+                                </form>
+                            #end
+                            #if($promotions)
+                                <div class="applied-promotions">
+                                    <h2>#label('promotional.codes.applied')</h2>
+                                    <table width="100%">
+                                        #foreach($pcMap in $promotions)
+                                            #surl('id=urlDelPromo' "action=shopcartPromotion" "code=$!pcMap.get('code')" 'output=del')
+                                            <tr>
+                                                <td>
+                                                    $!pcMap.get('code') - $!pcMap.get('name')
+                                                </td>
+                                                <td>
+                                                    <a href="$!urlDelPromo" class="remove"></a>
+                                                </td>
+                                            </tr>
+                                        #end
+                                    </table>
+                                </div>
+                            #end
+                        </div>
+                    #end
+                    <div id="shopcartGifts" class="block" style="display:none;">
+                        <h1>#label('gifts')</h1>
+                        #fieldErrors('gifts' "$action.getText('gifts')")
+                        #surl('id=urlGift' "action=shopcartPromotion")
+                        #if($maxPromoCodes>$numPromotions)
+                            <h2>#label('have.gift.card')</h2>
+
+                            <form id="formaddgift" action="$urlGift" method="post">
+                                <input type="hidden" name="output" value="add"/>
+                                <label>
+                                    <input type="text" name="code" class="field string-200 required"/>
+                                </label>
+                                <button type="submit"><span class="ok">#label('apply.gift.card')</span></button>
+                            </form>
+                        #end
+                    </div>
+                </div>
+
+                <div class="button-bar clearfix">
+                    #set($lastCat = $!action.getLastViewCategory())
+                    <div id="shopCartBtbLeft">
+                        #if($lastCat)
+                            <a href="#category_link($lastCat)"><img src="$!action.skinFile('images/[lang]/continue_shop.gif')" alt="$!action.getText('continue.shopping')"/></a>
+                        #else
+                            #surl('id=urlHome' "action=home")
+                            <a href="$urlHome"><img src="$!action.skinFile('images/[lang]/continue_shop.gif')" alt="$!action.getText('continue.shopping')"/></a>
+                        #end
+                    </div>
+
+                    <div id="shopCartBtbRight">
+                        #if($shoppingCart.status!='pending' && ($action.getStoreProperty('shopcart.can.quote','')=='Y' || $shoppingCart.needQuote()) )
+                            <a href="${urlShopCartSave}?output=quote"><img src="$!action.skinFile('images/[lang]/requestquote.gif')" alt="$!action.getText('shopcart.request.quote')"/></a>
+                        #end
+                        #if(!$shoppingCart.needQuote())
+                            #surl('id=urlCheckout' "action=paystepAddress")
+                            #if($action.canCheckout)
+                                #if($frontUser)
+                                    #if($action.getStoreProperty('onepage.checkout','Y')=='Y')
+                                        <a href="$!action.url('checkout')"><img src="$!action.skinFile('images/[lang]/checkout.gif')" alt="$!action.getText('shopcart.checkout')"/></a>
+                                    #else
+                                        <a href="$!action.url('paystepAddress')"><img src="$!action.skinFile('images/[lang]/checkout.gif')" alt="$!action.getText('shopcart.checkout')"/></a>
+                                    #end
+                                #else
+                                    <a href="$urlCheckout"><img src="$!action.skinFile('images/[lang]/checkout_register.gif')" alt="$!action.getText('shopcart.checkout.register')"/></a>
+                                    #if($allowAnonymousCheckout)
+                                        #surl('id=urlCheckoutAnonymous' "action=payanonymousform")
+                                        <a href="$!urlCheckoutAnonymous"><img src="$!action.skinFile('images/[lang]/checkout_anonymous.gif')" alt="$!action.getText('shopcart.checkout.anonymous')"/></a>
+                                    #end
+                                #end
+                            #end
+                        #end
+                    </div>
+                </div>
+
+            #end
+
+            <div class="block">
+                <div id="productRelated" class="clearfix">
+                    <h1>#label('shopcart.related.products')</h1>
+                    <ul>
+                        #foreach($p in $associatedProducts)
+                            #if($p.getMaxToBuy($frontUser)>0)
+                                <li>
+                                    #parse("/WEB-INF/views/${template}/front/product_relatedproduct.vm")
+                                </li>
+                            #end
+                        #end
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

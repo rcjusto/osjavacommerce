@@ -1,0 +1,47 @@
+#set($images = $imageResolver.getImagesForProduct($product,''))
+#if(!$list.isEmpty($images))
+
+<section id="slideshow">
+
+    <ul class="#if($images.size()>1) slider #end regular">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a class="fancybox" #if($images.size()>1) rel="gallery1" #end href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    <ul class="#if($images.size()>1) slider #end responsive">
+
+        #foreach($img in $images)
+            <li>
+                <h1>$!product.getProductName($locale.language)</h1>
+                <a class="fancybox" #if($images.size()>1) rel="gallery1" #end href="$!action.storeFile('images/products/zoom')/$!util.encodeUrl($img)"><img src="$!action.storeFile('images/products')/$!util.encodeUrl($img)" alt="$!product.getProductName($locale.language)"/></a>
+            </li>
+        #end
+
+    </ul>
+
+    #if($images.size()>1)
+    <!-- Slideshow Controls -->
+    <a title="Previous" class="slider-prev">Previous</a>
+    <a title="Next" class="slider-next">Next</a>
+    #end
+
+</section>
+
+#end
+<link rel="stylesheet" href="/templates/$!{template}/js/fancybox/jquery.fancybox.css?v=2.1.4" type="text/css" media="screen" />
+<script type="text/javascript" src="/templates/$!{template}/js/fancybox/jquery.fancybox.pack.js?v=2.1.4"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".fancybox").fancybox({
+            openEffect	: 'none',
+            closeEffect	: 'none'
+        });
+    });
+</script>
+

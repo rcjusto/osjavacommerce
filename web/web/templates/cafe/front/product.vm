@@ -1,0 +1,112 @@
+#set($productLang = $!product.getLanguage($locale.language,$defaultLanguage))
+#set($priceMap = $!product.getPriceMap($frontUserLevel, 1))
+
+<section id="left-column">
+
+    #control('product_images')
+
+    <!-- Product Slideshow -->
+
+
+    <!-- Main Content Area -->
+    <section id="main">
+
+        #control('product_data')
+        #control('product_labels')
+        #control('product_prices')
+        #control('product_form')
+        #control('product_actions')
+
+    </section>
+
+    #control('product_reviews_add')
+    #control('product_tabs')
+    #control('product_texts')
+    #control('product_combined_sales')
+    #control('product_related')
+
+
+    <!-- Secondary Feature Area — Useful for Sales -->
+
+</section>
+
+#control('aside')
+
+<script type="text/javascript">
+    var reviewDialog;
+    function getReviews(page) {
+        $('.reviews-navigator').html("$action.getText('admin.please.wait','Loading, please wait...')");
+        $('#productReviewList').load("$!action.url('getreviews')", {code:"$!product.urlCode",'reviews.currentpage':page});
+        return false;
+    }
+    $(function() {
+        if ($('#productTabs').find('li').size() > 0) $('#productTabs').tabs();
+        else $('#productTabs').hide();
+        $('#formBuy').submit(function() {
+            return $(this).validForm();
+        });
+        $('input.date').datepicker({minDate: 3, maxDate: 100,altField: '#selDate', altFormat: 'mm/dd/yy'});
+        $(".stars").each(function() {
+            var cc = $(this).attr('id');
+            $(this).stars({
+                captionEl: $("#cap-" + cc),
+                callback: function(ui, type, value) {
+                    $("#input-" + cc).val(eval(value) >= 0 ? value : 0);
+                }
+            })
+        });
+        var wndPrint = null;
+        $('a.print').click(function() {
+            if (wndPrint != null) if (!wndPrint.closed) wndPrint.close();
+            var url = "$!action.url('product','',$util.toMap(['idProduct',$!product.idProduct.toString()]))" + '&output=print';
+            wndPrint = window.open(url, 'wndPrint', 'toolbar=yes,location=0,directories=no,status=no,menubar=1,scrollbars=yes,resizable=yes,copyhistory=0,width=800,height=640');
+            wndPrint.focus();
+            return false;
+        });
+        $('a.mailtofriend').click(function() {
+            $('#mailProduct').show();
+            $('#mailSent').hide();
+            return false;
+        });
+        $('a.addtowishlist').click(function() {
+            $('#wishListAdded').hide();
+            $('#wishListLink').hide();
+            $('#wishListLoading').find('span').addClass('loading-min');
+            $('#wishListLoading').show();
+            jQuery.getJSON("$!action.url('addtowishlist')", {idProduct:$!product.idProduct}, function(data) {
+                $('#wishListLoading').hide();
+                if (data == 'ok') $('#wishListAdded').show();
+                else {
+                    $('#wishListLink').show();
+                }
+            });
+            return false;
+        });
+        $('a.addtostockalert').click(function() {
+            $('#stockAlertAdded').hide();
+            $('#stockAlertLink').hide();
+            $('#stockAlertLoading').find('span').addClass('loading-min');
+            $('#stockAlertLoading').show();
+            jQuery.getJSON("$!action.url('addstockalert')", {idProduct:$!product.idProduct}, function(data) {
+                $('#stockAlertLoading').hide();
+                if (data == 'ok') $('#stockAlertAdded').show();
+                else {
+                    $('#stockAlertLink').show();
+                }
+            });
+            return false;
+        });
+        $('#formEmailProduct').live('submit',function() {
+            if ($('#formEmailProduct').validForm()) {
+                var data = $('#formEmailProduct').serialize();
+                $('<div>').loading('Sending Mail', 'Please wait...').appendTo('#divMailProduct');
+                $('#divMailProduct').load("$!action.url('productmail')", data, function() {
+                });
+            }
+            return false;
+        });
+        $('#formAddNewReview').live('submit',function(){
+            return $('#formAddNewReview').validForm();
+        });
+    });
+</script>

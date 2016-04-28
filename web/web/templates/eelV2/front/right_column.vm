@@ -1,0 +1,6 @@
+#control('quick_login')
+#block('top.right')
+#control('menu_social')
+#banners('right-column')
+##control('comment')
+

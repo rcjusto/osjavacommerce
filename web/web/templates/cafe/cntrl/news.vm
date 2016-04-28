@@ -1,0 +1,22 @@
+#if($news && $news.listado.size()>0)
+
+<section id="recent-news">
+    <h2>News</h2>
+    <ul>
+    #foreach($n in $news.listado)
+        <li>
+            <div class="date">
+                <b>$!date.format('d',$n.date)</b>
+                <span class="month">$!date.format('MMM',$n.date)</span>
+            </div>
+            <div class="details">
+                $!n.title<br/>
+                <a href="$!n.link" title="Comments">$!action.getText('ver.detalles')</a>
+            </div>
+        </li>
+    #end
+    </ul>
+</section>
+
+
+#end

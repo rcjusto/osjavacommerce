@@ -1,0 +1,5 @@
+<div id="blockContent" class="clearfix">
+    <div class="statictext-centercol">
+        #actionMessages('register.page.subtitle.subscription')
+    </div>
+</div>

@@ -1,0 +1,112 @@
+<section id="left-column">
+
+    <section id="main">
+
+        <h1>#label('friend.page.title') $!friend.email</h1>
+        <div class="clearfix content">
+            <div class="block-messages">
+                #if($msgSent=='OK')
+                    <div class="resultado">#label('message.sent.successfully')</div>
+                #end
+
+                <div class="message-unread">
+                    #if($mensajes)
+                        #foreach($msg in $mensajes)
+                            <div class="mensaje unread">
+                                <div class="clearfix head">
+                                    <div class="email">$!msg.fromUser.email</div>
+                                    <div class="date">$!msg.created</div>
+                                </div>
+                                <div class="text">
+                                    $!msg.message
+                                </div>
+                            </div>
+                        #end
+                    #end
+                </div>
+
+                <form action="$!action.url('friendMessage')" id="formRefer" method="post">
+                    #stoken()
+                    <input type="hidden" name="idUser" value="$!friend.idUser" />
+                    <div class="add-message">
+                        <p class="label">#label('message.to') $!friend.email</p>
+                        <textarea rows="6" cols="60" id="mailComment" name="customMessage" class="field string-200"></textarea>
+                        <div class="buttons">
+                            <button type="submit"><span>#label('send')</span></button>
+                        </div>
+                    </div>
+                </form>
+
+                #if($allMessages)
+                    <div class="message-history">
+                        <p class="label">#label('message.history')</p>
+                        <div class="scroll-pane">
+                            #foreach($msg in $allMessages)
+                                <div class="mensaje #if($friend == $msg.fromUser) from-friend #else to-friend #end ">
+                                    <div class="clearfix head">
+                                        <div class="email">$!msg.fromUser.email</div>
+                                        <div class="date">$util.formatDate($msg.created, $locale.language) $!date.format('HH:mm',$msg.created)</div>
+                                    </div>
+                                    <div class="text">
+                                        $!msg.message
+                                    </div>
+                                </div>
+                            #end
+                        </div>
+                    </div>
+                #end
+            </div>
+            <div class="block-history">
+                #if($earns)
+                    <div class="rewards-from-friend block-history-block">
+                        <h3>#label('rewards.from.friend')</h3>
+                        <ul>
+                            #set($_rTotal = 0)
+                            #foreach($h in $earns)
+                                #set($_rTotal = $math.add($_rTotal, $!h.amount))
+                                <li class="clearfix">
+                                    <div class="text">#label("reward.type.$!{h.type}")</div>
+                                    <div class="amount">$!number.format('0',$h.amount)</div>
+                                </li>
+                            #end
+                            <li class="clearfix total">
+                                <div class="text">#label("rewards.total")</div>
+                                <div class="amount">$!number.format('0',$_rTotal)</div>
+                            </li>
+                        </ul>
+                    </div>
+                #end
+
+                #set($messageCount = $dao.getFriendsMessagesCount($frontUser, true))
+                #if($messageCount && !$messageCount.isEmpty())
+                    <div class="unread-messages block-history-block">
+                        <h3>#label('more.unread.messages')</h3>
+                        <ul>
+                            #foreach($friend in $messageCount.keySet())
+                                <li class="clearfix">
+                                    <div class="email"><a href="$!{action.url('friendData')}?idUser=$!{friend.idUser}">$!friend.email</a></div>
+                                    <div class="messages">$!messageCount.get($friend)</div>
+                                </li>
+                            #end
+                        </ul>
+                    </div>
+                #end
+
+            </div>
+        </div>
+
+    </section>
+
+</section>
+
+#control('aside')
+
+
+<link href="/struts/css/jquery.jscrollpane.css" type="text/css" rel="stylesheet">
+<script src="/struts/js/jquery.mousewheel.js" type="text/javascript"></script>
+<script src="/struts/js/jquery.jscrollpane.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+       $('.scroll-pane').jScrollPane();
+    });
+</script>

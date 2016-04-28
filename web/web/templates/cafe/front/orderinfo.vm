@@ -1,0 +1,266 @@
+#if($order)
+
+<div id="order_info" class="clearfix">
+    <div id="order_summary">
+        <h2>#label('order.summary')</h2>
+        <table>
+            #if($order.hasInvoiceNo())
+                <tr>
+                    <th>#label('invoice.no')</th>
+                    <td>$!action.getOrderInvoice($order)</td>
+                </tr>
+            #end
+            #if($order.invoiceDate)
+                <tr>
+                    <th>#label('invoice.date')</th>
+                    <td>$!util.formatDate($order.invoiceDate, $locale.language)</td>
+                </tr>
+            #end
+            #if($util.isNotEmpty($order.purchaseOrder))
+                <tr>
+                    <th>#label('purchase.no')</th>
+                    <td>$!order.purchaseOrder</td>
+                </tr>
+            #end
+            #if($util.isNotEmpty($order.customReference))
+                <tr>
+                    <th>#label('custom.reference')</th>
+                    <td>$!order.customReference</td>
+                </tr>
+            #end
+            <tr>
+                <th>#label('order.id')</th>
+                <td>$!order.idOrder</td>
+            </tr>
+            <tr>
+                <th>#label('order.status')</th>
+                <td>$!order.status.getStatusName($locale.language)</td>
+            </tr>
+            <tr>
+                <th>#label('order.created')</th>
+                <td>$!util.formatDate($order.createdDate,$locale.language)</td>
+            </tr>
+            <tr>
+                <th>#label('order.payment')</th>
+                <td>#if($util.isNotEmpty($order.paymentCard)) $!order.paymentCard #else $!action.getPaymentMethodName($order.paymentMethod) #end</td>
+            </tr>
+            #if($util.isNotEmpty($order.codeMerchant))
+                <tr>
+                    <th>#label('order.payment.transaction')</th>
+                    <td>$!order.codeMerchant</td>
+                </tr>
+            #end
+            <tr>
+                <th>#label('shipping.method')</th>
+                #if($order.shippingMethod)
+                <td>$!order.shippingMethod.getMethodName($locale.language)</td>
+                #else
+                    #if($order.pickInStore)
+                        <td>#label('shipping.type.pickinstore')</td>
+                    #else
+                        <td>-</td>
+                    #end
+                #end
+            </tr>
+        </table>
+        <table class="subtotals">
+            <tr>
+                <th>#label('subtotal.products')</th>
+                <td>$!action.formatActualCurrency($order.totalProducts,$order.currency)</td>
+            </tr>
+            #if($order.interestPercent && $order.interestPercent>0)
+                <tr>
+                    <th>#label('interest.percent') $!number.format('0.##',$order.interestPercent)</th>
+                    <td class="price">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
+                </tr>
+            #end
+            #if($order.totalFees && $order.totalFees>0)
+                <tr>
+                    <th>#label('subtotal.fees')</th>
+                    <td class="price">$!action.formatActualCurrency($order.totalFees,$order.currency)</td>
+                </tr>
+            #end
+            <tr>
+                <th>#label('subtotal.discount')</th>
+                <td>$!action.formatActualCurrency($order.totalDiscountPromotion,$order.currency)</td>
+            </tr>
+            <tr>
+                #set($freeShipPromList = $order.getPromotions('free-shipping') )
+                #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                    #set( $freeShipProm = $list.get($freeShipPromList,0))
+                    <th>PROMO: $!freeShipProm.get('code') - $!freeShipProm.get('name')</th>
+                #else
+                    <th>#label('subtotal.shipping')</th>
+                #end
+                <td>$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
+            </tr>
+            #if($order.totalInsurance && $order.totalInsurance>0)
+                <tr>
+                    <th>#label('subtotal.shipping.insurance')</th>
+                    <td>$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
+                </tr>
+            #end
+            #set($taxesl = $order.getTaxes())
+            #if($taxesl && !$taxesl.isEmpty())
+                #foreach($tax in $taxesl)
+                    <tr>
+                        <th>#label('subtotal.tax') $!tax.name
+                            #if($tax.totax)<span class="tax-detail">( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
+                        </th>
+                        <td>$!action.formatActualCurrency($tax.value,$order.currency)</td>
+                    </tr>
+                #end
+            #end
+            #if($order.totalRewards && $order.totalRewards>0)
+                <tr>
+                    <th>#label('used.rewards')</th>
+                    <td>- $!action.formatActualCurrency($order.totalRewards,$order.currency)</td>
+                </tr>
+            #end
+            <tr class="row-total">
+                <th>#label('subtotal.total')</th>
+                <td>$!action.formatActualCurrency($order.total,$order.currency)</td>
+            </tr>
+        </table>
+    </div>
+    <div id="order_details">
+        <div id="order_details_info" class="clearfix">
+            #if($order.billingAddress)
+                <div class="header-block">
+                    <h2>#label('address.billingAddress')</h2>
+                    <p>$!order.billingAddress.fullName, $!order.user.email</p>
+                    <p>$!order.billingAddress.address,
+                        #if($util.isNotEmpty($order.billingAddress.address2))$!order.billingAddress.address2, #end
+                        $!order.billingAddress.city $!order.billingAddress.state.stateCode $!order.billingAddress.zipCode $!order.billingAddress.idCountry
+                    </p>
+                    #if($util.isNotEmpty($order.billingAddress.phone))<p>$!order.billingAddress.phone</p>#end
+                </div>
+            #end
+            #if($order.shippingMethod && $order.deliveryAddress)
+                <div class="header-block">
+                    <h2>#label('address.shippingAddress')</h2>
+
+                    <p>$!order.deliveryAddress.fullName</p>
+                    <p>$!order.deliveryAddress.address,
+                    #if($util.isNotEmpty($order.deliveryAddress.address2))$!order.deliveryAddress.address2, #end
+                    $!order.deliveryAddress.city $!order.deliveryAddress.state.stateCode $!order.deliveryAddress.zipCode $!order.deliveryAddress.idCountry</p>
+                    #if($util.isNotEmpty($order.deliveryAddress.phone))<p>$!order.deliveryAddress.phone</p>#end
+                </div>
+            #end
+            #if($order.shippingMethod)
+                <div class="header-block shipping-method">
+                    <h2>#label('shipping.method')</h2>
+
+                    <p>
+                        <span class="shipping-method-name">$!order.shippingMethod.getMethodName($locale.language)</span>
+                        <span class="shipping-method-price">$!action.formatActualCurrency($order.totalShipping,$order.currency)</span>
+                    </p>
+                    #if($orderShowTrackingPackages=='Y')
+                        #set($sentPackages = $order.sentPackages)
+                        #if($sentPackages && !$sentPackages.isEmpty())
+                            <div class="shipping-packages">
+                                <h2>#label('shipping.packages')</h2>
+                                <table width="100%">
+                                    <tr>
+                                        <th>#label('sent.date')</th>
+                                        <th>#label('tracking')</th>
+                                    </tr>
+                                    #foreach($pack in $sentPackages)
+                                        <tr>
+                                            <td class="shipping-packages-delivery">$!util.formatDate($pack.deliveryDate, $locale.language)</td>
+                                            <td><a href="#" rel="$!pack.id" class="shipping-packages-tracking">$!pack.trackingNumber</a></td>
+                                        </tr>
+                                    #end
+                                </table>
+                            </div>
+                        #end
+                    #end
+                </div>
+            #else
+                #if($order.pickInStore)
+                        <div class="header-block shipping-method">
+                            <h2>#label('shipping.method')</h2>
+                            <p><span class="shipping-method-name">#label('shipping.type.pickinstore')</span></p>
+                            <p>$!order.pickInStore.storeName</p>
+                            #if($util.isNotEmpty($order.pickInStore.email))<p>$!order.pickInStore.email</p>#end
+
+                            <p>$!order.pickInStore.address</p>
+                            #if($util.isNotEmpty($order.pickInStore.address2))<p>$!order.pickInStore.address2</p>#end
+                            <p>$!order.pickInStore.city $!order.pickInStore.state.stateCode $!order.pickInStore.zipCode $!order.pickInStore.idCountry</p>
+                            #if($util.isNotEmpty($order.pickInStore.phone))<p>$!order.pickInStore.phone</p>#end
+                        </div>
+                #end
+            #end
+        </div>
+    </div>
+    <div id="order_items">
+        <h2>#label('order.items')</h2>
+        <table width="100%" class="table-items">
+            <tr>
+                <th class="name">#label('shopcart.product')</th>
+                <th class="quantity non-important">#label('shopcart.quantity')</th>
+                <th class="precio non-important">#label('shopcart.unitary.price')</th>
+                <th class="precio">#label('shopcart.line.price')</th>
+            </tr>
+            #foreach($detail in $order.orderDetails)
+                <tr class="product">
+                    <td class="name">
+                        <b class="show-smartphone">$!detail.quantity</b>
+                        #foreach($odp in $detail.orderDetailProducts)
+                            <span>$!odp.product.getProductName($locale.language)</span>
+                            #if($detail.promotionCode && $util.isNotEmpty($detail.promotionCode))
+                                <div class="promo">#label('promo') $!detail.promotionCode - $!detail.promotionName</div>
+                            #end
+                        #end
+                    </td>
+                    <td class="quantity non-important">$!detail.quantity</td>
+                    <td class="precio non-important">$!action.formatActualCurrency($detail.price,$order.currency)</td>
+                    <td class="precio">$!action.formatActualCurrency($detail.subTotal,$order.currency)</td>
+                </tr>
+                #foreach($odp in $detail.orderDetailProducts)
+                    #if($odp.feeValue)
+                        <tr class="fee">
+                            <td class="name"><b class="show-smartphone">$!detail.quantity</b> #label('fee') $!odp.feeName</td>
+                            <td class="quantity non-important">$!detail.quantity</td>
+                            <td class="precio non-important">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
+                            <td class="precio">$!action.formatActualCurrency($math.mul($odp.feeValue,$detail.quantity),$order.currency)</td>
+                        </tr>
+                    #end
+                    #if($util.isNotEmpty($odp.downloadLink))
+                        <tr class="download">
+                            <td colspan="4">
+                                <a class="download" href="$!odp.downloadLink" target="_blank">#label('download')</a>
+                            </td>
+                        </tr>
+                    #end
+                #end
+                #if($util.isNotEmpty($detail.complementName))
+                    <tr class="complement">
+                        <td class="name">#label('complement') $!detail.complementName</td>
+                        <td class="quantity non-important">$!detail.quantity</td>
+                        <td class="precio non-important">$!action.formatActualCurrency($detail.complementValue,$order.currency)</td>
+                        <td class="precio">$!action.formatActualCurrency($math.mul($detail.complementValue,$detail.quantity),$order.currency)</td>
+                    </tr>
+                #end
+            #end
+            #foreach($prom in $order.getPromotions('discount-percent'))
+                <tr class="promotion">
+                    <td class="promo">#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="precio">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+                </tr>
+            #end
+            #foreach($prom in $order.getPromotions('discount'))
+                <tr class="promotion" class="promo">
+                    <td>#label('promo'): $prom.get('code') - $!prom.get('name')</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="non-important">&nbsp;</td>
+                    <td class="precio">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
+                </tr>
+            #end
+        </table>
+    </div>
+</div>
+
+#end

@@ -1,0 +1,36 @@
+<nav>
+    <ul>
+        #foreach($mIt in $treemenu.children() )
+            #set( $m = $mIt.userObject )
+            #if($util.isEmpty($m.userConnected) || ($m.userConnected=='S' && $action.frontUser!=$util.null) || ($m.userConnected=='N' && $action.frontUser==$util.null))
+            #set($hasChildren = $mIt.children().hasMoreElements() || $m.menuContent || $m.showSubcategories)
+            <li class="$!m.cssClass  #if($hasChildren) dropdown #end">
+                <a #if(!$hasChildren) href="$!m.url" #end title="$!m.getLabel($locale.language)">$!m.getLabel($locale.language)</a>
+                #if($mIt.children().hasMoreElements())
+                    <ul>
+                        #foreach($sIt in $mIt.children())
+                            #set( $s = $sIt.userObject )
+                            <li class="$alternator.auto('even','odd')">
+                                <a href="$!s.url" title="$!s.getLabel($locale.language)">$!s.getLabel($locale.language)</a>
+                            </li>
+                        #end
+                    </ul>
+                #elseif($m.menuContent)
+                    <ul>
+                        <li class="even">$!m.menuContent</li>
+                    </ul>
+                #elseif($m.showSubcategories)
+                    #set($subcats = $action.getSubCategories($m.linkCategory, true))
+                    #if($subcats && $subcats.size()>0)
+                        <ul>
+                            #foreach($subcat in $subcats)
+                                <li class="$alternator.auto('even','odd')"><a href="$!action.urlCategory($subcat)" title="$!subcat.name">$!subcat.name</a></li>
+                            #end
+                        </ul>
+                    #end
+                #end
+            </li>
+            #end
+        #end
+    </ul>
+</nav>

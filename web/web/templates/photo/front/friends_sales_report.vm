@@ -1,0 +1,26 @@
+<section id="left-column">
+
+    <section id="main">
+
+        <h1>#label('my.top.sales')</h1>
+        #if($products)
+            <div class="category_product grid">
+                #control('product_list' $util.map.add('_prodList',$products).add('_prodTemplate','category_product'))
+            </div>
+        #else
+            <div class="info">
+                <h2>#label('friend.sales.not found')</h2>
+                <p>#label('friend.sales.not found.text')</p>
+            </div>
+
+            <div class="related">
+                #set($associatedProducts = $action.getRandomProducts('label:hot', $!math.toInteger($!action.getStoreProperty('home.hot.items', '9'))))
+            #control('shopcart_related' 9)
+            </div>
+        #end
+
+    </section>
+
+</section>
+
+#control('aside')

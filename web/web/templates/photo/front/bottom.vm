@@ -1,0 +1,41 @@
+<!-- Footer incl. Copyright and Secondary Navigation -->
+<footer>
+    <section id="bottom">
+
+        <!-- Recent News -->
+        #news(3)
+
+        #control('subscribe_newsletter')
+
+        #control('menu_bottom')
+
+
+
+
+        <!-- Information & Newsletter Subscription -->
+        <!--section id="about-us">
+            <h2>About Us</h2>
+            <div class="introduction">
+                <p><b>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</b></p>
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+            </div>
+            <form method="post" action="index.htm">
+                <div>
+                    <h2>Subscribe for Our Newsletter</h2>
+                    <label for="email">Stay informed about exclusive offers with our weekly Newsletter</label>
+                    <input type="text" id="email" class="newsletter-input" value="Your E-Mail Address"/>
+                    <input type="submit" value="Submit" class="newsletter-submit"/>
+                </div>
+            </form>
+        </section-->
+
+    </section>
+    <p>#label('copyright')</p>
+    <nav>
+        <ul>
+        </ul>
+    </nav>
+</footer>
+#if($frontUser && $rewardsEnabled)
+    #parse("/WEB-INF/views/$!{template}/front/bottom_bar.vm")
+#end

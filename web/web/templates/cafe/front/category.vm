@@ -1,0 +1,11 @@
+<section id="left-column">
+
+#control('category_name')
+
+#control('category_product')
+
+#control('home_bottom_banner')
+
+</section>
+
+#control('aside')

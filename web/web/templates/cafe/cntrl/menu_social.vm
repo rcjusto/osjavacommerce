@@ -1,0 +1,11 @@
+    <ul>
+        <li class="call">#block('top.bar.phone')</li>
+
+        #foreach($social in ['Twitter','Facebook','Flickr','Delicious','FriendFeed','Linked In','YouTube','Digg','Last.FM','Feedburner'])
+            #set($socialClass = $social.replaceAll('[.]','_'))
+            #set($socialClass = $socialClass.replaceAll(' ','_'))
+            #if($util.isNotEmpty($action.getStoreProperty("social.url.${socialClass}",'')))
+                <li class="${socialClass.toLowerCase()}"><a title="$!social" target="_blank" href="$action.getStoreProperty("social.url.${socialClass}",'')">$!social</a></li>
+            #end
+        #end
+    </ul>

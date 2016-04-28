@@ -1,0 +1,105 @@
+<div id="blockTop">
+    #surl('id=urlHome' "action=home")
+    <a href="$urlHome"><img id="logo" alt="Logo" src="$!action.storeFile('images/logo.png')"/></a>
+    <ul id="topMenuCart" style="" class="menu-right">
+        #if($frontUser && !$frontUser.anonymousCheckout)
+            #surl('id=urllogout' "action=logout")
+            <li>#linklabel('logout' $urllogout)</li>
+            <li>|</li>
+        #else
+            #surl('id=urlregister' "action=profile")
+            <li>#linklabel('sign.in' $urlregister)</li>
+            <li>|</li>
+        #end
+        #surl('id=urlshopcart' "action=shopcart")
+        <li>#linklabel('my.shopping.cart' $urlshopcart 'shopcart')</li>
+        #foreach($l in $languages)
+            #if($locale.language!=$l)
+                #surl('id=urlLang' "action=home" "set_lang=$l")
+                <li>|</li>
+                <li>#linklabel("lang.$!l" $urlLang)</li>
+            #end
+        #end
+    </ul>
+    <div id="topMenuSearch" style="float:right;clear:right;">
+        #surl('id=urlSearch' "action=search")
+        <form id="formSearch" action="$urlSearch" method="get">
+            <div class="search-wraper">
+                <input type="text" id="querySearch" name="query" value="$!esc.html($query)" class="required"/>
+            </div>
+            <a class="search-button" href="#" onclick="if($('#formSearch').validForm()) $('#formSearch').submit(); else return false;"></a>
+            <div style="clear:both;"></div>
+        </form>
+    </div>
+    #if('Y'==$action.getStoreProperty('search.autocomplete','N'))
+    <script type="text/javascript">
+        $(function(){
+            $("input#querySearch").autocomplete({source:"$!action.url('quicksearch')",html:true,
+             select: function(event, ui) {
+                 $('#querySearch').val(ui.item.value);
+                 $('#formSearch').submit();
+             }
+            });
+        })
+    </script>
+    #end
+    <div style="clear:both;"></div>
+</div>
+<div id="blockStoreHeader">#block('top.banner')</div>
+#set( $treemenu = $action.getTreeMenu('TopBar') )
+<div id="blockTopMenu">
+    <ul id="topMenuCategories" class="menu-left avoid-collision">
+        #foreach($mIt in $treemenu.children() )
+            #set( $m = $mIt.userObject )
+            <li><a href="$!m.url" rel="#topmenu${m.id}">$!m.getLabel($locale.language)</a></li>
+        #end
+    </ul>
+    <div style="clear:both;"></div>
+</div>
+<div class="blockTopMenuBottom"></div>
+#foreach($mIt in $treemenu.children() )
+    #set( $m = $mIt.userObject )
+    #if($mIt.children().hasMoreElements())
+    <div id="topmenu${m.id}" class="topsubmenu">
+        <ul class="unique">
+            #foreach($sIt in $mIt.children())
+                #set( $s = $sIt.userObject )
+                <li>
+                    <a href="$!s.url">$!s.getLabel($locale.language)</a>
+                </li>
+            #end
+        </ul>
+    </div>
+    #end
+    #if($m.menuContent)
+    <div id="topmenu${m.id}" class="topsubmenu">
+        $!m.menuContent.getLanguage($locale.language,$defaultLanguage).value
+    </div>
+    #end
+    #if($m.showSubcategories)
+        #set($subcats = $action.sortCategories($action.getSubCategories($m.linkCategory,true)))
+        #if($subcats && $subcats.size()>0)
+        <div id="topmenu${m.id}" class="topsubmenu">
+            #if ($subcats && $subcats.size()>12)      
+                <div class="multicolumn">
+                #set( $rowsCat = $util.getRows($subcats, $math.div($subcats.size(),2)))
+                #foreach($row in $rowsCat)
+                    <ul class="#if($velocityCount<1) first #end ">
+                        #foreach($subcat in $row)
+                            <li><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                        #end
+                    </ul>
+                #end
+                </div>
+            #else
+                <ul class="unique">
+                    #foreach($subcat in $subcats)
+                        <li><a href="$!action.urlCategory($subcat)">$!subcat.name</a></li>
+                    #end
+                </ul>
+            #end
+            <div class="clear"></div>
+        </div>
+        #end
+    #end
+#end

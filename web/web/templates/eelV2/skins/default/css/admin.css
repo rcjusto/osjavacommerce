@@ -1,0 +1,9 @@
+#header {}
+#header a {color:#333333}
+
+/* Menu superior  */
+#adminmenu ul li a {color:#007619;}
+#adminmenu ul li.selected a {background-color:#007619 !important;}
+#adminmenu ul li.hover a {background-color:#007619 !important;}
+.adminsubmenu {background-color:#007619;}
+.adminsubmenu ul li {border-bottom:1px dotted #aaa;}

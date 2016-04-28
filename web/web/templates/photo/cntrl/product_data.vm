@@ -1,0 +1,30 @@
+<h2>$!product.getProductName($locale.language)</h2>
+<p>$!productLang.description</p>
+<p class="code"><span>#label('product.partnumber')</span> $!{product.partNumber}</p>
+#if($product.manufacturer)
+<p class="manufacturer"><span>#label('product.manufacturer.name')</span> $!{product.manufacturer.manufacturerName}</p>
+#end
+#if($action.canShowStock)
+<p class="stock">
+    #if($product.stock>0)
+        #label('on.stock')
+    #else
+        #if($util.isNotEmpty($product.eta))
+            #label('backorder.until') $!product.eta
+        #else
+            #label('out.of.stock')
+            <span class="stock-alert">
+                #if($frontUser)
+                    #if($frontUser.hasPreference('STOCK_ALERT',"$!product.idProduct"))
+                        <span id="stockAlertAdded" class="action">#label('stock.alert.added')</span>
+                    #else
+                        <span id="stockAlertAdded" class="action" style="display:none;">#label('stock.alert.added')</span>
+                            <span id="stockAlertLoading" style="display:none;" class="action">#label('loading')</span>
+                            <span id="stockAlertLink" class="action">#linklabel('add.stock.alert' '#' 'addtostockalert')</span>
+                    #end
+                #end
+            </span>
+        #end
+    #end
+</p>
+#end

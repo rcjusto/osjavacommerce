@@ -1,0 +1,10 @@
+<div id="blockContent" class="clearfix">
+    <div id="leftColumn">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="centerColumn">
+        <div class="block">
+            #actionMessages('register.page.subtitle.subscription')
+        </div>
+    </div>
+</div>

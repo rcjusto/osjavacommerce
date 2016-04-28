@@ -1,0 +1,49 @@
+#if($action.frontUser) #else
+<div class="quick-login">
+<h2>#label('quick.login.title')</h2>
+<form id="formQuickLogin"  method="post">
+    <p>#label('quick.login.instructions')</p>
+    <div class="validation-error error hidden"></div>
+    <div class="form">
+        <label>
+            <span class="label">#label('Email Address')</span>
+            <input type="text" name="loginemail" value="" id="loginemail" class="field required email string-150"/>
+            <span class="field_error" data-my="left top" data-at="left bottom"></span>
+        </label>
+        <label>
+            <span class="label">#label('Password')</span>
+            <input type="password" name="loginpassword" id="loginpassword" class="field required string-150"/>
+            <span class="field_error" data-my="left top" data-at="left bottom"></span>
+        </label>
+        <label>
+            <input type="checkbox" name="rememberMe" value="true" id="rememberMe"/>
+            <span>#label('Remember me in this computer')</span>
+            <input type="hidden" id="__checkbox_rememberMe" name="__checkbox_rememberMe" value="true" />
+        </label>
+
+        <div class="button-bar">
+            <button id="submitLogin" type="submit"><span class="ok">#label('Login')</span></button>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('#formQuickLogin').submit(function(){
+            if ($('#formQuickLogin').validForm()) {
+                $('#formQuickLogin').loadingOverlay('Login','Please wait...');
+                $.getJSON("$!action.url('loginAjax')", $('#formQuickLogin').serialize(), function(d){
+                    $('#formQuickLogin').find('.loading-overlay').remove();
+                    if (d.result=='ok') {
+                        $('#formQuickLogin').find('.validation-error').html("$action.getText('Successfully Logged. Reloading...')").show();
+                        document.location.reload();
+                    } else {
+                        $('#formQuickLogin').find('.validation-error').html(d.message).show();
+                    }
+                });
+            }
+            return false;
+        });
+    });
+</script>
+#end

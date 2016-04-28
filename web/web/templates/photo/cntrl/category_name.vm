@@ -1,0 +1,10 @@
+#if($category)
+
+#set($lang = $!category.getLanguage($action.locale.language, $action.defaultLanguage))
+
+<section id="main">
+    <h2>$!category.getCategoryName($action.locale.language)</h2>
+    #if($lang && $util.isNotEmpty($!lang.description))<p>$!lang.description</p> #end
+</section>
+
+#end

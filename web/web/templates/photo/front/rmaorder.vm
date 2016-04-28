@@ -1,0 +1,215 @@
+<section id="left-column">
+
+    <section id="main">
+
+        <h1>#label('order.data')</h1>
+            #if($order)
+            <div id="order_rma" class="clearfix">
+                <div id="order_details">
+
+                    <div id="rma_items">
+                        #surl('id=addRma' "action=rmanew")
+                        #if($packageProducts && $packageProducts.size()>0)
+                            <h2>#label('rma.available.items')</h2>
+                            <div>
+                                #foreach($opp in $packageProducts)
+                                    #set($product = $opp.orderDetailProduct.product )
+                                    #set($rmaList = $opp.getProperty('rmas'))
+                                    <div class="product">
+
+                                        <div class="product-title clearfix">
+                                            <span>$!product.getProductName($locale.language)</span>
+                                            #if($opp.getProperty('can_create'))
+                                                <a href="#" onclick="$('.request-rma').hide();$('#addRma$!{opp.id}').show();">#label('request.product.rma')</a>
+                                            #end
+                                        </div>
+
+                                        <div class="product-rma">
+                                            #if($rmaList && $rmaList.size()>0)
+                                                    <ul class="rmas">
+                                                        #foreach($rma in $rmaList)
+                                                            #surl('id=urlDetail' "action=rmadetail" "idRma=$!rma.id")
+                                                            <li>
+                                                                <div class="clearfix">
+                                                                    <h3>RMA</h3>
+                                                                    #if($!util.isNotEmpty($rma.rmaNumber))
+                                                                        <span class="title">#label('rma.number'):</span>
+                                                                        <span class="value">$!rma.rmaNumber</span>
+                                                                    #end
+                                                                    <span class="title">#label('created'):</span>
+                                                                    <span class="value">$!util.formatDate($rma.createdDate, $locale.language)</span>
+                                                                    <span class="title">#label('status'):</span>
+                                                                    <span class="value">#label("rma.status.$!rma.rmaStatus")</span>
+                                                                    <span class="title">#label('type'):</span>
+                                                                    <span class="value">$!rma.rmaType.getName($locale.language)</span>
+                                                                    <span class="links"><a href="$urlDetail">#label('details')</a></span>
+                                                                </div>
+                                                            </li>
+                                                        #end
+                                                    </ul>
+                                            #end
+                                            #if($opp.getProperty('can_create'))
+                                                <div id="addRma$!{opp.id}" style="display:none;" class="variants request-rma">
+                                                    <div class="header-request-rma">
+                                                        <h2>#label('request.rma')</h2>
+
+                                                        <p>#label('for.product') $!product.getProductName($locale.language)</p>
+                                                    </div>
+                                                    <form id="formNewRma" action="$addRma" method="post" class="validable">
+                                                        <input type="hidden" name="idPackageProduct" value="$!opp.id"/>
+                                                        <label>
+                                                            <span class="label">#label('select.rma.type'):</span>
+                                                            <select name="idRmaType" class="field string-300">
+                                                                #foreach($type in $opp.getProperty('types'))
+                                                                    <option value="$type.id">$type.getName($locale.language)</option>
+                                                                #end
+                                                            </select>
+                                                        </label>
+                                                        <label>
+                                                            <span class="label">#label('serial.number'):</span>
+                                                            <input type="text" name="rmaSerialNumber" value="$!opp.orderDetailProduct.barCode" class="field string-300"/>
+                                                        </label>
+                                                        <label>
+                                                            <span class="label">#label('your.comments'):</span>
+                                                            <textarea name="rmaComment" rows="4" class="field string-400"></textarea>
+                                                        </label>
+                                                        <label>
+                                                            <span class="label">&nbsp;</span>
+                                                            <input type="checkbox" id="agreePolicy" class="required">
+                                                            <span>#label('agree.rma.police')</span>
+                                                        </label>
+
+                                                        <div>
+                                                            <span class="label">&nbsp;</span>
+                                                            <button type="submit"><span class="ok">#label('submit.rma.request')</span></button>
+                                                            <button type="button" onclick="$('#addRma$!{opp.id}').hide();"><span class="cancel">#label('cancel')</span></button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            #end
+                                        </div>
+
+                                    </div>
+                                #end
+                            </div>
+                        #else
+                            <div class="info">
+                                <h2>#label('rma.available.items')</h2>
+
+                                <p>#label('rma.available.items.none')</p>
+                            </div>
+                        #end
+                    </div>
+
+                </div>
+                <div id="order_summary">
+                    <h2>#label('order.summary')</h2>
+                    <table>
+                        <tr>
+                            <th>#label('order.id')</th>
+                            <td>$!order.idOrder</td>
+                        </tr>
+                        <tr>
+                            <th>#label('order.status')</th>
+                            <td>$!order.status.statusCode</td>
+                        </tr>
+                        <tr>
+                            <th>#label('order.created')</th>
+                            <td>$!util.formatDate($order.createdDate, $locale.language)</td>
+                        </tr>
+                        <tr>
+                            <th>#label('order.payment')</th>
+                            <td>$!order.paymentMethod</td>
+                        </tr>
+                        #if($util.isNotEmpty($order.codeMerchant))
+                            <tr>
+                                <th>#label('order.payment.transaction')</th>
+                                <td>$!order.codeMerchant</td>
+                            </tr>
+                        #end
+                    </table>
+                    <table class="subtotals">
+                        <tr>
+                            <th>#label('subtotal.products')</th>
+                            <td>$!action.formatActualCurrency($order.totalProducts,$order.currency)</td>
+                        </tr>
+                        #if($order.interestPercent && $order.interestPercent>0)
+                            <tr>
+                                <th>#label('interest.percent') $!number.format('0.##',$order.interestPercent)</th>
+                                <td class="price">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
+                            </tr>
+                        #end
+                        #if($order.totalFees && $order.totalFees>0)
+                            <tr>
+                                <th>#label('subtotal.fees')</th>
+                                <td class="price">$!action.formatActualCurrency($order.totalFees,$order.currency)</td>
+                            </tr>
+                        #end
+                        <tr>
+                            <th>#label('subtotal.discount')</th>
+                            <td>$!action.formatActualCurrency($order.totalDiscountPromotion,$order.currency)</td>
+                        </tr>
+                        <tr>
+                            #set($freeShipPromList = $order.getPromotions('free-shipping') )
+                            #if($freeShipPromList && !$freeShipPromList.isEmpty())
+                                #set( $freeShipProm = $list.get($freeShipPromList,0))
+                                <th>PROMO: $!freeShipProm.get('code') - $!freeShipProm.get('name')</th>
+                            #else
+                                <th>#label('subtotal.shipping')</th>
+                            #end
+                            <td>$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
+                        </tr>
+                        #if($order.totalInsurance && $order.totalInsurance>0)
+                            <tr>
+                                <th>#label('subtotal.shipping.insurance')</th>
+                                <td>$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
+                            </tr>
+                        #end
+                        #set($taxesl = $order.getTaxes())
+                        #if($taxesl && !$taxesl.isEmpty())
+                            #foreach($tax in $taxesl)
+                                <tr>
+                                    <th>#label('subtotal.tax') $!tax.name
+                                        #if($tax.totax)<span class="tax-detail" >( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
+                                    </th>
+                                    <td>$!action.formatActualCurrency($tax.value,$order.currency)</td>
+                                </tr>
+                            #end
+                        #end
+                        <tr class="row-total">
+                            <th>#label('subtotal.total')</th>
+                            <td>$!action.formatActualCurrency($order.total,$order.currency)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            #else
+            <div class="error">
+                <h2>#label('order.not.found')</h2>
+
+                <p>#label('order.not.found.text')</p>
+            </div>
+            #end
+
+        <div class="button-bar">
+            #surl('id=urlOrders' "action=orders")
+            <a class="button" href="$urlOrders"><span>#label('my.orders')</span></a>
+        </div>
+
+    </section>
+
+</section>
+
+#control('aside')
+
+<script type="text/javascript">
+    $(function() {
+        $('#formNewRma').submit(function() {
+            if ($('#agreePolicy').is(':checked')) return true;
+            else {
+                alert("$!action.getText('error.rma.policy.agree')");
+                return false;
+            }
+        });
+    });
+</script>

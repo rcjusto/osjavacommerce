@@ -1,0 +1,13 @@
+
+/* Menu superior  */
+#adminmenu ul li a {color:#0b8200;}
+#adminmenu ul li.selected a {background-color:#0b8200 !important;}
+#adminmenu ul li.hover a {background-color:#0b8200 !important;}
+.adminsubmenu {background-color:#0b8200;}
+.adminsubmenu ul li {border-bottom:1px dotted #aaa;}
+h2.block-title, .block-title th {color:#0b8200 !important; border-bottom-color: #0b8200 !important;}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected {background: none repeat scroll 0 0 #0b8200 !important;}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {background: none repeat scroll 0 0 #0b8200 !important;color: #FFFFFF !important;}
+#content div.tabpanel {border: 1px solid #0b8200 !important;}
+ul.breadcrumb li a {color: #0b8200;}
+div.listado table.listado th {color: #0b8200;background-color: #e0e0e0 !important;}

@@ -1,0 +1,6 @@
+#block('top.right')
+#control('menu_social')
+#if($listaBS && !$listaBS.isEmpty()) #else #set($listaBS = $action.getBestSellers(5)) #end
+#if($titleBS && $util.isNotEmpty($titleBS)) #else #set($titleBS = 'best.seller.products') #end
+#control('product_list' $util.map.add('_prodList',$listaBS).add('_prodTemplate','right_product').add('_blockTitle',$titleBS))
+#banners('right-column')

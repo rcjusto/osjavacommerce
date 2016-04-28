@@ -1,0 +1,117 @@
+#if($action.getStoreProperty('enable.product.reviews','Y')=='Y')
+<section id="main">
+    <h2>#label('reviews')</h2>
+    <div id="tabReviews">
+        <div class="clearfix">
+            #if($util.isNotEmpty($reviews.listado))
+                <div class="reviews-data">
+                    #control('review_stars' $product.ratingBy)
+                    <div class="reviews-rating">#label('product.customer.rating') $!util.formatNumber($product.ratingBy,'0.0') / 5</div>
+                    <div class="reviews-total">#label('product.customer.reviews') $!reviews.totalRows</div>
+                </div>
+            #end
+            #if($action.canAddReview())
+                <div class="reviews-add">
+                    <p>#label('product.review.add.text') <a href="#" onclick="$('#productReviewNew').show();return false;">#label('product.review.add')</a></p>
+                </div>
+            #else
+                <div class="reviews-add">
+                    #if($frontUser) #else #label('register.to.review.this.product') #end
+                </div>
+            #end
+        </div>
+
+        <div id="productReviewNew" class="add-review variants" style="display:none;">
+            <form id="formAddNewReview" action="$!action.url('addreview')" method="post">
+                #stoken()
+                #shidden('name=code' "value=$!product.urlCode")
+                <div class="dialog-header">
+                    <h2>#label('product.review.add.title')</h2>
+                    <h4>#label('product.review.add.subtitle')</h4>
+                </div>
+                <div class="dialog-data">
+                    <div id="reviewErrorMsg" class="error" style="display:none;">
+                        <h3>#label('error.review')</h3>
+                        <p>#label('error.review.text')</p>
+                    </div>
+                    #set($revCategories = $util.split($action.getParentProperty($product.category,'reviewCategories'),','))
+                    #if($revCategories)
+                        #foreach($revC in $revCategories)
+                            <label>
+                                <span class="label"><input type="hidden" name="review_score_name" value="$!revC"/>#label("$revC")</span>
+                                <div id="stars-$velocityCount" class="stars clearfix">
+                                    <input type="radio" value="1" checked="checked"/>
+                                    <input type="radio" value="2"/>
+                                    <input type="radio" value="3"/>
+                                    <input type="radio" value="4"/>
+                                    <input type="radio" value="5"/>
+                                    <input type="hidden" class="review-input required" id="input-stars-$velocityCount" name="review_score_value" value="0"/>
+                                </div>
+                                <span id="cap-stars-$velocityCount" class="review-value"></span>
+                            </label>
+                        #end
+                    #else
+                        <label>
+                            <span class="label">#label('review.score')</span>
+                            <div id="stars-1" class="stars">
+                                <input type="radio" value="1" checked="checked "/>
+                                <input type="radio" value="2"/>
+                                <input type="radio" value="3"/>
+                                <input type="radio" value="4"/>
+                                <input type="radio" value="5"/>
+                            </div>
+                            <span id="cap-stars-1" class="review-value"></span>
+                            <input type="hidden" class="review-input required" id="input-stars-1" name="review.averageScore" value="0"/>
+                        </label>
+                    #end
+                    #if($frontUser) #else
+                        <label>
+                            <span class="label">#label('review.username')</span>
+                            <input type="text" name="review.userName" value="" class="field string-500 required"/>
+                        </label>
+                    #end
+                    <label>
+                        <span class="label">#label('review.title')</span>
+                        <input type="text" name="review.title" value="" class="field string-500 required"/>
+                    </label>
+                    <label>
+                        <span class="label">#label('review.content')</span>
+                        <textarea name="review.opinion" class="field string-500 required" rows="6"></textarea>
+                    </label>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="button"><span class="ok">#label('review.send')</span></button>
+                    <button type="button" class="button" onclick="$('#productReviewNew').hide()"><span class="cancel">#label('cancel')</span></button>
+                </div>
+            </form>
+        </div>
+
+        #if($util.isNotEmpty($reviews.listado))
+            <div id="productReviewList" class="clearfix">
+                #control('product_reviews')
+            </div>
+        #end
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    $(function () {
+        $('#reviewErrorMsg').hide();
+        $('#formAddNewReview').submit(function () {
+            var validForm = $(this).validForm();
+            $('.review-input').each(function () {
+                $(this).parent().removeClass('invalid');
+                if ($(this).val() == '' || $(this).val() < 1) {
+                    validForm = false;
+                    $(this).parent().addClass('invalid');
+                }
+            });
+            if (validForm) return true;
+            $('#reviewErrorMsg').show();
+            return false;
+        })
+    });
+</script>
+
+#end
