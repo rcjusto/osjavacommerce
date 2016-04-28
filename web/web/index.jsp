@@ -1,16 +1,16 @@
 <%--
   Created by IntelliJ IDEA.
-  User: lechon
-  Date: 4/27/16
-  Time: 1:16 PM
+  User: Administrador
+  Date: Mar 21, 2010
+  Time: 3:26:08 AM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-  <head>
-    <title>$Title$</title>
-  </head>
+  <head><title>Simple jsp page</title></head>
   <body>
-  $END$
+  <div style="width:800px;margin-left:auto;margin-right:auto;border:1px solid red;background-color:#eeeeee;">
+      ZDFADSFASDF
+  </div>
   </body>
 </html>
