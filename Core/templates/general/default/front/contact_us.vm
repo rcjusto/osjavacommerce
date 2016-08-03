@@ -40,11 +40,7 @@
     <label class="clearfix">
         <div class="captcha-label">#label('enter.captcha')</div>
         <div class="clearfix captcha-value" >
-            <span style="width:220px;float:left;">
-                <img id="captchaImg" src="$urlCaptcha" alt=""/>
-            </span>
-            <div style="margin-bottom:10px;"><a href="contact_us.vm#" onclick="return reloadCaptcha();">#label('another.captcha')</a></div>
-            <input name="captcha" class="field string-200 required" value=""/>
+            <div id="captcha1"></div>
             #fieldError('captcha')
         </div>
     </label>
@@ -56,12 +52,13 @@
 </div>
 </div>
 <script type="text/javascript">
-    function reloadCaptcha() {
-        var url = "$!urlCaptcha" + '?rnd=' + Math.random();
-        $('#captchaImg').attr('src', url);
-        return false;
-    }
     $(function(){
+
+        var widgetId1 = grecaptcha.render('captcha1', {
+            'sitekey' : '$!action.getStoreProperty("recaptcha.public.key","")',
+            'theme' : 'light'
+        });
+
         $('#sendComment').live('click',function(){
             if ($('#formComment').validForm()) {
                 var data = $('#formComment').serialize();

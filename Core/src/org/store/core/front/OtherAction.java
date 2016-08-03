@@ -2,7 +2,9 @@ package org.store.core.front;
 
 import com.octo.captcha.service.CaptchaServiceException;
 import com.opensymphony.xwork2.ActionContext;
+import org.store.core.beans.StoreProperty;
 import org.store.core.globals.CaptchaServiceSingleton;
+import org.store.core.globals.SomeUtils;
 import org.store.core.globals.StoreActionMapping;
 import org.store.core.utils.events.EventService;
 import org.store.core.utils.events.EventUtils;
@@ -54,6 +56,7 @@ public class OtherAction extends FrontModuleAction {
     }
 
     public String validCaptcha() throws Exception {
+        /*
         boolean isCaptchaCorrect = false;
         String captchaId = getStoreCode() + getRequest().getSession().getId();
         try {
@@ -61,7 +64,16 @@ public class OtherAction extends FrontModuleAction {
         } catch (CaptchaServiceException e) {
             log.error(e.getMessage(), e);
         }
-        result = isCaptchaCorrect ? "ok" : "wrong";
+        */
+
+        result = "ok";
+        String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
+        if (StringUtils.isNotEmpty(privateKey)) {
+            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+            if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                result = "wrong";
+            }
+        }
         return SUCCESS;
     }
 

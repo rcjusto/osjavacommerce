@@ -1,5 +1,6 @@
 package org.store.core.velocity;
 
+import org.store.core.beans.StoreProperty;
 import org.store.core.beans.utils.MultiLangBean;
 import org.store.core.globals.BaseAction;
 import org.store.core.globals.SomeUtils;
@@ -364,6 +365,16 @@ public class VelocityUtils {
             return l;
         }
         return null;
+    }
+
+    public String reCaptcha() {
+        String publicKey = action.getStoreProperty(StoreProperty.RECAPTCHA_PUBLIC, null);
+        // add recaptcha
+        if (StringUtils.isNotEmpty(publicKey)) {
+            return "<div class=\"g-recaptcha\" data-sitekey=\""+publicKey+"\"></div>\n";
+        } else {
+            return "";
+        }
     }
 
     public String htmlToText(String html) {

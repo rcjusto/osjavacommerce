@@ -120,15 +120,12 @@ public class UserAction extends FrontModuleAction implements StoreMessages {
         boolean useEmailAsLogin = "Y".equalsIgnoreCase(getStoreProperty(StoreProperty.PROP_USE_EMAIL_AS_LOGIN, StoreProperty.PROP_DEFAULT_USE_EMAIL_AS_LOGIN));
 
         if ("Y".equalsIgnoreCase(getStoreProperty("register.show.captcha", "Y"))) {
-            boolean isCaptchaCorrect = false;
-            String captchaId = getStoreCode() + getRequest().getSession().getId();
-            try {
-                isCaptchaCorrect = CaptchaServiceSingleton.getInstance(this).validateResponseForID(captchaId, captcha);
-            } catch (CaptchaServiceException e) {
-                log.error(e.getMessage());
-            }
-            if (!isCaptchaCorrect) {
-                addFieldError("captcha", getText(CNT_ERROR_CAPTCHA_INVALID, CNT_DEFAULT_ERROR_CAPTCHA_INVALID));
+            String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
+            if (StringUtils.isNotEmpty(privateKey)) {
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                    addFieldError("captcha", getText(CNT_ERROR_CAPTCHA_INVALID, CNT_DEFAULT_ERROR_CAPTCHA_INVALID));
+                }
             }
         }
 
@@ -448,16 +445,14 @@ public class UserAction extends FrontModuleAction implements StoreMessages {
             addActionError(getText(CNT_ERROR_EMPTY_COMMENT, CNT_DEFAULT_ERROR_EMPTY_COMMENT));
             return INPUT;
         }
-        boolean isCaptchaCorrect = false;
-        String captchaId = getStoreCode() + getRequest().getSession().getId();
-        try {
-            isCaptchaCorrect = CaptchaServiceSingleton.getInstance(this).validateResponseForID(captchaId, captcha);
-        } catch (CaptchaServiceException e) {
-            log.error(e.getMessage(), e);
-        }
-        if (!isCaptchaCorrect) {
-            addActionError(getText(CNT_ERROR_CAPTCHA_INVALID, CNT_DEFAULT_ERROR_CAPTCHA_INVALID));
-            return INPUT;
+
+        String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
+        if (StringUtils.isNotEmpty(privateKey)) {
+            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+            if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                addActionError(getText(CNT_ERROR_CAPTCHA_INVALID, CNT_DEFAULT_ERROR_CAPTCHA_INVALID));
+                return INPUT;
+            }
         }
 
         if (StringUtils.isEmpty(mailSubject)) mailSubject = getText(CNT_MAIL_SUBJECT_COMMENT, CNT_DEFAULT_MAIL_SUBJECT_COMMENT);

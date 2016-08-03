@@ -88,11 +88,7 @@
                             <p>#label('error.wrong.captcha.text')</p>
                         </div>
                         <div class="clearfix">
-                            <div style="width:220px;float:left;">
-                                <img id="captchaImg" src="$urlCaptcha" alt=""/>
-                            </div>
-                            <div style="margin-bottom:10px;"><a href="#" onclick="return reloadCaptcha();">#label('another.captcha')</a></div>
-                            <input id="captcha" class="field string-200" onkeypress="$('#captchaError').hide()"/>
+                            $util.reCaptcha()
                         </div>
                     </td>
                 </tr>
@@ -106,23 +102,10 @@
 </div>
 #surl('id=urlValidateCaptcha' "action=validcaptcha")
 <script type="text/javascript">
-    function reloadCaptcha() {
-        var url = "$!urlCaptcha" + '?rnd=' + Math.random();
-        $('#captchaImg').attr('src', url);
-        return false;
-    }
     function saveReview() {
         $('#reviewError').hide();
         if ($('#formAddReview').validForm()) {
-            jQuery.getJSON("$urlValidateCaptcha", {captcha:$('#captcha').val()}, function(data) {
-                if (data == 'ok') {
-                    $('#formAddReview').submit();
-                } else {
-                    reloadCaptcha();
-                    $('#captchaError').show();
-                    $('#captcha').val('');
-                }
-            });
+            $('#formAddReview').submit();
         } else {
             $('#reviewError').show();
         }

@@ -131,6 +131,16 @@
                         <th>#label('admin.catalog.only')</th>
                         <td>#storePropertyField($storeProperties 'catalog.only' 'field string-short required' ['N','Y'])</td>
                     </tr>
+
+                    <tr>
+                        <th>#label('admin.recaptcha.public.key')</th>
+                        <td>#storePropertyField($storeProperties 'recaptcha.public.key' 'field string-large required')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.recaptcha.private.key')</th>
+                        <td>#storePropertyField($storeProperties 'recaptcha.private.key' 'field string-large required')</td>
+                    </tr>
+
                 </table>
             </div>
 
@@ -282,6 +292,18 @@
                     <tr>
                         <th>#label('admin.product.review.mailto')</th>
                         <td>#storePropertyField($storeProperties 'product.review.mailto' 'field string-medium')</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.show.print')</th>
+                        <td>#storePropertyField($storeProperties 'product.print.show' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.show.email.friend')</th>
+                        <td>#storePropertyField($storeProperties 'product.email.friend.show' 'field string-short required' ['Y','N'])</td>
+                    </tr>
+                    <tr>
+                        <th>#label('admin.product.show.add.wishlist')</th>
+                        <td>#storePropertyField($storeProperties 'product.wishlist.add.show' 'field string-short required' ['Y','N'])</td>
                     </tr>
                     <tr>
                         <th>#label('admin.home.hot.items')</th>

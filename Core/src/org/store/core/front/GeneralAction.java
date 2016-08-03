@@ -2,7 +2,14 @@ package org.store.core.front;
 
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.lucene.analysis.WordlistLoader;
+import org.apache.struts2.util.TokenHelper;
+import org.hibernate.Session;
 import org.store.core.beans.*;
 import org.store.core.beans.mail.MProduct;
 import org.store.core.beans.mail.MReview;
@@ -12,6 +19,7 @@ import org.store.core.globals.ImageResolver;
 import org.store.core.globals.ImageResolverImpl;
 import org.store.core.globals.SomeUtils;
 import org.store.core.globals.StoreSessionInterceptor;
+import org.store.core.hibernate.HibernateSessionFactory;
 import org.store.core.mail.MailSenderThreat;
 import org.store.core.search.LuceneSearcher;
 import org.store.core.utils.events.EventService;
@@ -21,14 +29,7 @@ import org.store.core.utils.merchants.MerchantUtils;
 import org.store.core.utils.merchants.PaymentResult;
 import org.store.sslplugin.annotation.Secured;
 import org.store.sslplugin.annotation.Unsecured;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts2.util.TokenHelper;
-import org.hibernate.Session;
-import org.store.core.hibernate.HibernateSessionFactory;
+
 import javax.servlet.http.Cookie;
 import java.io.*;
 import java.util.*;
@@ -572,9 +573,9 @@ public class GeneralAction extends FrontModuleAction {
                 }
 
                 // breadcrumb
-                for (Category c : getCategoryHierarchy(category))
-                    if (!"_base".equalsIgnoreCase(c.getUrlCode()))
-                        getBreadCrumbs().add(new BreadCrumb("category", c.getCategoryName(getLocale().getLanguage()), urlCategory(c), null));
+                for (Category c1 : getCategoryHierarchy(category))
+                    if (!"_base".equalsIgnoreCase(c1.getUrlCode()))
+                        getBreadCrumbs().add(new BreadCrumb("category", c1.getCategoryName(getLocale().getLanguage()), urlCategory(c1), null));
 
             }
             getBreadCrumbs().add(new BreadCrumb("product", product.getProductName(getLocale().getLanguage()), null, null));
@@ -615,53 +616,64 @@ public class GeneralAction extends FrontModuleAction {
     }
 
     public String productMail() throws Exception {
-        if (getFrontUser() != null && StringUtils.isNotEmpty(mailTo) && !dao.userHasFriend(getFrontUser(), mailTo)) {
-            UserFriends userFriends = new UserFriends();
-            userFriends.setFriendEmail(mailTo);
-            userFriends.setReferred(false);
-            userFriends.setUser(getFrontUser());
-            dao.save(userFriends);
+        if ("Y".equalsIgnoreCase(getStoreProperty("product.email.friend.show", "Y"))) {
+
+            // check recaptcha
+            String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
+            if (StringUtils.isNotEmpty(privateKey)) {
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                    addToStack("mailSent", 'N');
+                    return SUCCESS;
+                }
+            }
+
+            if (getFrontUser() != null && StringUtils.isNotEmpty(mailTo) && !dao.userHasFriend(getFrontUser(), mailTo)) {
+                UserFriends userFriends = new UserFriends();
+                userFriends.setFriendEmail(mailTo);
+                userFriends.setReferred(false);
+                userFriends.setUser(getFrontUser());
+                dao.save(userFriends);
+            }
+
+            product = (Product) dao.get(Product.class, idProduct);
+            if (product == null) addActionError(getText(CNT_ERROR_PRODUCT_NOT_FOUND, CNT_DEFAULT_ERROR_PRODUCT_NOT_FOUND));
+            if (StringUtils.isEmpty(mailTo)) addActionError(getText(CNT_ERROR_MAILTO_REQUIRED, CNT_DEFAULT_ERROR_MAILTO_REQUIRED));
+            if (getFrontUser() == null && StringUtils.isEmpty(mailFrom)) addActionError(getText(CNT_ERROR_MAILFROM_REQUIRED, CNT_DEFAULT_ERROR_MAILFROM_REQUIRED));
+            if (getFrontUser() == null && StringUtils.isEmpty(mailFromName)) addActionError(getText(CNT_ERROR_FROMNAME_REQUIRED, CNT_DEFAULT_ERROR_FROMNAME_REQUIRED));
+
+            if (hasErrors()) return SUCCESS;
+
+            Map<String, Object> map1 = new HashMap<String, Object>();
+            map1.put("product", new MProduct(product, this));
+            map1.put("mailFrom", getFrontUser() != null ? getFrontUser().getEmail() : mailFrom);
+            map1.put("mailFromName", getFrontUser() != null ? getFrontUser().getFullName() : mailFromName);
+            map1.put("mailTo", mailTo);
+            map1.put("mailComment", mailComment);
+            String body = proccessVelocityTemplate(Mail.MAIL_TEMPLATE_PRODUCT, map1);
+            Mail mail = new Mail();
+            mail.setInventaryCode(getStoreCode());
+            mail.setBody(body);
+            mail.setSubject(getText(CNT_SUBJECT_PRODUCT_FRIEND, CNT_DEFAULT_SUBJECT_PRODUCT_FRIEND, new String[]{product.getProductName(getLocale().getLanguage())}));
+            //mail.setFromAddress(mailFrom);
+            mail.setToAddress(mailTo);
+            mail.setPriority(10);
+            mail.setReference("PRODUCT TO FRIEND " + product.getPartNumber());
+            try {
+                Session hSession = HibernateSessionFactory.getSessionAutoCommit(getDatabaseConfig());
+                hSession.saveOrUpdate(mail);
+                hSession.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            MailSenderThreat.asyncSendMail(mail, this);
+            addToStack("mailSent", 'Y');
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("email", mailTo);
+            EventUtils.executeEvent(getServletContext(), EventService.EVENT_REFER_FRIEND, this, map);
+
         }
-
-        product = (Product) dao.get(Product.class, idProduct);
-        if (product == null) addActionError(getText(CNT_ERROR_PRODUCT_NOT_FOUND, CNT_DEFAULT_ERROR_PRODUCT_NOT_FOUND));
-        if (StringUtils.isEmpty(mailTo)) addActionError(getText(CNT_ERROR_MAILTO_REQUIRED, CNT_DEFAULT_ERROR_MAILTO_REQUIRED));
-        if (getFrontUser() == null && StringUtils.isEmpty(mailFrom)) addActionError(getText(CNT_ERROR_MAILFROM_REQUIRED, CNT_DEFAULT_ERROR_MAILFROM_REQUIRED));
-        if (getFrontUser() == null && StringUtils.isEmpty(mailFromName)) addActionError(getText(CNT_ERROR_FROMNAME_REQUIRED, CNT_DEFAULT_ERROR_FROMNAME_REQUIRED));
-
-        if (hasErrors()) return SUCCESS;
-
-        Map map1 = new HashMap();
-        map1.put("product", new MProduct(product, this));
-        map1.put("mailFrom", getFrontUser() != null ? getFrontUser().getEmail() : mailFrom);
-        map1.put("mailFromName", getFrontUser() != null ? getFrontUser().getFullName() : mailFromName);
-        map1.put("mailTo", mailTo);
-        map1.put("mailComment", mailComment);
-        String body = proccessVelocityTemplate(Mail.MAIL_TEMPLATE_PRODUCT, map1);
-        Mail mail = new Mail();
-        mail.setInventaryCode(getStoreCode());
-        mail.setBody(body);
-        mail.setSubject(getText(CNT_SUBJECT_PRODUCT_FRIEND, CNT_DEFAULT_SUBJECT_PRODUCT_FRIEND, new String[]{product.getProductName(getLocale().getLanguage())}));
-        //mail.setFromAddress(mailFrom);
-        mail.setToAddress(mailTo);
-        mail.setPriority(10);
-        mail.setReference("PRODUCT TO FRIEND " + product.getPartNumber());
-        try
-        {
-            Session hSession = HibernateSessionFactory.getSessionAutoCommit(getDatabaseConfig());
-            hSession.saveOrUpdate(mail);
-            hSession.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        MailSenderThreat.asyncSendMail(mail, this);
-        addToStack("mailSent", 'Y');
-
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("email", mailTo);
-        EventUtils.executeEvent(getServletContext(), EventService.EVENT_REFER_FRIEND, this, map);
         return SUCCESS;
     }
 
@@ -721,6 +733,14 @@ public class GeneralAction extends FrontModuleAction {
     public String addReview() throws Exception {
         if (canAddReview()) {
 
+            String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
+            if (StringUtils.isNotEmpty(privateKey)) {
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                    return SUCCESS;
+                }
+            }
+
             boolean validToken;
             synchronized (session) {
                 validToken = TokenHelper.validToken();
@@ -761,14 +781,11 @@ public class GeneralAction extends FrontModuleAction {
                     mail.setToAddress(mailTo);
                     mail.setPriority(4);
                     mail.setReference("PRODUCT REVIEW " + product.getPartNumber());
-                    try
-                    {
+                    try {
                         Session hSession = HibernateSessionFactory.getSessionAutoCommit(getDatabaseConfig());
                         hSession.saveOrUpdate(mail);
                         hSession.close();
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     MailSenderThreat.asyncSendMail(mail, this);

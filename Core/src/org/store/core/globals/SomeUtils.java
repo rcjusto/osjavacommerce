@@ -6,12 +6,16 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.TextExtractor;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.struts2.json.JSONUtil;
+import org.store.core.beans.StoreProperty;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -413,6 +417,33 @@ public class SomeUtils {
             log.error(e.getMessage(), e); 
         }
         return result;
+    }
+
+    public static boolean reCaptcha2(String secret, String ip, String response) {
+        if (StringUtils.isNotEmpty(secret)) {
+            boolean isHuman = false;
+            PostMethod post = new PostMethod(StoreProperty.RECAPTCHA_URL);
+            post.addParameter("secret", secret);
+            post.addParameter("response", StringUtils.isNotEmpty(response) ? response : "");
+            post.addParameter("remoteip", StringUtils.isNotEmpty(ip) ? ip : "");
+            HttpClient httpclient = new HttpClient();
+            try {
+                httpclient.executeMethod(post);
+                String res = post.getResponseBodyAsString();
+                Map json = (Map) JSONUtil.deserialize(res);
+                if (json.containsKey("success")) {
+                    isHuman = (Boolean) json.get("success");
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                isHuman = false;
+            } finally {
+                post.releaseConnection();
+            }
+            return isHuman;
+        }
+        return true;
     }
 
 }

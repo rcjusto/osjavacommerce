@@ -1937,7 +1937,7 @@ public class HibernateDAO {
                     if (idCat != null) dto.setIdCategory(idCat.longValue());
                     dto.setUrlCode((String) arr[1]);
                     dto.setName((String) arr[2]);
-                    dto.setPosition(arr[3] !=null ? (Integer) arr[3] : 999999);
+                    dto.setPosition(arr[3] != null ? (Integer) arr[3] : 999999);
                     l.add(dto);
                 }
             }
@@ -2763,7 +2763,7 @@ public class HibernateDAO {
     public State getStateByName(String country, String name) {
         List l = createCriteriaForStore(State.class)
                 .add(Restrictions.eq("countryCode", country))
-                .add(Restrictions.eq("stateName", name))
+                .add(Restrictions.or(Restrictions.eq("stateCode", name), Restrictions.eq("stateName", name)))
                 .list();
         return (l != null && l.size() > 0) ? (State) l.get(0) : null;
     }
@@ -2786,37 +2786,37 @@ public class HibernateDAO {
         List l;
         l = gethSession().createCriteria(CustomShippingMethodRule.class).add(Restrictions.eq("state", state)).list();
         if (l != null && !l.isEmpty()) {
-            respuesta.append("Used in Shipping methods: ").append(((CustomShippingMethodRule)(l.get(0))).getMethod().getName(getDefaultLanguage()));
+            respuesta.append("Used in Shipping methods: ").append(((CustomShippingMethodRule) (l.get(0))).getMethod().getName(getDefaultLanguage()));
             return respuesta.toString();
         }
         l = gethSession().createCriteria(ShippingRate.class).add(Restrictions.eq("state", state)).list();
         if (l != null && !l.isEmpty()) {
             ShippingRate rate = (ShippingRate) l.get(0);
-            if (rate.getCategory()!=null) respuesta.append("Used in shipping rates for Category: ").append(rate.getCategory().getCategoryName(getDefaultLanguage()));
-            else if (rate.getProduct()!=null) respuesta.append("Used in shipping rates for Product: ").append(rate.getProduct().getProductName(getDefaultLanguage()));
+            if (rate.getCategory() != null) respuesta.append("Used in shipping rates for Category: ").append(rate.getCategory().getCategoryName(getDefaultLanguage()));
+            else if (rate.getProduct() != null) respuesta.append("Used in shipping rates for Product: ").append(rate.getProduct().getProductName(getDefaultLanguage()));
             return respuesta.toString();
         }
         l = gethSession().createCriteria(Provider.class).add(Restrictions.eq("state", state)).list();
         if (l != null && !l.isEmpty()) {
             respuesta.append("Used in supplier: ");
-            for(Object o : l.subList(0,Math.min(5,l.size()-1))) {
-                respuesta.append(((Provider)o).getProviderName()).append(", ");
+            for (Object o : l.subList(0, Math.min(5, l.size() - 1))) {
+                respuesta.append(((Provider) o).getProviderName()).append(", ");
             }
             return respuesta.toString();
         }
         l = gethSession().createCriteria(UserAddress.class).add(Restrictions.eq("state", state)).list();
         if (l != null && !l.isEmpty()) {
             respuesta.append("Used in address of customers: ");
-            for(Object o : l.subList(0,Math.min(5,l.size()-1))) {
-                respuesta.append(((UserAddress)o).getUser().getFullName()).append(", ");
+            for (Object o : l.subList(0, Math.min(5, l.size() - 1))) {
+                respuesta.append(((UserAddress) o).getUser().getFullName()).append(", ");
             }
             return respuesta.toString();
         }
         l = gethSession().createCriteria(LocationStore.class).add(Restrictions.eq("state", state)).list();
         if (l != null && !l.isEmpty()) {
             respuesta.append("Used in address of store location: ");
-            for(Object o : l.subList(0,Math.min(5,l.size()-1))) {
-                respuesta.append(((LocationStore)o).getFullAddress(false)).append(", ");
+            for (Object o : l.subList(0, Math.min(5, l.size() - 1))) {
+                respuesta.append(((LocationStore) o).getFullAddress(false)).append(", ");
             }
             return respuesta.toString();
         }

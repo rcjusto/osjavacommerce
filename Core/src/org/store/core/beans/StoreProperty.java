@@ -249,6 +249,10 @@ public class StoreProperty extends BaseBean implements StoreBean {
     public static final String PROP_PRODUCT_NEW_LABEL_AUTO = "product.new.label.auto";
     public static final String PROP_DEFAULT_PRODUCT_NEW_LABEL_AUTO = "Y";
 
+    public static final String RECAPTCHA_PUBLIC = "recaptcha.public.key";
+    public static final String RECAPTCHA_PRIVATE = "recaptcha.private.key";
+    public static final String RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
+
 
     // Codigo q identifica el texto
     @Id

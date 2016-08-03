@@ -396,12 +396,7 @@
 #if($action.getStoreProperty('register.show.captcha','Y')=='Y')
 <div id="captchaData" class="clearfix">
     <p>#label('register.page.text.captcha')</p>
-
-    <div id="captchaImgContainer" style="width:220px;float:left;">
-        <img id="captchaImg" src="$urlCaptcha" alt=""/>
-    </div>
-    <div style="margin-bottom:10px;"><a href="#" onclick="return reloadCaptcha();">#label('another.captcha')</a></div>
-    <input name="captcha" class="field string-200 required" value=""/>
+    $util.reCaptcha()
     #fieldError('captcha')
 </div>
 #end

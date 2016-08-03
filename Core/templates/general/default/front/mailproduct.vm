@@ -34,6 +34,9 @@
         <span class="label">#label('mail.comment')</span>
         <textarea name="mailComment" class="field string-300" rows="3">$!mailComment</textarea>
     </label>
+    <div>
+        $util.reCaptcha()
+    </div>
     <div class="actions">
         <span class="label">&nbsp;</span>
         <button type="button" id="sendEmail"><span class="mail">#label('send.email')</span></button>

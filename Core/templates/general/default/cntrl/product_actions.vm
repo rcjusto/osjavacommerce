@@ -1,7 +1,12 @@
 <div class="actions">
     <ul class="clearfix">
-        <li class="print">#linklabel('product.print.this.page' '#' 'print')</li>
-        <li class="mailtofriend">#linklabel('product.mailToFriend' '#' 'mailtofriend')</li>
+        #if($!action.getStoreProperty('product.print.show', 'Y')=='Y')
+            <li class="print">#linklabel('product.print.this.page' '#' 'print')</li>
+        #end
+        #if($!action.getStoreProperty('product.email.friend.show', 'Y')=='Y')
+            <li class="mailtofriend">#linklabel('product.mailToFriend' '#' 'mailtofriend')</li>
+        #end
+        #if($!action.getStoreProperty('product.wishlist.add.show', 'Y')=='Y')
         <li class="wishlist">
             #if($action.productInWishList($product.idProduct))
                 <span id="wishListAdded" class="action">#label('product.in.wishlist')</span>
@@ -11,8 +16,11 @@
                 <span id="wishListLink" class="action">#linklabel('product.add.to.wishlist' '#' 'addtowishlist')</span>
             #end
         </li>
+        #end
     </ul>
 </div>
+#if($!action.getStoreProperty('product.email.friend.show', 'Y')=='Y')
 <div id="divMailProduct">
     #parse('/WEB-INF/views/front/mailproduct.vm')
 </div>
+#end

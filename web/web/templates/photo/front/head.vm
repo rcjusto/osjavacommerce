@@ -54,4 +54,5 @@
     };
 </script>
 #parse("/WEB-INF/views/front/head_custom.vm")
+<script src='https://www.google.com/recaptcha/api.js'></script>
 #parse("/WEB-INF/views/front/head_google_analytics.vm")

@@ -62,4 +62,5 @@
 #if($!action.getActionName()=='home' || $!action.getStoreProperty('header.javascript.home','')!='Y')
 $!action.getStoreProperty('header.javascript','')
 #end
+<script src='https://www.google.com/recaptcha/api.js'></script>
 #parse("/WEB-INF/views/front/head_google_analytics.vm")

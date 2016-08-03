@@ -20,7 +20,7 @@
 
         <jar basedir="${out.folder}/fedex" destfile="${jars.folder}/store20-plugin-fedex.jar" />
 
-        <copydir src="googletools/resources" dest="${out.folder}/googletools"/>
+        <copydir src="googletools/src/org/store/googletools/resources" dest="${out.folder}/googletools/org/store/googletools/resources"/>
         <jar basedir="${out.folder}/googletools" destfile="${jars.folder}/store20-plugin-googletools.jar" />
 
         <copydir src="importexport/resources" dest="${out.folder}/importexport"/>

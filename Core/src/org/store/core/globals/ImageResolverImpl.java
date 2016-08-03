@@ -118,7 +118,7 @@ public class ImageResolverImpl implements ImageResolver {
 
     public boolean processImage(Product product, File image, String ext) {
         if (ext != null) ext = ext.toLowerCase();
-        BufferedImage inImage = null;
+        BufferedImage inImage;
         try {
             ImageInputStream iis = ImageIO.createImageInputStream(image);
             Iterator<ImageReader> i = ImageIO.getImageReaders(iis);
@@ -189,6 +189,7 @@ public class ImageResolverImpl implements ImageResolver {
             iis.close();
             return lastError==null;
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage() + " - IMAGE: " + image.getName());
             lastError = e.getMessage();
             return false;
