@@ -39,7 +39,7 @@
     <label class="clearfix">
         <div class="captcha-label">#label('enter.captcha')</div>
         <div class="clearfix captcha-value" >
-            <div id="captcha1"></div>
+            $util.reCaptcha()
             #fieldError('captcha')
         </div>
     </label>
@@ -52,11 +52,6 @@
 </div>
 <script type="text/javascript">
     $(function(){
-        var widgetId1 = grecaptcha.render('captcha1', {
-            'sitekey' : '$!action.getStoreProperty("recaptcha.public.key","")',
-            'theme' : 'light'
-        });
-
         $('#sendComment').live('click',function(){
             if ($('#formComment').validForm()) {
                 var data = $('#formComment').serialize();
