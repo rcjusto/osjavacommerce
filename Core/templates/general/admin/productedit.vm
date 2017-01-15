@@ -2,6 +2,7 @@
 #parse('/WEB-INF/views/admin/page_top.vm')
 #surl('id=urlReload' "action=productedit" "idProduct=$!product.idProduct")
 #surl('id=urlSavePrices' "action=productsaveprice")
+#surl('id=urlSaveUserPrices' "action=productsaveuserlevelprice")
 #surl('id=urlProcessSupliers' "action=productproccessproviders")
 #surl('id=urlDelProvider' "action=productdelprovider")
 #surl('id=urlstatictexts' "action=liststaticpage")
@@ -31,7 +32,18 @@
         }
         return false;
     }
-    function refreshPrices() {                            
+
+    function saveUserPrices() {
+        if ($('#formuserprices').validForm()) {
+            var data = $('#formuserprices').serialize();
+            $('#divUserPrices').loading("$!action.getText('admin.updating.prices')", "$!action.getText('admin.please.wait')");
+            $('#divUserPrices').load("$urlSaveUserPrices", data);
+            return true;
+        }
+        return false;
+    }
+
+    function refreshPrices() {
         document.location.href="$!urlReload" + '&openTab=1'
     }
     function deleteVolume(index) {
@@ -142,6 +154,7 @@
     <ul class="tabs">
         <li><a href="#tabMainData" style="font-size:8pt;">#label('admin.main.data')</a></li>
         <li><a href="#tabPrice" style="font-size:8pt;">#label('admin.prices.and.supliers')</a></li>
+        <li><a href="#tabUserPrice" style="font-size:8pt;">#label('admin.userlevel.prices')</a></li>
         <li><a href="#tabAttributes" style="font-size:8pt;">#label('admin.attributes')</a></li>
         <li><a href="#tabImages" style="font-size:8pt;">#label('admin.images')</a></li>
         <li><a href="#tabLabels" style="font-size:8pt;">#label('admin.labels.and.categories')</a></li>
@@ -434,6 +447,12 @@
     <div id="tabPrice" class="tabpanel">
         <div id="divPrices">
             #parse('/WEB-INF/views/admin/productedit_price.vm')
+        </div>
+    </div>
+
+    <div id="tabUserPrice" class="tabpanel">
+        <div id="divUserPrices">
+            #parse('/WEB-INF/views/admin/productedit_userlevelprice.vm')
         </div>
     </div>
 

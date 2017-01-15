@@ -381,6 +381,7 @@ public class ProductAction extends AdminModuleAction {
             requestCache.remove("productVolume");
 
             // Save Customer Level Discount
+            /*
             if (levelId != null) {
                 for (int i = 0; i < levelId.length; i++) {
                     if (levelId[i] != null) {
@@ -402,7 +403,7 @@ public class ProductAction extends AdminModuleAction {
                     }
                 }
             }
-
+*/
             // Save configured providers
             if (providerId != null) {
                 for (int i = 0; i < providerId.length; i++) {
@@ -473,6 +474,41 @@ public class ProductAction extends AdminModuleAction {
                 }
             }
 
+        }
+        return productPrice();
+    }
+
+    @Action(value = "productsaveuserlevelprice", results = {
+            @Result(type = "velocity", name = "input", location = "/WEB-INF/views/admin/productedit_userlevelprice.vm"),
+            @Result(type = "velocity", location = "/WEB-INF/views/admin/productedit_userlevelprice.vm")
+    })
+    public String productSaveUserLevelPrice() throws Exception {
+        if (product != null) {
+            dao.save(product);
+            dao.indexProduct(product, false);
+
+            // Save Customer Level Discount
+            if (levelId != null) {
+                for (int i = 0; i < levelId.length; i++) {
+                    if (levelId[i] != null) {
+                        UserLevel uLevel = (UserLevel) dao.get(UserLevel.class, levelId[i]);
+                        if (uLevel != null) {
+                            ProductUserLevel bean = dao.getProductUserLevel(product, uLevel);
+                            if (levelPercent[i] != null) {
+                                if (bean == null) {
+                                    bean = new ProductUserLevel();
+                                    bean.setProduct(product);
+                                    bean.setLevel(uLevel);
+                                }
+                                bean.setPercentDiscount(levelPercent[i]);
+                                dao.save(bean);
+                            } else if (bean != null) {
+                                dao.delete(bean);
+                            }
+                        }
+                    }
+                }
+            }
         }
         return productPrice();
     }
