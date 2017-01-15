@@ -124,7 +124,6 @@ public class SSLInterceptor extends AbstractInterceptor {
         return invocation.invoke();
     }
 
-    // FIXME: This is copied from DefaultActionInvocation but should be exposed through the interface
     protected Method getActionMethod(Class actionClass, String methodName) throws NoSuchMethodException {
         Method method;
         try {

@@ -48,7 +48,6 @@ public class GetOptionClient {
 			userProps.load(propInputStream);
 			propInputStream.close(); // better in finally block
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace(System.out);
 			return;
 		}

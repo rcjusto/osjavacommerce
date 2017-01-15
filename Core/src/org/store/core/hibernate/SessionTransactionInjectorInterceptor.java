@@ -309,7 +309,6 @@ public class SessionTransactionInjectorInterceptor extends GenericInterceptor {
 			trueTarget = Arrays.toString(targetAsArray).replace("[", "").replace("]", "").replace(", ",".");
 
 			if (transaction==null)
-				//TODO: Look for the last TODO item. When finish this, change this line to *getTransaction()* method.
 				transaction = hibernateSession.beginTransaction();
 
 			invocation.getStack().setValue(trueTarget, transaction);
