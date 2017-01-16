@@ -183,6 +183,7 @@
         <li><a href="#tabComplements">#label('admin.product.complements')</a></li>
         <li><a href="#tabLabels">#label('admin.category.labels')</a></li>
         <li><a href="#tabPR">#label('admin.filter.price.ranges')</a></li>
+        <li><a href="#tabImages">#label('admin.category.images')</a></li>
     </ul>
     #end
 
@@ -477,6 +478,12 @@
     <div id="tabPR" class="formulario tabpanel">
         <div id="categoryPriceRange">
             #parse('/WEB-INF/views/admin/categorydata_pricerange.vm')
+        </div>
+    </div>
+
+    <div id="tabImages" class="formulario tabpanel">
+        <div id="categoryImages">
+            #parse('/WEB-INF/views/admin/categorydata_images.vm')
         </div>
     </div>
 

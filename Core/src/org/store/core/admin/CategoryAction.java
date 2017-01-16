@@ -1,8 +1,10 @@
 package org.store.core.admin;
 
+import org.apache.commons.io.FilenameUtils;
 import org.store.core.beans.*;
 import org.store.core.beans.utils.BreadCrumb;
 import org.store.core.dao.HibernateDAO;
+import org.store.core.globals.ImageResolver;
 import org.store.core.globals.SomeUtils;
 import org.store.core.globals.StoreThread;
 import org.store.core.globals.config.Store20Database;
@@ -33,6 +35,8 @@ public class CategoryAction extends AdminModuleAction {
     private static final String CNT_ERROR_CANNOT_DETELE_CATEGORY = "error.cannot.delete.category";
     private static final String CNT_DEFAULT_ERROR_CANNOT_DETELE_CATEGORY = "Can not delete category {0}. {1}";
     private static final int MAX_CATEGORIES = 50;
+    private static final String CNT_ERROR_IMAGE_CANNOT_BE_PROCESSED = "error.image.cannot.be.processed";
+    private static final String CNT_DEFAULT_ERROR_IMAGE_CANNOT_BE_PROCESSED = "Image {0} cannot be processed. {1}";
 
     @Override
     public void prepare() throws Exception {
@@ -75,7 +79,7 @@ public class CategoryAction extends AdminModuleAction {
     public String categorychildrenfix() throws Exception {
         Category root = dao.getRootCategory();
         List<Category> children = dao.getChildCategories(null, false);
-        for(Category cat : children) {
+        for (Category cat : children) {
             if (!cat.isRootCategory()) {
                 cat.setIdParent(root.getIdCategory());
                 dao.save(cat);
@@ -140,9 +144,9 @@ public class CategoryAction extends AdminModuleAction {
         Category root = dao.getRootCategory();
         List<Category> l = new ArrayList<Category>();
         List<Category> l1 = dao.getChildCategories(root, false);
-        if (l1!=null && !l1.isEmpty()) l.addAll(l1);
+        if (l1 != null && !l1.isEmpty()) l.addAll(l1);
         List<Category> l2 = dao.getChildCategories(null, false);
-        for(Category c : l2) {
+        for (Category c : l2) {
             if (!c.isRootCategory() && !l.contains(c)) l.add(c);
         }
         addToStack("categories", l);
@@ -157,6 +161,8 @@ public class CategoryAction extends AdminModuleAction {
         addToStack("categoryFilter", dao.getCategoriesCount() < MAX_CATEGORIES);
         getBreadCrumbs().add(new BreadCrumb(null, getText("admin.category.list"), url("categorylist", "/admin"), null));
         getBreadCrumbs().add(new BreadCrumb(null, getText("admin.category"), null, null));
+        categoryImage1 = (category != null) ? getImageResolver().getImageForCategory(category, "cat1/") : null;
+        categoryImage2 = (category != null) ? getImageResolver().getImageForCategory(category, "cat2/") : null;
         return SUCCESS;
     }
 
@@ -704,6 +710,47 @@ public class CategoryAction extends AdminModuleAction {
         return SUCCESS;
     }
 
+    @Action(value = "categorysaveimages", results = {
+            @Result(type = "velocity", name = "input", location = "/WEB-INF/views/admin/categorydata_images.vm"),
+            @Result(type = "velocity", location = "/WEB-INF/views/admin/categorydata_images.vm")
+    })
+    public String categorySaveImages() throws Exception {
+        if (category != null && (file1 != null || file2 != null)) {
+            ImageResolver ir = getImageResolver();
+            if (file1 != null && StringUtils.isNotEmpty(file1FileName)) {
+                if (ir.validExtension(file1FileName)) {
+                    ir.deleteImage1(category);
+                    if (!ir.processImage1(category, file1, FilenameUtils.getExtension(file1FileName))) {
+                        addFlash("images_errors", getText(CNT_ERROR_IMAGE_CANNOT_BE_PROCESSED, CNT_DEFAULT_ERROR_IMAGE_CANNOT_BE_PROCESSED, new String[]{file1FileName, ir.getLastError()}));
+                    }
+                } else {
+                    addFlash("images_errors", getText(CNT_ERROR_IMAGE_CANNOT_BE_PROCESSED, CNT_DEFAULT_ERROR_IMAGE_CANNOT_BE_PROCESSED, new String[]{file1FileName, "Invalid file extension"}));
+                }
+            }
+            if (file2 != null && StringUtils.isNotEmpty(file2FileName)) {
+                if (ir.validExtension(file2FileName)) {
+                    ir.deleteImage2(category);
+                    if (!ir.processImage2(category, file2, FilenameUtils.getExtension(file2FileName))) {
+                        addFlash("images_errors", getText(CNT_ERROR_IMAGE_CANNOT_BE_PROCESSED, CNT_DEFAULT_ERROR_IMAGE_CANNOT_BE_PROCESSED, new String[]{file1FileName, ir.getLastError()}));
+                    }
+                } else {
+                    addFlash("images_errors", getText(CNT_ERROR_IMAGE_CANNOT_BE_PROCESSED, CNT_DEFAULT_ERROR_IMAGE_CANNOT_BE_PROCESSED, new String[]{file1FileName, "Invalid file extension"}));
+                }
+            }
+        }
+        categoryImage1 = (category != null) ? getImageResolver().getImageForCategory(category, "cat1/") : null;
+        categoryImage2 = (category != null) ? getImageResolver().getImageForCategory(category, "cat2/") : null;
+        return SUCCESS;
+    }
+
+    @Action(value = "categorysaveimagesex", results = {
+            @Result(type = "redirectAction", name = "input", location = "categorydata?idCategory=${category.idCategory}&openTab=6"),
+            @Result(type = "redirectAction", location = "categorydata?idCategory=${category.idCategory}&openTab=6")
+    })
+    public String categorySaveImagesEx() throws Exception {
+        return categorySaveImages();
+    }
+
     @Action(value = "categoryupdateurl")
     public String updateCodeNames() throws Exception {
         int oks = 0;
@@ -809,6 +856,12 @@ public class CategoryAction extends AdminModuleAction {
     private Long[] idChild;
     private String[] categoryName;
     private String[] description;
+    private File file1;
+    private File file2;
+    private String file1FileName;
+    private String file2FileName;
+    private String categoryImage1;
+    private String categoryImage2;
 
     private String[] seoTitle;
     private String[] seoKeywords;
@@ -884,9 +937,13 @@ public class CategoryAction extends AdminModuleAction {
     private String[] labels;
 
 
-    public String[] getCategoryPosition() {return categoryPosition;}
+    public String[] getCategoryPosition() {
+        return categoryPosition;
+    }
 
-    public void setCategoryPosition(String[] categoryPosition) {this.categoryPosition = categoryPosition;}
+    public void setCategoryPosition(String[] categoryPosition) {
+        this.categoryPosition = categoryPosition;
+    }
 
     public String[] getMinPrice() {
         return minPrice;
@@ -1462,6 +1519,54 @@ public class CategoryAction extends AdminModuleAction {
 
     public void setLabels(String[] labels) {
         this.labels = labels;
+    }
+
+    public File getFile1() {
+        return file1;
+    }
+
+    public void setFile1(File file1) {
+        this.file1 = file1;
+    }
+
+    public File getFile2() {
+        return file2;
+    }
+
+    public void setFile2(File file2) {
+        this.file2 = file2;
+    }
+
+    public String getFile1FileName() {
+        return file1FileName;
+    }
+
+    public void setFile1FileName(String file1FileName) {
+        this.file1FileName = file1FileName;
+    }
+
+    public String getFile2FileName() {
+        return file2FileName;
+    }
+
+    public void setFile2FileName(String file2FileName) {
+        this.file2FileName = file2FileName;
+    }
+
+    public String getCategoryImage1() {
+        return categoryImage1;
+    }
+
+    public void setCategoryImage1(String categoryImage1) {
+        this.categoryImage1 = categoryImage1;
+    }
+
+    public String getCategoryImage2() {
+        return categoryImage2;
+    }
+
+    public void setCategoryImage2(String categoryImage2) {
+        this.categoryImage2 = categoryImage2;
     }
 
     public class UpdateProductThread extends StoreThread {

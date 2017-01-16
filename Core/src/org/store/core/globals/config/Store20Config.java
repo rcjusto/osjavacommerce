@@ -3,6 +3,7 @@ package org.store.core.globals.config;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 import org.apache.commons.digester.Digester;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -213,6 +214,23 @@ public class Store20Config {
                 propHost.setValue(commerce.getFullHost(0));
                 dao.save(propHost);
                 dao.flushSession();
+
+                // create some path if do not exists
+                String[] paths = {
+                        "images",
+                        "images"+File.separator+"products",
+                        "images"+File.separator+"products"+File.separator+"list",
+                        "images"+File.separator+"products"+File.separator+"zoom",
+                        "images"+File.separator+"products"+File.separator+"cat1",
+                        "images"+File.separator+"products"+File.separator+"cat2"
+                };
+                for(String p : paths) {
+                    File f = new File(storePath + File.separator + p);
+                    if (!f.exists()) {
+                        LOG.info("Creating folder: " + p);
+                        FileUtils.forceMkdir(f);
+                    }
+                }
 
                 // Configurar tareas en background
                 try {

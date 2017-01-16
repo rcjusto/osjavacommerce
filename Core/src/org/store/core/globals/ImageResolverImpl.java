@@ -1,9 +1,11 @@
 package org.store.core.globals;
 
+import com.caucho.quercus.lib.string.StringUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.store.core.beans.Category;
 import org.store.core.beans.Product;
 
 import javax.imageio.ImageIO;
@@ -32,6 +34,8 @@ public class ImageResolverImpl implements ImageResolver {
     public static final String IMAGE_PRODUCT_PATH = File.separator + "images" + File.separator + "products" + File.separator;
     public static final String PATH_ZOOM = "zoom" + File.separator;
     public static final String PATH_LIST = "list" + File.separator;
+    public static final String PATH_CAT1 = "cat1" + File.separator;
+    public static final String PATH_CAT2 = "cat2" + File.separator;
     private Float qualityZoom = 0.75f;
     private Float qualityDetail = 0.70f;
     private Float qualityList = 0.65f;
@@ -90,6 +94,12 @@ public class ImageResolverImpl implements ImageResolver {
         if (StringUtils.isNotEmpty(c2)) prefix.append(c2);
         if (StringUtils.isNotEmpty(c3)) prefix.append(c3);
         return getImagesForPrefix(prefix.toString(), folder);
+    }
+
+    @Override
+    public String getImageForCategory(Category c, String folder) {
+        String[] arr = getImagesForPrefix(String.valueOf(c.getIdCategory()) + "_", folder);
+        return arr!=null && arr.length>0 ? arr[0] : null;
     }
 
     public boolean validExtension(String name) {
@@ -196,6 +206,20 @@ public class ImageResolverImpl implements ImageResolver {
         }
     }
 
+    @Override
+    public boolean processImage1(Category category, File image, String ext) {
+        File targetFile = new File(basePath + "stores/" + storeCode + IMAGE_PRODUCT_PATH + PATH_CAT1 + category.getIdCategory() + "_." + ext.toLowerCase());
+        if (targetFile.exists()) targetFile.delete();
+        return image.renameTo(targetFile);
+    }
+
+    @Override
+    public boolean processImage2(Category category, File image, String ext) {
+        File targetFile = new File(basePath + "stores/" + storeCode + IMAGE_PRODUCT_PATH + PATH_CAT2 + category.getIdCategory() + "_." + ext.toLowerCase());
+        if (targetFile.exists()) targetFile.delete();
+        return image.renameTo(targetFile);
+    }
+
     private boolean dimensionsAccepted(int width, int height) {
         return !(maxWidth != null && maxWidth > 0 && width > maxWidth) && !(maxHeight != null && maxHeight > 0 && height > maxHeight);
     }
@@ -229,6 +253,30 @@ public class ImageResolverImpl implements ImageResolver {
                     FileUtils.forceDelete(f);
                 } catch (IOException ignored) {
                 }
+            }
+        }
+    }
+
+    @Override
+    public void deleteImage1(Category category) {
+        String fn = getImageForCategory(category, PATH_CAT1);
+        if (StringUtils.isNotEmpty(fn)) {
+            File f = new File(basePath + "stores/" + storeCode + IMAGE_PRODUCT_PATH + PATH_CAT1 + fn);
+            if (f.exists()) try {
+                FileUtils.forceDelete(f);
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    @Override
+    public void deleteImage2(Category category) {
+        String fn = getImageForCategory(category, PATH_CAT2);
+        if (StringUtils.isNotEmpty(fn)) {
+            File f = new File(basePath + "stores/" + storeCode + IMAGE_PRODUCT_PATH + PATH_CAT2 + fn);
+            if (f.exists()) try {
+                FileUtils.forceDelete(f);
+            } catch (IOException ignored) {
             }
         }
     }

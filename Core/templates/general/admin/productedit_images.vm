@@ -98,16 +98,6 @@
                     <button type="submit"><span class="ok">#label('admin.submit')</span></button>
                 </div>
             </form>
-
-            <!--div id="my_uploader" style="width: 450px; height: 330px;">You browser doesn't support native upload. Try Firefox 3 or Safari 4.</div-->
-            <!--div class="button-bar">
-                <div  id="container" style="float:left;">
-                    <button type="button" id="pickImage"><span class="">#label('admin.select.files')</span></button>
-                </div>
-                <button type="button" id="uploadfiles"><span class="">#label('admin.upload.files')</span></button>
-                <div style="clear:both;"></div>
-            </div>
-            <table id="filelist" cellpadding="0" cellspacing="0"></table-->
         </div>
         <br style="clear:both;"/>
     </div>
@@ -129,62 +119,6 @@
         $('#divImages').load("$urlDelImg",{idProduct:$!product.idProduct,deleteImg:imgName});
     }
     $(function() {
-        /*
-        uploader = new plupload.Uploader({
-                runtimes : 'gears,html5,flash,silverlight,browserplus',
-                browse_button : 'pickImage',
-                container : 'container',
-                max_file_size : '2mb',
-                multipart: true,
-                url : "$urlAddImg",
-                flash_swf_url : '/js/plupload/plupload.flash.swf',
-                filters : [
-                    {title : "Image files", extensions : "jpg,gif,png"}
-                ]
-            });
-
-            uploader.bind('Init', function(up, params) {
-                $('#filelist').html("<tr><th class='filename'>$!action.getText('admin.file')</th><th class='filesize'>$!action.getText('admin.size')</th><th class='filepercent'>%</th><th class='filedelete'>&nbsp;</th></tr>");
-            });
-
-            uploader.bind('FilesAdded', function(up, files) {
-                jQuery.each(files, function(i, file) {
-                    $('#filelist').append(
-                        '<tr id="' + file.id + '"><td class="filename">' + file.name + '</td><td class="filesize">' + plupload.formatSize(file.size) + '</td><td class="filepercent"></td><td class="filedelete"><a href="#" class="delFileList delete-row" rel="' + file.id + '"></a></td></tr>');
-                });
-            });
-
-            uploader.bind('UploadProgress', function(up, file) {
-                $('#' + file.id + " b").html(file.percent + "%");
-            });
-
-            uploader.bind('FileUploaded', function(up, file) {
-                $('#' + file.id).hide();
-            });
-
-            uploader.bind('StateChanged', function(up) {
-                if (up.state==plupload.STOPPED) {
-                    $('#divImages').loading("$!action.getText('admin.updating.images')","$!action.getText('admin.please.wait')");
-                    $('#divImages').load("$urlDelImg",{idProduct:$!product.idProduct});
-                }
-            });
-
-            $('#uploadfiles').click(function(e) {
-                uploader.start();
-                e.preventDefault();
-            });
-
-            $('.delFileList').live('click',function(e){
-                var f = uploader.getFile($(this).attr('rel'));
-                if (f) {
-                    uploader.removeFile(f);
-                    $('#' + f.id).hide();
-                }
-                e.preventDefault();
-            });
-
-            uploader.init();
-           */
         $("#my_uploader").pluploadQueue({
             // General settings
             runtimes : 'flash',
