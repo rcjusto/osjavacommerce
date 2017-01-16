@@ -1,0 +1,44 @@
+#set($apiKey = $action.getStoreProperty("store.plugin.locations_map.api_key",""))
+#set($center = $action.getStoreProperty("store.plugin.locations_map.center",""))
+#set($zoom = $action.getStoreProperty("store.plugin.locations_map.zoom","3"))
+#set($jsData = $action.getStoreProperty("store.plugin.locations_map.data","[]"))
+
+#set($_height = $_parameters.get('_height'))
+<style>#locations_map {height: $!{_height}px; </style>
+<div id="locations_map"></div>
+<script>
+
+    function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('locations_map'), {
+            zoom: eval($!zoom),
+            center: eval($!center)
+        });
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function(location, i) {
+            var marker = new google.maps.Marker({
+                position: {lat: parseFloat(location.lat), lng: parseFloat(location.lng)},
+                label: location.label,
+                title: location.title
+            });
+            if (location['description']!==undefined) {
+                google.maps.event.addListener(marker, 'click', function() {
+                    new google.maps.InfoWindow({
+                        content: location.description
+                    }).open(map,marker);
+                });
+            }
+            return marker;
+        });
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers, {imagePath: '/struts/images/m'});
+    }
+    var locations = eval($!jsData);
+</script>
+<script src="/struts/js/markerclusterer.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=$!apiKey&callback=initMap"></script>

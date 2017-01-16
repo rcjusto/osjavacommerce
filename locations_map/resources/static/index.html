@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Marker Clustering</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+    function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 3,
+            center: {lat: -28.024, lng: 140.887}
+        });
+
+        var contentString = '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+            '<div id="bodyContent">'+
+            '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+            'sandstone rock formation in the southern part of the '+
+            'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
+            'south west of the nearest large town, Alice Springs; 450&#160;km '+
+            '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
+            'features of the Uluru - Kata Tjuta National Park. Uluru is '+
+            'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
+            'Aboriginal people of the area. It has many springs, waterholes, '+
+            'rock caves and ancient paintings. Uluru is listed as a World '+
+            'Heritage Site.</p>'+
+            '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+            'https://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+            '(last visited June 22, 2009).</p>'+
+            '</div>'+
+            '</div>';
+
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function(location, i) {
+            var marker = new google.maps.Marker({
+                position: {lat: location.lat, lng: location.lng},
+                label: location.label,
+                title: location.title
+            });
+            google.maps.event.addListener(marker, 'click', function() {
+                new google.maps.InfoWindow({
+                    content: contentString
+                }).open(map,marker);
+            });
+            return marker;
+        });
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'images/m'});
+    }
+    var locations = [
+        {lat: -31.563910, lng: 147.154312, label: 'A', title: 'Carla la malcriada'},
+        {lat: -33.718234, lng: 150.363181, label: 'B', title: 'another tuitle'},
+        {lat: -33.727111, lng: 150.371124, label: 'C', title: 'another'},
+        {lat: -33.848588, lng: 151.209834, label: 'D', title: 'another'},
+        {lat: -33.851702, lng: 151.216968, label: 'E', title: 'another'},
+        {lat: -34.671264, lng: 150.863657, label: 'F', title: 'another'},
+        {lat: -35.304724, lng: 148.662905, label: 'G', title: 'another'}
+    ]
+</script>
+<script src="js/markerclusterer.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTrtfi2ngnD58MVpf60jPH5x0i7OlWm84&callback=initMap"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+#surl('id=urlAddImg' "action=categorysaveimages" "idCategory=$!category.idCategory")
+#surl('id=urlAddImgEx' "action=categorysaveimagesex" "idCategory=$!category.idCategory")
+<form id="formlabels" action="$urlAddImgEx" method="post" enctype="multipart/form-data">
+    #shidden('name=idCategory' "value=$!category.idCategory")
+    <div class="listado clearfix">
+        #formErrors()
+        <table>
+            <tr>
+                <th>#label('admin.category.image1')</th>
+                <th>#label('admin.category.image2')</th>
+            </tr>
+            <tr>
+                <td>
+                    #set( $fs = $util.fileSize($!action.storeFile("images/products/cat1/$categoryImage1") ))
+                    #if($fs>0)
+                        <img src="$!action.storeFile('images/products/cat1')/$!util.encodeUrl($categoryImage1)?rnd=$math.random" style="max-height:80px;height:80px;"/>
+                    #end
+                </td>
+                <td>
+                    #set( $fs = $util.fileSize($!action.storeFile("images/products/cat2/$categoryImage2") ))
+                    #if($fs>0)
+                        <img src="$!action.storeFile('images/products/cat2')/$!util.encodeUrl($categoryImage2)?rnd=$math.random" style="max-height:80px;height:80px;"/>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td><input type="file" name="file1" size="40"/></td>
+                <td><input type="file" name="file2" size="40"/></td>
+            </tr>
+        </table>
+        <div class="button-bar">
+            <button type="submit"><span class="ok">#label('admin.submit')</span></button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+
+</script>

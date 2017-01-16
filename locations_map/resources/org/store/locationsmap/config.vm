@@ -1,0 +1,108 @@
+#set($apiKey = $action.getStoreProperty("store.plugin.locations_map.api_key",""))
+#set($center = $action.getStoreProperty("store.plugin.locations_map.center",""))
+#set($zoom = $action.getStoreProperty("store.plugin.locations_map.zoom","3"))
+#set($jsData = $action.getStoreProperty("store.plugin.locations_map.data","[]"))
+
+#set($menuSelected='cms')
+#parse('/WEB-INF/views/admin/page_top.vm')
+<style>
+    #locations_map {margin: 40px;}
+    #template input {margin: 2px;}
+</style>
+<script>
+    var json = eval($!jsData);
+    var loadJSON = function() {
+        $('#allData').html('');
+        json.forEach(function(loc){
+            var elem = $('#template').clone();
+            elem.css('display','block');
+            elem.find('.lat').val(loc.lat);
+            elem.find('.lng').val(loc.lng);
+            elem.find('.label').val(loc.label);
+            elem.find('.title').val(loc.title);
+            elem.find('.delete-row').click(function(){
+                elem.remove();
+                return false;
+            });
+            elem.appendTo('#allData')
+        });
+    };
+    var addRow = function() {
+        var elem = $('#template').clone();
+        elem.css('display','block');
+        elem.find('.lat').val('');
+        elem.find('.lng').val('');
+        elem.find('.label').val('');
+        elem.find('.title').val('');
+        elem.find('.delete-row').click(function(){
+            elem.remove();
+            return false;
+        });
+        elem.appendTo('#allData')
+    };
+    $(function(){
+        loadJSON();
+        if (json.length<1) addRow();
+    })
+</script>
+
+<div id="template" class="" style="display: none;clear: both">
+    <input type="text" class="field lat" name="lat" placeholder="Latitude" style="width: 100px">
+    <input type="text" class="field lng" name="lng" placeholder="Longitude" style="width: 100px">
+    <input type="text" class="field label" name="label" placeholder="Label" style="width: 50px">
+    <input type="text" class="field title" name="title" placeholder="Title" style="width: 300px">
+    <a href class="delete-row" style="margin-top: 3px;"></a>
+</div>
+
+<h1>#label('admin.locationsmap.title')</h1>
+<div class="formulario">
+    <form action="$!action.url('locationsmap_config_save','/admin')" method="post">
+        <table class="formulario" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>#label('locationsmap.label.apikey')</th>
+                <td>
+                    <input type="text" name="apikey" value="$!apiKey" class="field string-large"/>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('locationsmap.label.center')</th>
+                <td>
+                    <input type="text" name="center" value="$!center" class="field string-large"/>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('locationsmap.label.zoom')</th>
+                <td>
+                    <input type="text" name="zoom" value="$!zoom" class="field integer string-large"/>
+                </td>
+            </tr>
+            <tr>
+                <th>#label('locationsmap.label.data')</th>
+                <td>
+                    <div style="min-width: 640px;">
+                        <span style="width:106px;display: inline-block;">Latitude</span>
+                        <span style="width:106px;display: inline-block;">Longitude</span>
+                        <span style="width:56px;display: inline-block;">Label</span>
+                        <span style="width:100px;display: inline-block;">Title</span>
+                    </div>
+                    <div id="allData" style="min-width: 640px;"></div>
+                    <div style="padding: 5px;clear: both">
+                        <button type="button" onclick="addRow();">
+                            <span class="add">#label('locationsmap.add.location')</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+        </table
+
+        <div class="button-bar" style="margin: 10px 0">
+            <button type="submit"><span class="ok">#label('admin.save')</span></button>
+        </div>
+
+        <div>
+            #control('locations_map', $util.map.add('_height','400'))
+        </div>
+    </form>
+</div>
+#parse('/WEB-INF/views/admin/page_bot.vm')

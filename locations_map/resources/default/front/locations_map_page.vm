@@ -1,0 +1,10 @@
+<div id="blockContent" class="locations-map-page clearfix">
+    <div id="blockLeft">
+        #parse("/WEB-INF/views/${template}/front/left_column.vm")
+    </div>
+    <div id="blockCenter">
+        #block("locations.map.top")
+        #control('locations_map', $util.map.add('_height','400'))
+        #block("locations.map.bottom")
+    </div>
+</div>

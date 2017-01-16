@@ -1,0 +1,48 @@
+#set($bp = $product.basePrice)
+#set($defCurrCode = $action.defaultCurrency.code.toLowerCase() )
+<form id="formuserprices">
+    #shidden('name=idProduct' "value=$!product.idProduct")
+    <div class="formulario">
+        #formErrors()
+        <div style="float:left;width:900px;">
+
+            <h2 class="block-title">#label('admin.customer.level.discounts')</h2>
+            <table class="formulario" cellpadding="0" cellspacing="0">
+                #foreach($row in $util.getRows($userLevelListAll,2))
+                    <tr>
+                        #foreach($l in $row)
+                            #if($l!="")
+                                #set( $levelPerc = $math.toDouble(0))
+                                #set( $levelPerc = $action.getProductUserLevelPercent($product, $l) )
+                                #if($levelPerc && $levelPerc>0)
+                                    #set( $levelParPerc = $math.toDouble(0))
+                                #else
+                                    #set( $levelParPerc = $action.getParentProductUserLevelPercent($product, $l) )
+                                #end
+                                <th>
+                                    <input type="hidden" name="levelId" value="$!l.id">
+                                    $!{l.getName($defaultLanguage)}
+                                </th>
+                                <td nowrap="nowrap" style="width:160px;">
+                                    #if($levelParPerc && $levelParPerc>0)
+                                        <div class="inherited">$!util.formatNumber($levelParPerc, 'money')</div>
+                                    #end
+                                    <input name="levelPercent" type="text" value="$!util.formatNumber($levelPerc,'money')" class="field decimal"/>
+                                </td>
+                            #end
+                        #end
+                    </tr>
+                #end
+            </table>
+        </div>
+        <br style="clear:both;"/>
+    </div>
+
+    <div class="button-bar">
+        <button type="button" onclick="saveUserPrices();"><span class="ok">#label('admin.save')</span></button>
+    </div>
+</form>
+
+<script type="text/javascript">
+
+</script>
