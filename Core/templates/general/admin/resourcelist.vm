@@ -1,9 +1,33 @@
 #set($menuSelected='cms')
 #parse('/WEB-INF/views/admin/page_top.vm')
+<script type="text/javascript">
+    $(function(){
+        $('.sort').click(function(){
+            var sb = $(this).attr('sortBy');
+            if (sb==$('#sortedField').val()) {
+                if ('desc'==$('#sortedDirection').val()) {
+                    $('#sortedDirection').val('asc');
+                    $(this).removeClass('sort-desc').addClass('sort-asc')
+                } else {
+                    $('#sortedDirection').val('desc');
+                    $(this).removeClass('sort-asc').addClass('sort-desc')
+                }
+            } else {
+                $('.sort').removeClass('sort-asc').removeClass('sort-desc')
+                $('#sortedField').val(sb);
+                $('#sortedDirection').val('asc');
+                $(this).addClass('sort-asc')
+            }
+            $('#form_filter').submit();
+        })
+    });
+</script>
 <h1>#label('admin.resource.list')</h1>
 <div class="listado">
     #surl('id=urlformfilter' "action=listresource")
     <form id="form_filter" action="$urlformfilter" method="post">
+        <input type="hidden" name="sortedField" id="sortedField" value="$!sortedField">
+        <input type="hidden" name="sortedDirection" id="sortedDirection" value="$!sortedDirection">
         <div id="filterContainer" class="filters formulario">
             #formErrors()
             <table class="formulario" cellpadding="0" cellspacing="0" style="line-height:20px;" width="900">
@@ -46,9 +70,9 @@
                 <tr>
                     <th style="text-align:center;width:1%;"><a href="#" onclick="$(this).toggleClass('selected');$('.selecteds').attr('checked',$(this).hasClass('selected'));return false;"><img src="/struts/css/images/bin_closed.png" alt="Del" style="border:0"/></a></th>
                     <th>#label('admin.id')</th>
-                    <th>#label('admin.type')</th>
-                    <th>#label('admin.name')</th>
-                    <th>#label('admin.filename')</th>
+                    <th class="sort #if($sortedField=='resourceType') #if($sortedDirection=='desc') sort-desc #else sort-asc #end #end" sortBy="resourceType">#label('admin.type')</th>
+                    <th class="sort #if($sortedField=='resourceName') #if($sortedDirection=='desc') sort-desc #else sort-asc #end #end" sortBy="resourceName">#label('admin.name')</th>
+                    <th class="sort #if($sortedField=='fileName') #if($sortedDirection=='desc') sort-desc #else sort-asc #end #end" sortBy="fileName">#label('admin.filename')</th>
                     <th>&nbsp;</th>
                 </tr>
                 #foreach($r in $resources.listado)

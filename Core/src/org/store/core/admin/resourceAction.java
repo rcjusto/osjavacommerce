@@ -57,7 +57,7 @@ public class resourceAction extends AdminModuleAction implements StoreMessages {
             return "modal";
         } else {
             DataNavigator nav = new DataNavigator(getRequest(), "resources");
-            nav.setListado(dao.getResources(nav, filterResourceType, filterResourceName));
+            nav.setListado(dao.getResources(nav, filterResourceType, filterResourceName, sortedField, sortedDirection));
             addToStack("resources", nav);
             getResponse().addCookie(nav.getPageRowCookie());
             getBreadCrumbs().add(new BreadCrumb(null, getText("admin.resource.list"), null, null));
@@ -148,6 +148,8 @@ public class resourceAction extends AdminModuleAction implements StoreMessages {
     private String filterResourceType;
     private String filterResourceName;
     private String resourceDate;
+    private String sortedField;
+    private String sortedDirection;
 
     public String getResourceDate() {
         return resourceDate;
@@ -227,5 +229,21 @@ public class resourceAction extends AdminModuleAction implements StoreMessages {
 
     public void setFilterResourceName(String filterResourceName) {
         this.filterResourceName = filterResourceName;
+    }
+
+    public String getSortedField() {
+        return sortedField;
+    }
+
+    public void setSortedField(String sortedField) {
+        this.sortedField = sortedField;
+    }
+
+    public String getSortedDirection() {
+        return sortedDirection;
+    }
+
+    public void setSortedDirection(String sortedDirection) {
+        this.sortedDirection = sortedDirection;
     }
 }

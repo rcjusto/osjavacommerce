@@ -2076,6 +2076,10 @@ public class HibernateDAO {
     }
 
     public List<Resource> getResources(DataNavigator nav, String resourceType, String filterName) {
+        return getResources(nav, resourceType, filterName, null, null);
+    }
+
+    public List<Resource> getResources(DataNavigator nav, String resourceType, String filterName, String sortedField, String sortedDirection) {
         Criteria cri = createCriteriaForStore(Resource.class);
         if (StringUtils.isNotEmpty(resourceType)) cri.add(Restrictions.eq("resourceType", resourceType));
         if (StringUtils.isNotEmpty(filterName)) cri.add(Restrictions.like("resourceName", filterName, MatchMode.ANYWHERE));
@@ -2089,7 +2093,14 @@ public class HibernateDAO {
                 cri.setMaxResults(nav.getPageRows());
             }
         }
-        cri.addOrder(Order.asc("id"));
+        if (StringUtils.isEmpty(sortedField)) {
+            sortedField = "id";
+        }
+        if ("desc".equalsIgnoreCase(sortedDirection)) {
+            cri.addOrder(Order.desc(sortedField));
+        } else {
+            cri.addOrder(Order.asc(sortedField));
+        }
         return cri.list();
     }
 
