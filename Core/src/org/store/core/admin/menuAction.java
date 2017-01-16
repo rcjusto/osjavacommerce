@@ -38,6 +38,7 @@ public class menuAction extends AdminModuleAction implements StoreMessages {
         List<String> menuTypes = dao.getMenuTypes();
         if (!menuTypes.contains("TopBar")) menuTypes.add("TopBar");
         if (!menuTypes.contains("BottomBar")) menuTypes.add("BottomBar");
+        if (!menuTypes.contains("CenterMenu")) menuTypes.add("CenterMenu");
         addToStack("menuTypes", menuTypes);
         if (StringUtils.isEmpty(menuType) && getSession().containsKey("ADMIN_MENU_NAME")) {
             menuType = (String) getSession().get("ADMIN_MENU_NAME");
@@ -55,6 +56,7 @@ public class menuAction extends AdminModuleAction implements StoreMessages {
         List<String> menuTypes = dao.getMenuTypes();
         if (!menuTypes.contains("TopBar")) menuTypes.add("TopBar");
         if (!menuTypes.contains("BottomBar")) menuTypes.add("BottomBar");
+        if (!menuTypes.contains("CenterMenu")) menuTypes.add("CenterMenu");
         addToStack("menuTypes", menuTypes);
         if (menu != null && StringUtils.isNotEmpty(menu.getMenu())) menuType = menu.getMenu();
         if (StringUtils.isNotEmpty(menuType)) {
