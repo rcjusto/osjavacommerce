@@ -38,6 +38,7 @@
             label_edit: "$!action.url('staticlabeledit','admin')",
             block_edit: "$!action.url('blockedit')",
             country_states: "$!action.url('countrystates')",
+            country_states_ex: "$!action.url('countrystatesex')",
             menu_subcategories: "$!action.url('menuSubcategories')",
             compare_product:"$!action.url('compareAdd')",
             compare_remove:"$!action.url('compareDel')"
