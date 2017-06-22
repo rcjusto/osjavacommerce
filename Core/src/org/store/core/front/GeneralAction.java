@@ -836,7 +836,7 @@ public class GeneralAction extends FrontModuleAction {
                 FileInputStream fis = new FileInputStream(f);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 setInputStream(bis);
-                setContentDisposition("attachment;filename=\"" + resource.getFileName() + "\"");
+                setContentDisposition("inline;filename=\"" + resource.getFileName() + "\"");
             }
         }
         return SUCCESS;
