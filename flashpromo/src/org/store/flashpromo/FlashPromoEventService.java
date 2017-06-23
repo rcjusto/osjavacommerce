@@ -105,6 +105,9 @@ public class FlashPromoEventService extends DefaultEventServiceImpl {
     }
 
     private FlashPageConfig getActivePage(BaseAction action, String name) {
+        if (StringUtils.isBlank(name) || "index".equalsIgnoreCase(name)) {
+            name = "home";
+        }
         // listado de promo activas para la pagina ordenadas aleatoriamente
         List<FlashPageConfig> l = action.getDao().createCriteriaForStore(FlashPageConfig.class)
                 .add(Restrictions.eq("page", name))
