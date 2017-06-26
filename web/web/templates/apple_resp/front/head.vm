@@ -59,4 +59,5 @@
 </script>
 <script type="text/javascript" src="/struts/js/site.js" charset="UTF-8"></script>
 #parse("/WEB-INF/views/front/head_custom.vm")
+<script src='https://www.google.com/recaptcha/api.js'></script>
 #parse("/WEB-INF/views/front/head_google_analytics.vm")
