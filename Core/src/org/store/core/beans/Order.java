@@ -673,7 +673,7 @@ public class Order extends BaseBean {
         if (orderDetails!=null && !orderDetails.isEmpty()) {
             for(OrderDetail od : orderDetails) if (od.getOrderDetailProducts()!=null) {
                 for(OrderDetailProduct odp : od.getOrderDetailProducts()) {
-                    if (odp.getCostPrice()!=null) result += odp.getCostPrice();
+                    if (odp.getCostPrice()!=null) result += odp.getCostPrice() * od.getQuantity();
                 }
             }
         }

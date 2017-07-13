@@ -1,0 +1,8 @@
+<ul style="margin-left: 30px;">
+    #foreach( $cat in $categories )
+        <li>
+            <a href data-id="$!cat.idCategory" class="more-data">&nbsp;</a>
+            <a class="sel-cat" href data-id="$!cat.idCategory">$!cat.getCategoryName($action.defaultLanguage)</a>
+        </li>
+    #end
+</ul>
