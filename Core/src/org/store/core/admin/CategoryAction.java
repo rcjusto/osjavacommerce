@@ -75,6 +75,11 @@ public class CategoryAction extends AdminModuleAction {
         return categorylist();
     }
 
+    @Action(value = "categoryselectorchildren", results = @Result(type = "velocity", location = "/WEB-INF/views/admin/categorychildren_selector.vm"))
+    public String categoryselectorchildren() throws Exception {
+        return categorychildren();
+    }
+
     @Action(value = "categorychildrenfix", results = @Result(type = "redirectAction", location = "categorylist"))
     public String categorychildrenfix() throws Exception {
         Category root = dao.getRootCategory();
