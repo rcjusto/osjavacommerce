@@ -1,11 +1,11 @@
 <commerces>
     <database id="caonline">
         <type>MySQL</type>
-        <url>jdbc:mysql://127.0.0.1/caonline</url>
+        <url>jdbc:mysql://127.0.0.1/factoryd?useSSL=false</url>
         <user>admin</user>
         <password>123</password>
     </database>
-    <commerce id="caonline">
+    <commerce id="factd">
         <database>caonline</database>
         <url domain="store2.local" path="caonline"/>
     </commerce>
