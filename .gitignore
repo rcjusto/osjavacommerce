@@ -1,0 +1,47 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+.idea/ant.xml
+.idea/artifacts/
+.idea/compiler.xml
+.idea/copyright/
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+Core/resources/static/images/
+Core/resources/static/js/ckeditor/plugins/velocitymacro/lang/
+Core/src/org/store/merchants/resources/
+Core/templates/templates/
+canada_post/src/
+custom_template/src/org/store/template/beans/
+out/
+src/
+web/src/
+web/web/WEB-INF/indexes/
+web/web/WEB-INF/lib/.fuse_hidden00008d9e0000001c
+web/web/WEB-INF/lib/store20-plugin-locationsmap.jar
+web/web/WEB-INF/log/
+web/web/WEB-INF/tmp/
+web/web/WEB-INF/views/
+web/web/log/
+web/web/stores/
+web/web/templates/apple/mails/
+web/web/templates/apple_resp/mails/
+web/web/templates/cartronic/mails/
+web/web/templates/crohns/skins/default/css/img/flag/.DS_Store
+web/web/templates/eel/template.config~
+web/web/templates/eelV2/template.config~
+web/web/templates/lexus/skins/default/css/img/flag/.DS_Store
+web/web/templates/lexus/skins/default/css/site.css~
+web/web/templates/lustre/skins/default/css/img/flag/.DS_Store
+web/web/templates/lustre2/skins/default/css/img/flag/.DS_Store
+web/web/templates/peonline/mails/
+web/web/templates/photo/template.config~
