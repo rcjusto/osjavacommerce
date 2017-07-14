@@ -1,16 +1,86 @@
+<style>
+    #treecat1, #treecat1 ul, #treecat1 li {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #treecat1 a.more-data {
+        background: url(/struts/css/images/toggle-expand-dark.png) no-repeat 0 50%;
+        display: inline-block;
+        padding-left: 18px;
+        line-height: 24px;
+        color: #333333;
+        text-decoration: none
+    }
+
+    #treecat1 a.more-data.opened {
+        background-image: url(/struts/css/images/toggle-collapse-dark.png);
+    }
+
+    #treecat1 a.more-data.loading-data {
+        background-image: url(/struts/css/images/ui-anim_basic_16x16.gif);
+    }
+
+    #treecat1 a.more-data.empty {
+        background-image: none;
+    }
+
+</style>
 <div class="dialog-header">
-<h2>#label('admin.select.category')</h2>
-<h4>#label('admin.select.category.instructions')</h4>
+    <h2>#label('admin.select.category')</h2>
+    <h4>#label('admin.select.category.instructions')</h4>
 </div>
 <div id="treecat1" class="dialog-data" style="height:300px;">
-<ul>  
-    #processCatNode( $categoryTree )
-</ul>
+    <ul>
+        #foreach( $cat in $categories )
+            <li>
+                <a href data-id="$!cat.idCategory" class="more-data">&nbsp;</a>
+                <a class="sel-cat" href data-id="$!cat.idCategory">$!cat.getCategoryName($action.defaultLanguage)</a>
+            </li>
+        #end
+    </ul>
 </div>
 <div class="button-bar">
-    <input class="buttonOk" type="button" value="OK" onclick=""/>
-    <input type="button" value="Cancel" onclick="$('#dialogo').dialog('close');"/>
+    <div class="clearfix">
+        <div id="selCatBtn" style="float:left;display: none;">
+            <span id="selCat" data-id="" style="font-weight: bold;padding-right: 12px;"></span>
+            <input class="buttonOk" type="button" value="OK" onclick=""/>
+        </div>
+        <input style="float: right" type="button" value="Cancel" onclick="$('#dialogo').dialog('close');"/>
+    </div>
 </div>
-<script type="text/javascript">
-$(function(){$('#treecat1').dynatree();});
+<script>
+    $(function () {
+        $('a.sel-cat').live('click', function () {
+            var _self = $(this);
+            $('#selCat').attr('data-id', _self.attr('data-id')).text(_self.text());
+            $('#selCatBtn').show();
+            return false;
+        });
+        $('a.more-data').live('click', function () {
+            var _self = $(this);
+            var _li = $(this).closest('li');
+            if (_li.find('.children').length < 1) {
+                _self.addClass('loading-data');
+                $.get("$!action.url('categoryselectorchildren')", {idParent: _self.attr('data-id')}, function (data) {
+                    var _div = $('<div></div>').hide().addClass('children').appendTo(_li);
+                    _self.removeClass('loading-data');
+                    if (data == null || data.trim() == '') _self.addClass('empty'); else {
+                        _div.html(data).slideDown();
+                        _self.addClass('opened');
+                    }
+                });
+            } else {
+                if (_li.find('.children').is(':visible')) {
+                    _li.find('.children').hide();
+                    _self.removeClass('opened');
+                } else {
+                    _li.find('.children').slideDown();
+                    _self.addClass('opened');
+                }
+            }
+            return false;
+        });
+    });
 </script>

@@ -101,7 +101,7 @@ def execute() {
   List<Object[]> list = sqlQuery.list();
   for (Object[] o: list) {
     def order = (Order) o;
-    def profit = order.getTotal() - order.getCostProduct() - order.getCostShipping();
+    def profit = order.getTotal() - order.getCostProduct() - order.totalShipping;
     if (order.totalFees!=null) profit -= order.totalFees
     if (order.totalTax!=null) profit -= order.totalTax
     if (order.handlingCost!=null) profit -= order.handlingCost
@@ -115,7 +115,7 @@ def execute() {
       .addCell(new ReportCell(order.getCostProduct(), "normal-right"))
       .addCell(new ReportCell((order.totalFees!=null) ? order.totalFees : 0, "normal-right"))
       .addCell(new ReportCell((order.totalTax!=null) ? order.totalTax : 0, "normal-right"))
-      .addCell(new ReportCell(order.getCostShipping(), "normal-right"))
+      .addCell(new ReportCell(order.totalShipping, "normal-right"))
       .addCell(new ReportCell((order.handlingCost!=null) ? order.handlingCost : 0, "normal-right"))
       .addCell(new ReportCell(profit, "normal-right"))
     )
@@ -125,7 +125,7 @@ def execute() {
     t1 += order.getCostProduct()
     if (order.totalFees!=null) t2 += order.totalFees
     if (order.totalTax!=null) t3 += order.totalTax
-    t4 += order.getCostShipping()
+    t4 += order.totalShipping
     if (order.handlingCost!=null) t5 += order.handlingCost
     t6 += profit
   }
