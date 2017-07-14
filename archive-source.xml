@@ -59,6 +59,9 @@
         <copydir src="xmltools/resources" dest="${out.folder}/xmltools"/>
         <jar basedir="${out.folder}/xmltools" destfile="${jars.folder}/store20-plugin-xmlcatalog.jar" />
 
+        <copydir src="locations_map/resources" dest="${out.folder}/locations_map"/>
+        <jar basedir="${out.folder}/locations_map" destfile="${jars.folder}/store20-plugin-locationsmap.jar" />
+
         <jar basedir="Core/resources" destfile="${jars.folder}/store20-resources.jar" />
         <jar basedir="Core/templates/general" destfile="${jars.folder}/store20-views.jar" />
 

@@ -38,6 +38,7 @@
             label_edit: "$!action.url('staticlabeledit','admin')",
             block_edit: "$!action.url('blockedit')",
             country_states: "$!action.url('countrystates')",
+            country_states_ex: "$!action.url('countrystatesex')",
             menu_subcategories: "$!action.url('menuSubcategories')",
             compare_product:"$!action.url('compareAdd')",
             compare_remove:"$!action.url('compareDel')"
@@ -58,4 +59,5 @@
 </script>
 <script type="text/javascript" src="/struts/js/site.js" charset="UTF-8"></script>
 #parse("/WEB-INF/views/front/head_custom.vm")
+<script src='https://www.google.com/recaptcha/api.js'></script>
 #parse("/WEB-INF/views/front/head_google_analytics.vm")
