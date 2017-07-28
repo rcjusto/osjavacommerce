@@ -11,10 +11,7 @@ import org.store.core.utils.merchants.MerchantUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class merchantAction extends AdminModuleAction implements StoreMessages {
 
@@ -23,7 +20,7 @@ public class merchantAction extends AdminModuleAction implements StoreMessages {
     }
 
     public String list() throws Exception {
-        List l = new ArrayList();
+        List<Map> l = new ArrayList<Map>();
         MerchantUtils merchantUtils = new MerchantUtils(getServletContext());
         Map<String, Class> mapServices = merchantUtils.getMerchants();
         if (mapServices != null && !mapServices.isEmpty()) {
@@ -37,6 +34,17 @@ public class merchantAction extends AdminModuleAction implements StoreMessages {
                 l.add(map);
             }
         }
+
+        Collections.sort(l, new Comparator<Map>() {
+            @Override
+            public int compare(Map m1, Map m2) {
+                String n1 = m1.get("name").toString();
+                String n2 = m2.get("name").toString();
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                return n1.compareTo(n2);
+            }
+        });
+
         addToStack("listado", l);
         getBreadCrumbs().add(new BreadCrumb(null, getText("admin.merchant.list"), null, null));
         return SUCCESS;

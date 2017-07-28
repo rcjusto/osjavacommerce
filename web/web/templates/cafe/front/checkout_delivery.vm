@@ -58,11 +58,18 @@
 #else
 <form id="formDefaultMethod">
     <input type="hidden" name="idShopCart" value="$!shopCart.id"/>
-    #if($shopCart.pickInStore)
-        #label('pick.in.store'), #label('shipping.cost'): <span class="">$!action.formatActualCurrency($scu.subtotalShipping)</span>
-        <div class="button-bar clearfix">
-            <button type="submit"><span class="next">#label('next')</span></button>
-        </div>
+    #if(($shopCart.pickInStore!=$util.getNull()) || $scu.freeShipping)
+        #if($shopCart.pickInStore)
+            #label('pick.in.store'), #label('shipping.cost'): <span class="">$!action.formatActualCurrency($scu.subtotalShipping)</span>
+            <div class="button-bar clearfix">
+                <button type="submit"><span class="next">#label('next')</span></button>
+            </div>
+        #else
+            #label('free.shipping'), #label('shipping.cost'): <span class="">$!action.formatActualCurrency($scu.subtotalShipping)</span>
+            <div class="button-bar clearfix">
+                <button type="submit"><span class="next">#label('next')</span></button>
+            </div>
+        #end
     #else
         #if($scu.shippingMethod)
             <input type="hidden" name="selectedMethod" value="$!scu.shippingMethod.id"/>

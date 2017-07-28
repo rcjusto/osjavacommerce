@@ -254,6 +254,10 @@ public class CheckoutAction extends FrontModuleAction {
                 jsonResp.put("result", "OK");
                 jsonResp.put("data", getText("pick.in.store", "Pick in store") + " " + formatActualCurrency(0));
                 shopCart.setShippingMethod(null);
+            } else if (scu.isFreeShipping()) {
+                jsonResp.put("result", "OK");
+                jsonResp.put("data", getText("free.shipping", "Free Shipping") + " " + formatActualCurrency(0));
+                shopCart.setShippingMethod(null);
             } else if (scu.isShippingNeedSelection() && scu.getShippingServices() != null && !scu.getShippingServices().isEmpty() && selectedMethod != null) {
                 boolean methodExists = false;
                 for (Map m : scu.getShippingServices())

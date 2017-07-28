@@ -118,7 +118,7 @@ public class ShopCartUtils {
             if (cart.getItems()==null || cart.getItems().isEmpty()) pendingForPay = action.getText(StoreMessages.CNT_MSG_SELECT_BILLING_ADDRESS, StoreMessages.CNT_DEFAULT_MSG_SELECT_BILLING_ADDRESS);
             if (StringUtils.isEmpty(pendingForPay) && cart.getBillingAddress()==null) pendingForPay = action.getText(StoreMessages.CNT_MSG_SELECT_BILLING_ADDRESS, StoreMessages.CNT_DEFAULT_MSG_SELECT_BILLING_ADDRESS);
             if (StringUtils.isEmpty(pendingForPay) && shippingNeeded && (cart.getDeliveryAddress()==null && cart.getPickInStore()==null)) pendingForPay = action.getText(StoreMessages.CNT_MSG_SELECT_SHIPPING_ADDRESS, StoreMessages.CNT_DEFAULT_MSG_SELECT_SHIPPING_ADDRESS);
-            if (StringUtils.isEmpty(pendingForPay) && shippingNeeded && (cart.getShippingMethod()==null && cart.getPickInStore()==null)) pendingForPay = action.getText(StoreMessages.CNT_MSG_SELECT_SHIPPING_METHOD, StoreMessages.CNT_DEFAULT_MSG_SELECT_SHIPPING_METHOD);
+            if (StringUtils.isEmpty(pendingForPay) && shippingNeeded && !freeShipping && (cart.getShippingMethod()==null && cart.getPickInStore()==null)) pendingForPay = action.getText(StoreMessages.CNT_MSG_SELECT_SHIPPING_METHOD, StoreMessages.CNT_DEFAULT_MSG_SELECT_SHIPPING_METHOD);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
