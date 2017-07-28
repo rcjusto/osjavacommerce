@@ -57,6 +57,7 @@ def execute() {
             .addCell(new ReportCell("Order #", "header"))
             .addCell(new ReportCell("Created", "header"))
             .addCell(new ReportCell("Customer", "header"))
+            .addCell(new ReportCell("Company", "header"))
             .addCell(new ReportCell("Total", "header-right"))
             .addCell(new ReportCell("Product", "header-right"))
             .addCell(new ReportCell("Fees", "header-right"))
@@ -66,7 +67,7 @@ def execute() {
             .addCell(new ReportCell("Profit", "header-right"))
   )
 
-  def colWidths = [54f,76f,230f,64f,64f,64f,64f,64f,64f,64f]
+  def colWidths = [54f,76f,230f,230f,64f,64f,64f,64f,64f,64f,64f]
   rt.setColWidths(colWidths)
 
   Date dateIni = SomeUtils.strToDate(getParameter(action, "created_ini"), lang);
@@ -111,6 +112,7 @@ def execute() {
       .addCell(new ReportCell(order.idOrder, "normal-left"))
       .addCell(new ReportCell(order.createdDate, "normal-date"))
       .addCell(new ReportCell(order.user.email, "normal-left"))
+      .addCell(new ReportCell(order.user.companyName, "normal-left"))
       .addCell(new ReportCell(order.getTotal(), "normal-right"))
       .addCell(new ReportCell(order.getCostProduct(), "normal-right"))
       .addCell(new ReportCell((order.totalFees!=null) ? order.totalFees : 0, "normal-right"))
@@ -132,7 +134,7 @@ def execute() {
   // agregar total
   rt.addRow(
     new ReportRow()
-        .addCell(new ReportCell("TOTAL", "total",3))
+        .addCell(new ReportCell("TOTAL", "total",4))
         .addCell(new ReportCell(t0, "total-right"))
         .addCell(new ReportCell(t1, "total-right"))
         .addCell(new ReportCell(t2, "total-right"))

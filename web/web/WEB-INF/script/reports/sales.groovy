@@ -38,6 +38,7 @@ def objectToRow(order, lang) {
   .addCell(new ReportCell(order.status.getStatusName(lang), "normal-left"))
   .addCell(new ReportCell(order.user.userId, "normal-left"))
   .addCell(new ReportCell(order.user.fullName, "normal-left"))
+  .addCell(new ReportCell(order.user.companyName, "normal-left"))
   .addCell(new ReportCell(order.totalProducts, "normal-right"))
   .addCell(new ReportCell(order.totalFees, "normal-right"))
   .addCell(new ReportCell(order.totalTax, "normal-right"))
@@ -87,6 +88,7 @@ def execute() {
             .addCell(new ReportCell("Status", "header"))
             .addCell(new ReportCell("Customer ID", "header"))
             .addCell(new ReportCell("Customer Name", "header"))
+            .addCell(new ReportCell("Company", "header"))
             .addCell(new ReportCell("Products", "header-right"))
             .addCell(new ReportCell("Fees", "header-right"))
             .addCell(new ReportCell("Taxes", "header-right"))
@@ -95,7 +97,7 @@ def execute() {
             .addCell(new ReportCell("Total", "header-right"))
   )
 
-  def colWidths = [54f,76f,120f,80f,230f,64f,64f,64f,64f,64f,64f]
+  def colWidths = [54f,76f,120f,80f,230f,230f,64f,64f,64f,64f,64f,64f]
   rt.setColWidths(colWidths)
 
   Date dateIni = SomeUtils.strToDate(getParameter(action, "created_ini"), lang);
@@ -149,7 +151,7 @@ def execute() {
   // agregar total
   rt.addRow(
           new ReportRow()
-  .addCell(new ReportCell("TOTAL", "total",5))
+  .addCell(new ReportCell("TOTAL", "total",6))
   .addCell(new ReportCell(t0, "total-right"))
   .addCell(new ReportCell(t1, "total-right"))
   .addCell(new ReportCell(t2, "total-right"))
