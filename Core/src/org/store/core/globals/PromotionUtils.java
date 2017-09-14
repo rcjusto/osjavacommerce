@@ -29,28 +29,51 @@ public class PromotionUtils {
             freeShipping = false;
             data = new ArrayList<Map<String, Object>>();
             for (PromotionalCode pc : promotionalCodes) {
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("code", pc.getCode());
-                map.put("name", pc.getName(action.getLocale().getLanguage()));
-                double value = 0.0d;
                 if (pc.getFreeShipping()) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", pc.getCode());
+                    map.put("name", pc.getName(action.getLocale().getLanguage()));
+                    double value = 0.0d;
                     map.put("type", "free-shipping");
                     freeShipping = true;
-                } else if (pc.getFreeProduct() != null) {
+                    total += value;
+                    map.put("value", value);
+                    data.add(map);
+                }
+                if (pc.getFreeProduct() != null) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", pc.getCode());
+                    map.put("name", pc.getName(action.getLocale().getLanguage()));
+                    double value = 0.0d;
                     map.put("type", "product");
                     map.put("data", pc.getFreeProduct().getIdProduct());
                     if (pc.getFreeProduct().getCostPrice()!=null) freeProductCost += pc.getFreeProduct().getCostPrice();
-                } else if (pc.getDiscount() != null && pc.getDiscount() > 0) {
+                    total += value;
+                    map.put("value", value);
+                    data.add(map);
+                }
+                if (pc.getDiscount() != null && pc.getDiscount() > 0) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", pc.getCode());
+                    map.put("name", pc.getName(action.getLocale().getLanguage()));
+                    double value = 0.0d;
                     map.put("type", "discount");
                     value -= couponUsed(pc, cart);
+                    total += value;
+                    map.put("value", value);
+                    data.add(map);
                 } else if (pc.getDiscountPercent() != null && pc.getDiscountPercent() > 0) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", pc.getCode());
+                    map.put("name", pc.getName(action.getLocale().getLanguage()));
+                    double value = 0.0d;
                     map.put("type", "discount-percent");
                     map.put("data", pc.getDiscountPercent());
                     value -= BigDecimal.valueOf(pc.getDiscountPercent() * totalProducts).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    total += value;
+                    map.put("value", value);
+                    data.add(map);
                 }
-                total += value;
-                map.put("value", value);
-                data.add(map);
             }
         }
     }
