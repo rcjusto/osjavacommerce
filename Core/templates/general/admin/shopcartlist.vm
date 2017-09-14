@@ -37,7 +37,7 @@
                 <td>
                     <select name="filters.status" class="field string-medium">
                         <option value="">#label('admin.not.filter')</option>
-                        #foreach($st in ['saved','pending','approved','finished'])
+                        #foreach($st in ['saved','pending','approved','finished','preparing','cancelled'])
                             <option value="$st" #if($st==$filters.get('status')) selected="selected" #end >#label("shopcart.status.${st}")</option>
                         #end
                     </select>
