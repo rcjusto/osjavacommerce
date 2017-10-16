@@ -1,15 +1,17 @@
 <table width="100%" class="with-border" cellpadding="0" cellspacing="0">
     <tr>
         <th width="10%">#label('shopcart.webid')</th>
-        <th width="57%">#label('shopcart.product')</th>
-        <th width="11%">#label('shopcart.quantity')</th>
-        <th width="11%" class="price">#label('shopcart.unitary.price')</th>
-        <th width="11%" class="price">#label('shopcart.line.price')</th>
+        <th width="10%">#label('shopcart.partnumber')</th>
+        <th width="50%">#label('shopcart.product')</th>
+        <th width="10%">#label('shopcart.quantity')</th>
+        <th width="10%" class="price">#label('shopcart.unitary.price')</th>
+        <th width="10%" class="price">#label('shopcart.line.price')</th>
     </tr>
     #foreach($detail in $order.orderDetails)
         #set( $firstODP = $detail.getFirstDetailProducts() )
         <tr class="product">
             <td>$!firstODP.product.idProduct</td>
+            <td>$!firstODP.product.mfgPartnumber</td>
             <td>
                 #foreach($odp in $detail.orderDetailProducts)
                     <div>
@@ -28,7 +30,7 @@
         #foreach($odp in $detail.orderDetailProducts)
             #if($odp.feeValue)
                 <tr class="fee">
-                    <td></td>
+                    <td colspan="2"></td>
                     <td>#label('fee') $!odp.feeName</td>
                     <td align="center">$!detail.quantity</td>
                     <td class="price">$!action.formatActualCurrency($odp.feeValue,$order.currency)</td>
@@ -38,30 +40,30 @@
         #end
     #end
     <tr class="subtotal">
-        <td colspan="4">#label('admin.merchandise.subtotal')</td>
+        <td colspan="5">#label('admin.merchandise.subtotal')</td>
         <td class="price">$!action.formatActualCurrency($order.totalProducts,$order.currency)</td>
     </tr>
     #if($order.interestPercent && $order.interestPercent>0)
         <tr class="subtotal">
-            <td colspan="4">#label('interest.percent') $!number.format('0.##',$order.interestPercent)</td>
+            <td colspan="5">#label('interest.percent') $!number.format('0.##',$order.interestPercent)</td>
             <td class="price">$!action.formatActualCurrency($order.totalInterest,$order.currency)</td>
         </tr>
     #end
     #if($order.totalFees && $order.totalFees>0)
         <tr class="subtotal">
-            <td colspan="4">#label('subtotal.fees')</td>
+            <td colspan="5">#label('subtotal.fees')</td>
             <td class="price">$!action.formatActualCurrency($order.totalFees,$order.currency)</td>
         </tr>
     #end
     #foreach($prom in $order.getPromotions('discount-percent'))
         <tr class="promotion">
-            <td colspan="4" class="promo">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+            <td colspan="5" class="promo">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
             <td class="price">$!action.formatActualCurrency($prom.get('value'),$order.currency)</td>
         </tr>
     #end
     #foreach($prom in $order.getPromotions('discount'))
         <tr class="promotion promo">
-            <td colspan="4">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
+            <td colspan="5">#label('admin.promo'): $prom.get('code') - $!prom.get('name')</td>
             <td class="price">$!action.formatActualCurrency($prom.get('value'), $order.currency)</td>
         </tr>
     #end
@@ -69,15 +71,15 @@
         #set($freeShipPromList = $order.getPromotions('free-shipping') )
         #if($freeShipPromList && !$freeShipPromList.isEmpty())
             #set( $freeShipProm = $list.get($freeShipPromList,0))
-            <td colspan="4">#label('admin.promo'): $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
+            <td colspan="5">#label('admin.promo'): $!freeShipProm.get('code') - $!freeShipProm.get('name')</td>
         #else
-            <td colspan="4">#label('admin.subtotal.shipping')</td>
+            <td colspan="5">#label('admin.subtotal.shipping')</td>
         #end
         <td class="price">$!action.formatActualCurrency($order.totalShipping,$order.currency)</td>
     </tr>
     #if($order.totalInsurance && $order.totalInsurance>0)
         <tr class="subtotal">
-            <td colspan="4">#label('admin.subtotal.shipping.insurance')</td>
+            <td colspan="5">#label('admin.subtotal.shipping.insurance')</td>
             <td class="price">$!action.formatActualCurrency($order.totalInsurance,$order.currency)</td>
         </tr>
     #end
@@ -86,7 +88,7 @@
     #if($taxesl && !$taxesl.isEmpty())
         #foreach($tax in $taxesl)
             <tr class="subtotal">
-                <td colspan="4">#label('admin.subtotal.tax') $!tax.name
+                <td colspan="5">#label('admin.subtotal.tax') $!tax.name
                     #if($tax.totax)<span class="tax-detail">( $!number.format('percent',$tax.percent) #label('of') $!action.formatActualCurrency($tax.totax,$order.currency) )</span> #end
                 </td>
                 <td class="price">$!action.formatActualCurrency($tax.value,$order.currency)</td>
@@ -96,13 +98,13 @@
 
     #if($order.totalRewards && $order.totalRewards>0)
         <tr class="subtotal">
-            <td colspan="4">#label('used.rewards')</td>
+            <td colspan="5">#label('used.rewards')</td>
             <td class="price">- $!action.formatActualCurrency($order.totalRewards,$order.currency)</td>
         </tr>
     #end
 
     <tr class="total">
-        <td colspan="4">#label('admin.total')</td>
+        <td colspan="5">#label('admin.total')</td>
         <td class="price">$!action.formatActualCurrency($order.total,$order.currency)</td>
     </tr>
 
