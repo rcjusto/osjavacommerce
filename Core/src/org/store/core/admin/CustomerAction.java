@@ -163,6 +163,21 @@ public class CustomerAction extends AdminModuleAction implements StoreMessages {
         return (isNew) ? "reedit" : SUCCESS;
     }
 
+    @Action(value = "customersubscription", results = @Result(type = "redirectAction", location = "customeredit?idUser=${user.idUser}"))
+    public String customerSubscription() throws Exception {
+        if (user != null && newState != null) {
+            UserPreference up = user.getRegisteredSubscription();
+            if (up==null) {
+                up= new UserPreference();
+                up.setUser(user);
+                up.setPreferenceCode("register.subscriptions");
+            }
+            up.setPreferenceValue(newState);
+            getDao().save(up);
+        }
+        return SUCCESS;
+    }
+
     @Action(value = "customeraddtax", results = @Result(type = "redirectAction", location = "customeredit?idUser=${user.idUser}"))
     public String customerAddTax() throws Exception {
         Tax tax = (Tax) dao.get(Tax.class, idTax);

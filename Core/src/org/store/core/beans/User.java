@@ -576,6 +576,16 @@ public class User extends BaseBean implements StoreBean, ExportedBean {
         return null;
     }
 
+    public UserPreference getRegisteredSubscription() {
+        List<UserPreference> l = getPreferencesByCode("register.subscriptions");
+        return l.size()>0 ? l.get(0) : null;
+    }
+
+    public boolean isSubscribed() {
+        UserPreference up = getRegisteredSubscription();
+        return up!=null && "yes".equalsIgnoreCase(up.getPreferenceValue());
+    }
+
     public List<UserPreference> getStockAlerts() {
         return getPreferencesByCode(UserPreference.STOCK_ALERT);
     }
