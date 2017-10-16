@@ -249,9 +249,9 @@
         $('#dialogContent').load("$urlcatsel", {rnd:Math.random()}, function() {
             $('#dialogContent').find('h2').html('Add Category');
             $('#dialogo').find('input.buttonOk:first').click(function() {
-                var selNode = $('#treecat1').dynatree("getActiveNode");
+                var selNode = $('#selCat').attr('data-id');
                 if (selNode) {
-                    var cId = selNode.data.key.substr(4);
+                    var cId = selNode;
                     $('#dialogo').dialog('close');
                     if (type == 'yes') {
                         $('#conditionAction').val('categoryAddYes');
