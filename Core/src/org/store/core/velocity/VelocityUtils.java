@@ -371,7 +371,7 @@ public class VelocityUtils {
         String publicKey = action.getStoreProperty(StoreProperty.RECAPTCHA_PUBLIC, null);
         // add recaptcha
         if (StringUtils.isNotEmpty(publicKey)) {
-            return "<div class=\"g-recaptcha\" data-sitekey=\""+publicKey+"\"></div>\n";
+            return "<div class=\"g-recaptcha\" data-callback=\"captchaClicked\" data-sitekey=\""+publicKey+"\"></div>\n";
         } else {
             return "";
         }

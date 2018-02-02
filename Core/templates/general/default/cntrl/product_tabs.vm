@@ -197,6 +197,14 @@
                     <th>#label('review.content')</th>
                     <td><textarea name="review.opinion" class="field string-500 required" rows="6"></textarea></td>
                 </tr>
+                <tr>
+                    <th>#label('review.captcha')</th>
+                    <td>
+                        <div class="clearfix">
+                            $util.reCaptcha()
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
         <div class="button-bar">
@@ -206,7 +214,12 @@
     </form>
 </div>
 <script type="text/javascript">
+    captchaOK = false;
+    function captchaClicked() {
+        captchaOK = true;
+    }
     $(function(){
+
         $('#reviewErrorMsg').hide();
         $('#formAddNewReview').submit(function(){
             var validForm = $(this).validForm();
@@ -217,7 +230,8 @@
                     $(this).parent().addClass('invalid');
                 }
             });
-            if (validForm) return true;
+
+            if (validForm && captchaOK) return true;
             $('#reviewErrorMsg').show();
             return false;
         })
