@@ -738,7 +738,7 @@ public class GeneralAction extends FrontModuleAction {
             String privateKey = getStoreProperty(StoreProperty.RECAPTCHA_PRIVATE, null);
             if (StringUtils.isNotEmpty(privateKey)) {
                 String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-                if (!SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
+                if (reCaptchaResponse!=null && !SomeUtils.reCaptcha2(privateKey, request.getRemoteAddr(), reCaptchaResponse)) {
                     return SUCCESS;
                 }
             }
