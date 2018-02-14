@@ -263,6 +263,10 @@
                         <th>#label('admin.default.page.items')</th>
                         <td>#storePropertyField($storeProperties 'default.page.items' 'field integer')</td>
                     </tr>
+                   <tr>
+                        <th>#label('admin.default.product.buy.max')</th>
+                        <td>#storePropertyField($storeProperties 'product.buy.max' 'field integer')</td>
+                    </tr>
                     <tr>
                         <th>#label('admin.page.items.options')</th>
                         <td>#storePropertyField($storeProperties 'page.items.options' 'field string_medium')
