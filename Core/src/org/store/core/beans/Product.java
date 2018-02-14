@@ -1120,7 +1120,7 @@ public class Product extends BaseBean implements MultiLangBean, ExportedBean, St
             }
         }
 
-        return res;
+        return res!=null ? res : Long.MAX_VALUE;
     }
 
     // EXPORT OPTIONS
