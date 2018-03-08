@@ -137,7 +137,7 @@ public class StoreVelocityLoader extends ResourceLoader {
     private VMTemplate getInDB(String name) throws ResourceNotFoundException {
         try {
             HibernateDAO dao = getHibernateDao();
-            return dao.getVMTemplateForStore(name, dao.getStoreCode());
+            return dao!=null ? dao.getVMTemplateForStore(name, dao.getStoreCode()) : null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -172,8 +172,8 @@ public class StoreVelocityLoader extends ResourceLoader {
         BaseAction action = (ServletActionContext.getContext().getActionInvocation().getAction() instanceof BaseAction) ? (BaseAction) ServletActionContext.getContext().getActionInvocation().getAction() : null;
         Store20Database databaseConfig = action != null ? action.getDatabaseConfig() : null;
         String store = (action != null) ? action.getStoreCode() : null;
-        Session s = HibernateSessionFactory.getSession(databaseConfig);
-        return new HibernateDAO(s, store);
+        Session s = databaseConfig!=null ? HibernateSessionFactory.getSession(databaseConfig) : null;
+        return s!=null ? new HibernateDAO(s, store) : null;
     }
 
     private synchronized InputStream getResourceInDisk(String templateName) throws ResourceNotFoundException {
