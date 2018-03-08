@@ -171,9 +171,7 @@ public class StoreVelocityResult extends VelocityResult {
             location = invocation.getProxy().getNamespace() + "/" + location;
         }
 
-        Template template = velocity.getTemplate(location, encoding);
-
-        return template;
+        return velocity.getTemplate(location, encoding);
     }
 
     /**
