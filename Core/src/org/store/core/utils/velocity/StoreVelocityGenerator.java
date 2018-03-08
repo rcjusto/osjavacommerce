@@ -1,5 +1,6 @@
 package org.store.core.utils.velocity;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.store.core.velocity.VelocityUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
@@ -39,9 +40,9 @@ public class StoreVelocityGenerator {
     public static void generateFile(VelocityContext context, String templateName, File file) {
         try {
             Properties props = (context!=null && context.containsKey("application-path")) ? getVelocityPropertiesEx((String) context.get("application-path")) : getVelocityProperties();
-            Velocity.init(props);
-            Template template;
-            template = Velocity.getTemplate(templateName);
+            VelocityEngine velocityEngine = new VelocityEngine();
+            velocityEngine.init(props);
+            Template template = velocityEngine.getTemplate(templateName);
             FileWriter writer = new FileWriter(file);
             if (template != null) template.merge(context, writer);
             writer.close();
@@ -63,13 +64,11 @@ public class StoreVelocityGenerator {
     private static Properties getVelocityPropertiesEx(String path) {
         Properties prop = new Properties();
         prop.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
-        prop.setProperty(Velocity.RESOURCE_LOADER, "myfileloader,mydbloader,myjarloader");
-        prop.setProperty("myfileloader.resource.loader.class", "org.store.core.velocity.StoreFileVelocityLoader");
+        prop.setProperty(Velocity.RESOURCE_LOADER, "myfileloader");
+        prop.setProperty("myfileloader.resource.loader.class", "org.store.core.velocity.StoreVelocityLoader");
         prop.setProperty("myfileloader.resource.loader.path", path);
         prop.setProperty("myfileloader.resource.loader.modificationCheckInterval", "2");
         prop.setProperty("myfileloader.resource.loader.cache", "true");
-        prop.setProperty("myjarloader.resource.loader.class", "org.store.core.velocity.StoreJarVelocityLoader");
-        prop.setProperty("mydbloader.resource.loader.class", "org.store.core.velocity.StoreDbVelocityLoader");
         prop.setProperty("directive.foreach.counter.name", "velocityCount");
         prop.setProperty("directive.foreach.counter.initial.value", "0");
         prop.setProperty("velocimacro.library", "/WEB-INF/views/global_library.vm");
