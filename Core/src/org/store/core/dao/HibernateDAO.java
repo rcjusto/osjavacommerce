@@ -269,7 +269,8 @@ public class HibernateDAO {
 
     public List<Category> getChildCategories(Category parent, boolean onlyVisible) {
         Criteria cri = createCriteriaForStore(Category.class);
-        if (onlyVisible) cri.add(Restrictions.eq("visible", Boolean.TRUE));
+        // parent category is usually not visible
+        if (onlyVisible && parent != null) cri.add(Restrictions.eq("visible", Boolean.TRUE));
         if (parent != null) cri.add(Restrictions.eq("idParent", parent.getIdCategory()));
         else cri.add(Restrictions.isNull("idParent"));
         cri.addOrder(Order.asc("defaultPosition"));
