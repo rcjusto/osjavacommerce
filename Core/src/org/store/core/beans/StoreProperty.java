@@ -253,6 +253,8 @@ public class StoreProperty extends BaseBean implements StoreBean {
     public static final String RECAPTCHA_PRIVATE = "recaptcha.private.key";
     public static final String RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
 
+    public static final String PROP_USER_REQUEST_LEVEL_EMAIL = "user.request.level.email";
+
 
     // Codigo q identifica el texto
     @Id
