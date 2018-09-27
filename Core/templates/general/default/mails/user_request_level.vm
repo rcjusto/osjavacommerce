@@ -1,0 +1,22 @@
+$!{action.mailGlobalTop}
+
+<p><br/></p>
+
+<table>
+    <tr>
+        <td>$!{action.getText('user.id')}:</td>
+        <td>$!{user.userId}</td>
+    </tr>
+    <tr>
+        <td>$!{action.getText('admin.name')}:</td>
+        <td>$!{user.fullname}</td>
+    </tr>
+    <tr>
+        <td>$!{action.getText('admin.email')}:</td>
+        <td>$!{user.email}</td>
+    </tr>
+    <tr>
+        <td>$!{action.getText('admin.level.requested')}:</td>
+        <td>$!{user.levelRequested}</td>
+    </tr>
+</table>
