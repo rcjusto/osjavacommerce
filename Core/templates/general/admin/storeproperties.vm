@@ -421,6 +421,11 @@
                         <th>#label('admin.allow.order.custom.message')</th>
                         <td>#storePropertyField($storeProperties 'allow.order.custom.message' 'field string-short required' ['N','Y'])</td>
                     </tr>
+                    <tr>
+                        <th>#label('admin.user.request.level.email')</th>
+                        <td>#storePropertyField($storeProperties 'user.request.level.email' 'field string-medium')</td>
+                    </tr>
+
                     <tr class="block-title">
                         <th colspan="2">#label('register.show.fields')</th>
                     </tr>
