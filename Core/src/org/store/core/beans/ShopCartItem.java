@@ -337,7 +337,7 @@ public class ShopCartItem extends BaseBean {
 
     public void initializeItem(BaseAction action) {
         if (action != null) {
-            boolean calculatePrice = (this.getPriceOriginal() == null);
+            boolean calculatePrice = true;//(this.getPriceOriginal() == null);
             boolean needQuote = false;
             if (getComplement()!=null) {
                 Product c = (Product) action.getDao().get(Product.class, getComplement());
