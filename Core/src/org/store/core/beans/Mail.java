@@ -51,6 +51,7 @@ public class Mail extends BaseBean implements StoreBean {
     public static final String MAIL_TEMPLATE_AVAILABLE_LINKS = "/WEB-INF/views/mails/available_links.vm";
     public static final String MAIL_TEMPLATE_ORDER_READY_TO_PAY = "/WEB-INF/views/mails/order_pay_ready.vm";
     public static final String MAIL_TEMPLATE_PRODUCT_REVIEW = "/WEB-INF/views/mails/product_review.vm";
+    public static final String MAIL_TEMPLATE_USER_REQUEST_LEVEL = "/WEB-INF/views/mails/user_request_level.vm";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
