@@ -175,12 +175,14 @@ public class UserAction extends FrontModuleAction implements StoreMessages {
         user.setLevelRequested(levelRequested);
         // Verificar si el nivel necesita aprobacion
         UserLevel l = dao.getUserLevel(levelRequested);
+        boolean generateRequestLevelEmail = false;
         if (l != null && !l.getNeedApproval()) {
             user.setLevel(l);
             user.setLevelStatus(STATUS_APPROVED);
         } else {
             user.setLevel(getDefaultLevel());
             user.setLevelStatus(STATUS_REQUESTED);
+            generateRequestLevelEmail = true;
         }
 
         dao.save(user);
@@ -282,6 +284,7 @@ public class UserAction extends FrontModuleAction implements StoreMessages {
         }
 
         sendWelcomeMail(user, password);
+        if (generateRequestLevelEmail) generateUserRequestLevelEmail(user);
         setFrontUser(user);
         EventUtils.executeEvent(getServletContext(), EventService.EVENT_REGISTER, this);
         return (StringUtils.isNotEmpty(redirectUrl)) ? "redirect" : SUCCESS;
