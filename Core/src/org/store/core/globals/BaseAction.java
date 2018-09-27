@@ -56,6 +56,7 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
 import org.hibernate.Session;
 import org.store.core.hibernate.HibernateSessionFactory;
@@ -108,6 +109,8 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
     private static final String CNT_DEFAULT_SUBJECT_ORDER_STATUS = "Your order {1} has status {2}";
     private static final String CNT_SUBJECT_WELCOME = "mail.subject.welcome";
     private static final String CNT_DEFAULT_SUBJECT_WELCOME = "Welcome to our store";
+    private static final String CNT_SUBJECT_USER_REQUEST_LEVEL = "mail.subject.user.request.level";
+    private static final String CNT_DEFAULT_SUBJECT_USER_REQUEST_LEVEL = "Customer level requested";
 
     private Configuration configuration;
 
@@ -124,9 +127,9 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
                 return actionMappings.keySet().contains(action);
             }
         }
-       return false;
+        return false;
     }
-    
+
     @Inject
     public void setStoreVelocityManager(StoreVelocityManager mgr) {
         this.velocityManager = mgr;
@@ -558,8 +561,8 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
 
     public Manufacturer getManufacturer(Object idO) {
         Long id = null;
-        if (idO instanceof Number) id = ((Number)idO).longValue();
-        else if (idO instanceof String) id = SomeUtils.strToLong((String)idO);
+        if (idO instanceof Number) id = ((Number) idO).longValue();
+        else if (idO instanceof String) id = SomeUtils.strToLong((String) idO);
         return (Manufacturer) dao.get(Manufacturer.class, id);
     }
 
@@ -793,14 +796,14 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
 
     public TemplateConfig getTemplateConfig() {
         if (!requestCache.containsKey("TemplateConfig")) {
-            TemplateConfig templateConfig =  TemplateUtils.getTemplateConfig(getServletContext(), getTemplate());
-            if (templateConfig!=null) requestCache.put("TemplateConfig", templateConfig);
+            TemplateConfig templateConfig = TemplateUtils.getTemplateConfig(getServletContext(), getTemplate());
+            if (templateConfig != null) requestCache.put("TemplateConfig", templateConfig);
         }
         return (requestCache.containsKey("TemplateConfig")) ? (TemplateConfig) requestCache.get("TemplateConfig") : null;
     }
 
     public TemplateBannerZone getTemplateBannerZone(String zone) {
-        TemplateConfig templateConfig =  getTemplateConfig();
+        TemplateConfig templateConfig = getTemplateConfig();
         return (templateConfig != null) ? templateConfig.getBannerZone(zone) : null;
     }
 
@@ -1058,6 +1061,23 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
         }
     }
 
+    public void generateUserRequestLevelEmail(User u) {
+        String email = getStoreProperty(StoreProperty.PROP_USER_REQUEST_LEVEL_EMAIL, null);
+        if (StringUtils.isNotEmpty(email) && u != null) {
+            Map map = new HashMap();
+            map.put("user", new MUser(u, this));
+            String body = proccessVelocityTemplate(Mail.MAIL_TEMPLATE_USER_REQUEST_LEVEL, map);
+            Mail mail = new Mail();
+            mail.setInventaryCode(getStoreCode());
+            mail.setBody(body);
+            mail.setSubject(getText(CNT_SUBJECT_USER_REQUEST_LEVEL, CNT_DEFAULT_SUBJECT_USER_REQUEST_LEVEL));
+            mail.setToAddress(email);
+            mail.setPriority(Mail.PRIORITY_HIGH);
+            mail.setReference("USER REQUEST LEVEL " + u.getIdUser());
+            mailSaveAndSend(mail);
+        }
+    }
+
     public void sendWelcomeMail(User user, String password) {
         // Send welcome email
         Map<String, Object> map = new HashMap<String, Object>();
@@ -1101,7 +1121,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
                 Long rewardPoints = order.getUser().getRewardPoints();
                 order.getUser().setRewardPoints((rewardPoints != null) ? rewardPoints + rewardsUsedPoints : rewardsUsedPoints);
                 dao.save(order.getUser());
-                addRewardHistory(order.getUser(), ((Number)rewardsUsedPoints).doubleValue(), order, null, UserRewardHistory.TYPE_PURCHASE_CANCELLATION, "");
+                addRewardHistory(order.getUser(), ((Number) rewardsUsedPoints).doubleValue(), order, null, UserRewardHistory.TYPE_PURCHASE_CANCELLATION, "");
             }
         }
     }
@@ -1171,7 +1191,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
     public void addRewardHistory(User referral, Double amount, Order order, User friend, String type, String s) {
         UserRewardHistory urh = new UserRewardHistory();
         urh.setAmount(amount);
-        if (order!=null) urh.setIdOrder(order.getIdOrder());
+        if (order != null) urh.setIdOrder(order.getIdOrder());
         urh.setFriend(friend);
         urh.setUser(referral);
         urh.setType(type);
@@ -1257,7 +1277,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
     public Banner getBanner(Number id) {
         return (Banner) dao.get(Banner.class, id.longValue());
     }
-    
+
     public List<Banner> getBanners(String zone) {
         return dao.getBanners(zone);
     }
@@ -1285,7 +1305,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
         if (StringUtils.isNotEmpty(data)) {
             try {
                 Map map = (Map) JSONUtil.deserialize(data);
-                if (map.containsKey("items") && map.get("items")!=null && map.get("items") instanceof List && !((List) map.get("items")).isEmpty()) return map;
+                if (map.containsKey("items") && map.get("items") != null && map.get("items") instanceof List && !((List) map.get("items")).isEmpty()) return map;
             } catch (JSONException e) {
                 log.error(e.getMessage(), e);
             }
@@ -1478,7 +1498,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
     }
 
     public String urlProductImage(Product p) {
-        return  urlProductImage(p, false);
+        return urlProductImage(p, false);
     }
 
     public String urlProductImage(Product p, boolean includeDomain) {
@@ -1486,7 +1506,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
         map.put("idProduct", p.getIdProduct().toString());
         return url("productImage", "", map, includeDomain);
     }
-    
+
     public String urlNews(StaticText p) {
         if (p == null) return null;
         if (StringUtils.isNotEmpty(p.getContentUrl())) return p.getContentUrl();
@@ -1499,7 +1519,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
     }
 
     public String urlPage(StaticText p, boolean includeDomain) {
-        if (p == null || p.getId()==null) return null;
+        if (p == null || p.getId() == null) return null;
         if ("Y".equalsIgnoreCase(getStoreProperty(StoreProperty.PROP_USE_FRIENDLY_URLS, StoreProperty.PROP_DEFAULT_USE_FRIENDLY_URLS)) && StringUtils.isNotEmpty(p.getUrlCode())) {
             return urlFriendly("page", "", p.getUrlCode(), includeDomain);
         } else {
@@ -1536,7 +1556,7 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
 
     public StoreActionMapping getStoreActionMapping() {
         ActionContext context = ActionContext.getContext();
-        return (context!=null) ? (StoreActionMapping) context.get(ServletActionContext.ACTION_MAPPING) : null;
+        return (context != null) ? (StoreActionMapping) context.get(ServletActionContext.ACTION_MAPPING) : null;
     }
 
     public String url(String action, String namespace, Map<String, String> params, boolean includeDomain) {
@@ -1626,8 +1646,8 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
         ActionContext context = ActionContext.getContext();
         StringBuilder buff = new StringBuilder();
         if (context != null) {
-                buff.append(request.getRequestURL().toString().toLowerCase().startsWith("https") ? "https://" : "http://")
-                        .append(request.getHeader("Host")).append(request.getContextPath());
+            buff.append(request.getRequestURL().toString().toLowerCase().startsWith("https") ? "https://" : "http://")
+                    .append(request.getHeader("Host")).append(request.getContextPath());
 
             StoreActionMapping orig = (StoreActionMapping) context.get(ServletActionContext.ACTION_MAPPING);
             if (StringUtils.isNotEmpty(orig.getStore())) {
@@ -1644,10 +1664,10 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
         if (StringUtils.isNotEmpty(request.getQueryString())) b.append("?").append(request.getQueryString());
         return b.toString();
     }
-    
+
     public String skinFile(String file) {
         if (file.contains("[lang]")) file = StringUtils.replace(file, "[lang]", getLocale().getLanguage());
-        return "/templates/"+getTemplate()+"/skins/"+getSkin()+ (file.startsWith("/") ? file : "/" + file);
+        return "/templates/" + getTemplate() + "/skins/" + getSkin() + (file.startsWith("/") ? file : "/" + file);
     }
 
     public String storeFile(String file) {
@@ -1657,50 +1677,45 @@ public class BaseAction extends ActionSupport implements Preparable, SessionAwar
 
     public void addFlash(String type, String value) {
         if (getStoreSessionObjects().containsKey(type) && getStoreSessionObjects().get(type) instanceof List) {
-            ((List)getStoreSessionObjects().get(type)).add(value);    
+            ((List) getStoreSessionObjects().get(type)).add(value);
         } else {
             List l = new ArrayList();
             l.add(value);
             getStoreSessionObjects().put(type, l);
         }
     }
-    
+
     public List getFlash(String type) {
         List l = new ArrayList();
         if (getStoreSessionObjects().containsKey(type) && getStoreSessionObjects().get(type) instanceof List) {
             l.addAll((List) getStoreSessionObjects().get(type));
             getStoreSessionObjects().remove(type);
-        }        
+        }
         return l;
     }
 
-    public String getActionName()
-    {
+    public String getActionName() {
         return ServletActionContext.getActionMapping().getName();
     }
 
     public String getMailGlobalTop() {
-        return proccessVelocityTemplate("/WEB-INF/views/"+getTemplate()+"/mails/global_top.vm");
+        return proccessVelocityTemplate("/WEB-INF/views/" + getTemplate() + "/mails/global_top.vm");
     }
 
     public String getMailGlobalBottom() {
-        return proccessVelocityTemplate("/WEB-INF/views/"+getTemplate()+"/mails/global_bot.vm");
+        return proccessVelocityTemplate("/WEB-INF/views/" + getTemplate() + "/mails/global_bot.vm");
     }
 
     public String mailBlock(String block) {
-        return proccessVelocityTemplate("/WEB-INF/views/"+getTemplate()+"/mails/"+ block +".vm");
+        return proccessVelocityTemplate("/WEB-INF/views/" + getTemplate() + "/mails/" + block + ".vm");
     }
 
-    public void mailSaveAndSend(Mail mail)
-    {
-        try
-        {
+    public void mailSaveAndSend(Mail mail) {
+        try {
             Session hSession = HibernateSessionFactory.getSessionAutoCommit(getDatabaseConfig());
             hSession.saveOrUpdate(mail);
             hSession.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         MailSenderThreat.asyncSendMail(mail, this);
