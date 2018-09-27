@@ -68,6 +68,10 @@ public class MUser {
         return  user.getWebsite();
     }
 
+    public String getLevelRequested() {
+        return  user.getLevelRequested();
+    }
+
     public String getCancelSubscriptionLink() {
         String url = getCancelSubscriptionUrl();
         StringBuilder b = new StringBuilder();
