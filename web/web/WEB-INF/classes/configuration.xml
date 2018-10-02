@@ -2,8 +2,8 @@
     <database id="caonline">
         <type>MySQL</type>
         <url>jdbc:mysql://127.0.0.1/factoryd?useSSL=false</url>
-        <user>root</user>
-        <password>root</password>
+        <user>factoryd</user>
+        <password>factoryd</password>
     </database>
     <commerce id="factd">
         <database>caonline</database>
