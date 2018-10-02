@@ -1,5 +1,6 @@
 package org.store.core.beans;
 
+import org.store.core.admin.AdminModuleAction;
 import org.store.core.globals.BaseAction;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -337,7 +338,7 @@ public class ShopCartItem extends BaseBean {
 
     public void initializeItem(BaseAction action) {
         if (action != null) {
-            boolean calculatePrice = true;//(this.getPriceOriginal() == null);
+            boolean calculatePrice = (!(action instanceof AdminModuleAction)) || (this.getPriceOriginal() == null);
             boolean needQuote = false;
             if (getComplement()!=null) {
                 Product c = (Product) action.getDao().get(Product.class, getComplement());
