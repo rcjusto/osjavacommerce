@@ -4,7 +4,6 @@ import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -839,9 +838,11 @@ public class GeneralAction extends FrontModuleAction {
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 setInputStream(bis);
                 setContentLength(String.valueOf(f.length()));
+                String contentType = SomeUtils.getMimeType(f.getName());
+                setContentType(contentType);
+
                 if (FilenameUtils.isExtension(f.getName(), "pdf")) {
                     setContentDisposition("inline; filename=\"" + resource.getFileName() + "\"");
-                    setContentType("application/pdf");
                 } else {
                     setContentDisposition("attachment; filename=\"" + resource.getFileName() + "\"");
                 }

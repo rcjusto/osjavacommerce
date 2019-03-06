@@ -8,6 +8,7 @@ import net.htmlparser.jericho.TextExtractor;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -444,6 +445,24 @@ public class SomeUtils {
             return isHuman;
         }
         return true;
+    }
+
+    public static String getMimeType(String fileName) {
+        String ext = FilenameUtils.getExtension(fileName);
+        if ("pdf".equalsIgnoreCase(ext)) return "application/pdf";
+        else if ("text".equalsIgnoreCase(ext)) return "text/plain";
+        else if ("html".equalsIgnoreCase(ext)) return "text/html";
+        else if ("doc".equalsIgnoreCase(ext)) return "application/msword";
+        else if ("docx".equalsIgnoreCase(ext)) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        else if ("xls".equalsIgnoreCase(ext)) return "application/vnd.ms-excel";
+        else if ("xlsx".equalsIgnoreCase(ext)) return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        else if ("ppt".equalsIgnoreCase(ext)) return "application/vnd.ms-powerpoint";
+        else if ("pptx".equalsIgnoreCase(ext)) return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+        else if ("gif".equalsIgnoreCase(ext)) return "image/gif";
+        else if ("png".equalsIgnoreCase(ext)) return "image/png";
+        else if ("jpg".equalsIgnoreCase(ext)) return "image/jpeg";
+        else if ("jpeg".equalsIgnoreCase(ext)) return "image/jpeg";
+        else return "application/octet-stream";
     }
 
 }
