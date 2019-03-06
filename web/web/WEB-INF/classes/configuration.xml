@@ -5,8 +5,14 @@
         <user>factoryd</user>
         <password>factoryd</password>
     </database>
-    <commerce id="factd">
-        <database>caonline</database>
-        <url domain="store2.local" path="caonline"/>
+    <database id="spanishb">
+        <type>MySQL</type>
+        <url>jdbc:mysql://127.0.0.1/spanishb?useSSL=false</url>
+        <user>spanishb</user>
+        <password>spanishb</password>
+    </database>
+    <commerce id="spanishb">
+        <database>spanishb</database>
+        <url domain="store2.local" path="spanishb"/>
     </commerce>
 </commerces>
